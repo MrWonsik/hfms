@@ -1,6 +1,5 @@
-package com.wasacz.hfms.security.userManagement;
+package com.wasacz.hfms.security;
 
-import com.wasacz.hfms.security.JwtTokenProvider;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,10 +20,10 @@ public class AuthService {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    public void authenticateUser(String email, String password) {
+    public void authenticateUser(String username, String password) {
         this.authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        email, password
+                        username, password
                 )
         );
 
