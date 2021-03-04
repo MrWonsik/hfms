@@ -3,6 +3,7 @@ package com.wasacz.hfms.security;
 import com.wasacz.hfms.persistence.User;
 import io.jsonwebtoken.*;
 import lombok.Builder;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -70,6 +71,7 @@ public class JwtTokenProvider {
     }
 
     @Builder
+    @Getter
     private static final class UserInfo {
         private final String id;
         private final String role;

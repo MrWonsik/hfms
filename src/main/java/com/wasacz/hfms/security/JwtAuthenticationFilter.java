@@ -1,5 +1,6 @@
 package com.wasacz.hfms.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,7 @@ import java.io.IOException;
 
 import static org.apache.logging.log4j.util.Strings.isNotBlank;
 
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -43,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         } catch (Exception ex) {
-            System.out.println("Could not set user authentication in security context: " + ex.getMessage()); //TODO: add logger!
+            log.warn("Could not set user authentication in security context: " + ex.getMessage());
         }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
@@ -52,6 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String getJwtFromRequest(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         if(StringUtils.hasText(token)) {
+            log.debug("Authorization header exists.");
             return token;
         }
         return null;

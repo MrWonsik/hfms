@@ -22,7 +22,7 @@ class UserRepositoryIntegrationTest {
     @Test
     public void whenFindByUsername_thenReturnUser() {
         //given
-        User user = User.builder().username("Test").password("secuirty_password").role(Role.USER).build();
+        User user = User.builder().username("Test").password("security_password").role(Role.ROLE_USER).build();
         entityManager.persist(user);
         entityManager.flush();
 

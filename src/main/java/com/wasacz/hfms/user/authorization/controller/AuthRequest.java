@@ -1,4 +1,4 @@
-package com.wasacz.hfms.controller;
+package com.wasacz.hfms.user.authorization.controller;
 
 
 import lombok.AllArgsConstructor;

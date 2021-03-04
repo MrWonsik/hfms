@@ -1,5 +1,5 @@
 package com.wasacz.hfms.persistence;
 
 public enum Role {
-    ADMIN, USER
+    ROLE_ADMIN, ROLE_USER
 }

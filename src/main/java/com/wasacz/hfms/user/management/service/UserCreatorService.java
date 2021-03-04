@@ -1,34 +1,39 @@
-package com.wasacz.hfms.service.userManagement;
+package com.wasacz.hfms.user.management.service;
 
-import com.wasacz.hfms.controller.userManagement.CreateUserRequest;
+import com.wasacz.hfms.user.management.controller.CreateUserRequest;
 import com.wasacz.hfms.persistence.Role;
 import com.wasacz.hfms.persistence.User;
 import com.wasacz.hfms.persistence.UserRepository;
+import com.wasacz.hfms.user.management.controller.CreateUserResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j //This is used to automatically append logger to class
+@Slf4j
 public class UserCreatorService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final CreateUserValidator createUserValidator;
+    private final UserCreatorValidator userCreatorValidator;
 
     private final UserRepository userRepository;
 
-    public UserCreatorService(PasswordEncoder passwordEncoder, UserRepository userRepository, CreateUserValidator createUserValidator) {
+    public UserCreatorService(PasswordEncoder passwordEncoder, UserRepository userRepository, UserCreatorValidator userCreatorValidator) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
-        this.createUserValidator = createUserValidator;
+        this.userCreatorValidator = userCreatorValidator;
     }
 
-    public void createUser(CreateUserRequest createUserRequest) {
-        // TODO: add validation for creating user (check if user with username already exists then throw exception)
-        createUserValidator.validate(createUserRequest);
+    public CreateUserResponse createUser(CreateUserRequest createUserRequest) {
+        userCreatorValidator.validate(createUserRequest);
         User createdUser = userRepository.save(buildUser(createUserRequest));
-        log.debug("User {} has been created with role: {}.", createUserRequest.getUsername(), createUserRequest.getRole()); // TODO: save log to file!
+        log.debug("User {} has been created with role: {}.", createUserRequest.getUsername(), createUserRequest.getRole());
+        return CreateUserResponse.builder()
+                .id(createdUser.getId())
+                .username(createdUser.getUsername())
+                .role(createdUser.getRole())
+                .build();
     }
 
     private User buildUser(CreateUserRequest createUserRequest) {
