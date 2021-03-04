@@ -26,7 +26,7 @@ public class UserCreatorValidator {
 
         if(userRepository.findByUsername(createUserRequest.getUsername()).isPresent()) {
             String msg = "Username is already used " + createUserRequest.getUsername() + "!";
-            log.info(msg);
+            log.debug(msg);
             throw new IllegalArgumentException(msg);
         }
     }

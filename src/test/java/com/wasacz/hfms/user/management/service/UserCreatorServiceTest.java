@@ -38,10 +38,10 @@ class UserCreatorServiceTest {
         String username = "Test";
         String password = "secure_password";
         String role = "ROLE_USER";
-        CreateUserRequest createUserRequest = new CreateUserRequest();
-        createUserRequest.setUsername(username);
-        createUserRequest.setPassword(password);
-        createUserRequest.setRole(role);
+        CreateUserRequest createUserRequest = CreateUserRequest.builder()
+                .username(username)
+                .password(password)
+                .role(role).build();
 
         User user = User.builder().username(username).password(password).role(Role.valueOf(role)).id(userId).build();
 

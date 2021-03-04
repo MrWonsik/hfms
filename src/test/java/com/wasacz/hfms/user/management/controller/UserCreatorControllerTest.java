@@ -83,11 +83,7 @@ class UserCreatorControllerTest {
     }
 
     private CreateUserRequest getCreateUserRequest() {
-        CreateUserRequest createUserRequest = new CreateUserRequest();
-        createUserRequest.setUsername("Username");
-        createUserRequest.setPassword("Password1@");
-        createUserRequest.setRole("ROLE_USER");
-        return createUserRequest;
+        return CreateUserRequest.builder().username("Username").password("Password1@").role("ROLE_USER").build();
     }
 
     public static String asJsonString(final Object obj) {

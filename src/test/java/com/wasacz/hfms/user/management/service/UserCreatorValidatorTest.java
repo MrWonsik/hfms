@@ -31,10 +31,7 @@ class UserCreatorValidatorTest {
     @Test
     public void whenValidateCreateUserRequest_givenAllCorrectFields_thenNoThrowException() {
         //given
-        CreateUserRequest createUserRequest = new CreateUserRequest();
-        createUserRequest.setUsername("Correct username");
-        createUserRequest.setPassword(CORRECT_PASSWORD);
-        createUserRequest.setRole("ROLE_USER");
+        CreateUserRequest createUserRequest = CreateUserRequest.builder().username("Username").password(CORRECT_PASSWORD).role("ROLE_USER").build();
         when(userRepository.findByUsername(createUserRequest.getUsername())).thenReturn(Optional.empty());
 
         //when
@@ -46,10 +43,8 @@ class UserCreatorValidatorTest {
         //given
         User user = mock(User.class);
 
-        CreateUserRequest createUserRequest = new CreateUserRequest();
-        createUserRequest.setUsername("username_that_already_used");
-        createUserRequest.setPassword(CORRECT_PASSWORD);
-        createUserRequest.setRole("ROLE_USER");
+        CreateUserRequest createUserRequest = CreateUserRequest.builder().username("username_that_already_used").password(CORRECT_PASSWORD).role("ROLE_USER").build();
+
         when(userRepository.findByUsername(createUserRequest.getUsername())).thenReturn(Optional.of(user));
 
         //when and then
@@ -59,10 +54,8 @@ class UserCreatorValidatorTest {
     @ParameterizedTest
     @NullAndEmptySource
     public void whenValdateCreateUserRequest_givenBlankUsername_thenThrowException(String username) {
-        CreateUserRequest createUserRequest = new CreateUserRequest();
-        createUserRequest.setUsername(username);
-        createUserRequest.setPassword(CORRECT_PASSWORD);
-        createUserRequest.setRole("ROLE_USER");
+        CreateUserRequest createUserRequest = CreateUserRequest.builder().username(username).password(CORRECT_PASSWORD).role("ROLE_USER").build();
+
 
         Assertions.assertThrows(IllegalStateException.class, () -> userCreatorValidator.validate(createUserRequest), "Username cannot be blank.");
     }
@@ -70,20 +63,16 @@ class UserCreatorValidatorTest {
     @ParameterizedTest
     @NullAndEmptySource
     public void whenValdateCreateUserRequest_givenBlankPassword_thenThrowException(String password) {
-        CreateUserRequest createUserRequest = new CreateUserRequest();
-        createUserRequest.setUsername("Username");
-        createUserRequest.setPassword(password);
-        createUserRequest.setRole("ROLE_USER");
+        CreateUserRequest createUserRequest = CreateUserRequest.builder().username("Username").password(password).role("ROLE_USER").build();
+
 
         Assertions.assertThrows(IllegalStateException.class, () -> userCreatorValidator.validate(createUserRequest), "Password cannot be blank.");
     }
 
     @Test
     public void whenValdateCreateUserRequest_givenPasswordThatNotMeetTheRules_thenThrowException() {
-        CreateUserRequest createUserRequest = new CreateUserRequest();
-        createUserRequest.setUsername("Username");
-        createUserRequest.setPassword("nie poprawne haslo");
-        createUserRequest.setRole("ROLE_USER");
+        CreateUserRequest createUserRequest = CreateUserRequest.builder().username("Username").password("nie poprawne haslo").role("ROLE_USER").build();
+
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> userCreatorValidator.validate(createUserRequest), "Password don't meet rules.");
     }
@@ -91,20 +80,16 @@ class UserCreatorValidatorTest {
     @ParameterizedTest
     @NullAndEmptySource
     public void whenValdateCreateUserRequest_givenBlankRole_thenThrowException(String role) {
-        CreateUserRequest createUserRequest = new CreateUserRequest();
-        createUserRequest.setUsername("username");
-        createUserRequest.setPassword(CORRECT_PASSWORD);
-        createUserRequest.setRole(role);
+        CreateUserRequest createUserRequest = CreateUserRequest.builder().username("Username").password(CORRECT_PASSWORD).role(role).build();
+
 
         Assertions.assertThrows(IllegalStateException.class, () -> userCreatorValidator.validate(createUserRequest), "Role cannot be blank.");
     }
 
     @Test
     public void whenValdateCreateUserRequest_givenRoleThatNotExists_thenThrowException() {
-        CreateUserRequest createUserRequest = new CreateUserRequest();
-        createUserRequest.setUsername("Username");
-        createUserRequest.setPassword(CORRECT_PASSWORD);
-        createUserRequest.setRole("ROLE_THAT_WILL_NEVER_EXISTS");
+        CreateUserRequest createUserRequest = CreateUserRequest.builder().username("Username").password(CORRECT_PASSWORD).role("ROLE_THAT_NOT_EXISTS").build();
+
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> userCreatorValidator.validate(createUserRequest), "Provided incorrect role.");
     }
