@@ -76,7 +76,7 @@ class UserCreatorControllerTest {
     @WithAnonymousUser
     public void whenCreateUserAsAnonymousUser_givenCreateUserRequest_thenReturnStatusUnauthorized() throws Exception {
         this.mockMvc.perform(post("/api/user")
-                .content(asJsonString( getCreateUserRequest()))
+                .content(asJsonString(getCreateUserRequest()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());

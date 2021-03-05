@@ -1,6 +1,6 @@
 package com.wasacz.hfms.user.authorization.controller;
 
-import com.wasacz.hfms.security.AuthService;
+import com.wasacz.hfms.user.authorization.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +23,6 @@ public class AuthController {
     public ResponseEntity<?> authenticateUser(@RequestBody AuthRequest authParam) {
         authService.authenticateUser(authParam.getUsername(), authParam.getPassword());
         String accessToken = authService.generateToken();
-        return ResponseEntity.ok(accessToken); //TODO: works on return token (maybe in header?)
+        return ResponseEntity.ok(accessToken);
     }
 }

@@ -1,5 +1,6 @@
-package com.wasacz.hfms.security;
+package com.wasacz.hfms.user.authorization.service;
 
+import com.wasacz.hfms.security.JwtTokenProvider;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
