@@ -9,10 +9,9 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class CreateUserResponse {
+public class UserResponse {
     private final Long id;
     private final String username;
+    private final Boolean isEnabled;
     private final Role role;
-
-
 }

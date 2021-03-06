@@ -31,18 +31,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = getJwtFromRequest(httpServletRequest);
 
-            if(isNotBlank(jwt) && jwtTokenProvider.validateToken(jwt)) {
+            if (isNotBlank(jwt) && jwtTokenProvider.validateToken(jwt)) {
                 Long userId = jwtTokenProvider.getUserIdFromJwt(jwt);
 
                 UserDetails userDetails = customUserDetailsService.loadUserById(userId);
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+                if (userDetails.isEnabled()) {
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
 
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
             }
         } catch (Exception ex) {
             log.warn("Could not set user authentication in security context: " + ex.getMessage());
@@ -53,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String getJwtFromRequest(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
-        if(StringUtils.hasText(token)) {
+        if (StringUtils.hasText(token)) {
             log.debug("Authorization header exists.");
             return token;
         }
