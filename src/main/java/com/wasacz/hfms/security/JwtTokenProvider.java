@@ -49,6 +49,7 @@ public class JwtTokenProvider {
         return UserInfo.builder()
                 .id(user.getId().toString())
                 .role(user.getRole().name())
+                .username(user.getUsername())
                 .build();
     }
 
@@ -75,5 +76,6 @@ public class JwtTokenProvider {
     private static final class UserInfo {
         private final String id;
         private final String role;
+        private final String username;
     }
 }

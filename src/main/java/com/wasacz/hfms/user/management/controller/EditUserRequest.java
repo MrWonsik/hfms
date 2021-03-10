@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class EditUserRequest implements ValidableRequest {
+public class EditUserRequest {
     private String password;
     private Boolean isEnabled;
 }

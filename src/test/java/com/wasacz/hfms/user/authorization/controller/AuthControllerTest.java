@@ -80,7 +80,8 @@ class AuthControllerTest {
                 .content(asJsonString(getAuthRequest("test", "Test123!@#")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Incorrect login or password."));
     }
 
     private AuthRequest getAuthRequest(String username, String password) {

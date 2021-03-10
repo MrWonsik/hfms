@@ -53,7 +53,7 @@ class UserManagementControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Username cannot be blank."));
+                .andExpect(status().reason("Username cannot be blank."));
     }
 
     @Test
@@ -66,7 +66,7 @@ class UserManagementControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Provided incorrect role."));
+                .andExpect(status().reason("Provided incorrect role."));
     }
 
     @Test
@@ -167,7 +167,7 @@ class UserManagementControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Password don't meet rules."));
+                .andExpect(status().reason("Password don't meet rules."));
     }
 
     @Test
@@ -180,7 +180,7 @@ class UserManagementControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("User with id 999999 not found."));
+                .andExpect(status().reason("User with id 999999 not found."));
     }
 
     @Test
@@ -203,7 +203,7 @@ class UserManagementControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("User with id 999999 not found."));
+                .andExpect(status().reason("User with id 999999 not found."));
     }
 
     @Test
