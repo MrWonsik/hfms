@@ -25,6 +25,7 @@ public class AppInitializer implements CommandLineRunner {
     public void run(String... args) {
         if (ddlAuto.equals("create")) {
             userManagementService.createUser(CreateUserRequest.builder().username("admin").password("Admin123!@").role("ROLE_ADMIN").build());
+            userManagementService.createUser(CreateUserRequest.builder().username("user").password("User123!@").role("ROLE_USER").build());
         }
     }
 }
