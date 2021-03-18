@@ -17,13 +17,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static com.wasacz.hfms.helpers.UserCreatorStatic.PASSWORD;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserValidatorTest {
-
-    private final String CORRECT_PASSWORD = "SuperTajneHaslo123@@@";
 
     @Mock
     private UserRepository userRepository;
@@ -34,7 +33,7 @@ class UserValidatorTest {
     @Test
     public void whenValidateCreateUserRequest_givenAllCorrectFields_thenNoThrowException() {
         //given
-        CreateUserRequest createUserRequest = CreateUserRequest.builder().username("Username").password(CORRECT_PASSWORD).role("ROLE_USER").build();
+        CreateUserRequest createUserRequest = CreateUserRequest.builder().username("Username").password(PASSWORD).role("ROLE_USER").build();
         when(userRepository.findByUsername(createUserRequest.getUsername())).thenReturn(Optional.empty());
 
         //when
@@ -46,7 +45,7 @@ class UserValidatorTest {
         //given
         User user = mock(User.class);
 
-        CreateUserRequest createUserRequest = CreateUserRequest.builder().username("username_that_already_used").password(CORRECT_PASSWORD).role("ROLE_USER").build();
+        CreateUserRequest createUserRequest = CreateUserRequest.builder().username("username_that_already_used").password(PASSWORD).role("ROLE_USER").build();
 
         when(userRepository.findByUsername(createUserRequest.getUsername())).thenReturn(Optional.of(user));
 
@@ -60,7 +59,7 @@ class UserValidatorTest {
     @ParameterizedTest
     @NullAndEmptySource
     public void whenValidateCreateUserRequest_givenBlankUsername_thenThrowException(String username) {
-        CreateUserRequest createUserRequest = CreateUserRequest.builder().username(username).password(CORRECT_PASSWORD).role("ROLE_USER").build();
+        CreateUserRequest createUserRequest = CreateUserRequest.builder().username(username).password(PASSWORD).role("ROLE_USER").build();
 
 
         Assertions.assertThrows(IllegalStateException.class,
@@ -90,7 +89,7 @@ class UserValidatorTest {
     @ParameterizedTest
     @NullAndEmptySource
     public void whenValidateCreateUserRequest_givenBlankRole_thenThrowException(String role) {
-        CreateUserRequest createUserRequest = CreateUserRequest.builder().username("Username").password(CORRECT_PASSWORD).role(role).build();
+        CreateUserRequest createUserRequest = CreateUserRequest.builder().username("Username").password(PASSWORD).role(role).build();
 
 
         Assertions.assertThrows(IllegalStateException.class, () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)),
@@ -99,7 +98,7 @@ class UserValidatorTest {
 
     @Test
     public void whenValidateCreateUserRequest_givenRoleThatNotExists_thenThrowException() {
-        CreateUserRequest createUserRequest = CreateUserRequest.builder().username("Username").password(CORRECT_PASSWORD).role("ROLE_THAT_NOT_EXISTS").build();
+        CreateUserRequest createUserRequest = CreateUserRequest.builder().username("Username").password(PASSWORD).role("ROLE_THAT_NOT_EXISTS").build();
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)),
                 "Provided incorrect role.");
@@ -123,8 +122,8 @@ class UserValidatorTest {
     public void whenValidateEditUserRequest_givenAllCorrectFields_thenNoThrowException() {
         //given
         long userId = 1L;
-        User user = User.builder().username("Username").password(CORRECT_PASSWORD).role(Role.ROLE_USER).id(userId).build();
-        EditUserRequest editUserRequest = EditUserRequest.builder().isEnabled(false).password(CORRECT_PASSWORD).build();
+        User user = User.builder().username("Username").password(PASSWORD).role(Role.ROLE_USER).id(userId).build();
+        EditUserRequest editUserRequest = EditUserRequest.builder().isEnabled(false).password(PASSWORD).build();
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         //when
@@ -135,7 +134,7 @@ class UserValidatorTest {
     public void whenValidateEditUserRequest_givenIsEnabledField_thenNoThrowException() {
         //given
         long userId = 1L;
-        User user = User.builder().username("Username").password(CORRECT_PASSWORD).role(Role.ROLE_USER).id(userId).build();
+        User user = User.builder().username("Username").password(PASSWORD).role(Role.ROLE_USER).id(userId).build();
         EditUserRequest editUserRequest = EditUserRequest.builder().isEnabled(false).build();
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
@@ -147,8 +146,8 @@ class UserValidatorTest {
     public void whenValidateEditUserRequest_givenPasswordField_thenNoThrowException() {
         //given
         long userId = 1L;
-        User user = User.builder().username("Username").password(CORRECT_PASSWORD).role(Role.ROLE_USER).id(userId).build();
-        EditUserRequest editUserRequest = EditUserRequest.builder().password(CORRECT_PASSWORD).build();
+        User user = User.builder().username("Username").password(PASSWORD).role(Role.ROLE_USER).id(userId).build();
+        EditUserRequest editUserRequest = EditUserRequest.builder().password(PASSWORD).build();
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         //when
@@ -159,7 +158,7 @@ class UserValidatorTest {
     public void whenValidateEditUserRequest_givenEmptyRequest_thenNoThrowException() {
         //given
         long userId = 1L;
-        User user = User.builder().username("Username").password(CORRECT_PASSWORD).role(Role.ROLE_USER).id(userId).build();
+        User user = User.builder().username("Username").password(PASSWORD).role(Role.ROLE_USER).id(userId).build();
         EditUserRequest editUserRequest = EditUserRequest.builder().build();
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
@@ -181,7 +180,7 @@ class UserValidatorTest {
     @Test
     public void whenValidateEditUserRequest_givenNullEditUserRequest_thenThrowException() {
         //given
-        User user = User.builder().username("Username").password(CORRECT_PASSWORD).role(Role.ROLE_USER).id(1L).build();
+        User user = User.builder().username("Username").password(PASSWORD).role(Role.ROLE_USER).id(1L).build();
 
         //when
         Assertions.assertThrows(InvalidValidateMethodArguments.class,

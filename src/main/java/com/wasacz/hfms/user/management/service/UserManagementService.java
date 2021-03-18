@@ -6,6 +6,7 @@ import com.wasacz.hfms.persistence.UserRepository;
 import com.wasacz.hfms.user.management.controller.CreateUserRequest;
 import com.wasacz.hfms.user.management.controller.EditUserRequest;
 import com.wasacz.hfms.user.management.controller.UserResponse;
+import com.wasacz.hfms.user.management.controller.UsersResponse;
 import com.wasacz.hfms.user.management.service.validator.UserCreateValidator;
 import com.wasacz.hfms.user.management.service.validator.UserDeleteValidator;
 import com.wasacz.hfms.user.management.service.validator.UserEditValidator;
@@ -14,7 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -28,6 +31,12 @@ public class UserManagementService {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.userValidator = userValidator;
+    }
+
+    public UsersResponse getAllUsers() {
+        List<User> allUsers = userRepository.findAll();
+        List<UserResponse> userLists = allUsers.stream().map(this::buildUserResponse).collect(Collectors.toList());
+        return UsersResponse.builder().users(userLists).build();
     }
 
     public UserResponse createUser(CreateUserRequest createUserRequest) {

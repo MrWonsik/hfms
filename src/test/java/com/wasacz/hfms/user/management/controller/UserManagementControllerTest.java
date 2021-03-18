@@ -14,8 +14,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static com.wasacz.hfms.helpers.ObjectMapperStatic.asJsonString;
+import static com.wasacz.hfms.helpers.UserCreatorStatic.callCreateUserEndpoint;
+import static com.wasacz.hfms.helpers.UserCreatorStatic.getCreateUserRequest;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -92,7 +94,7 @@ class UserManagementControllerTest {
     @Test
     @WithMockUser(authorities = "ROLE_ADMIN")
     public void whenEditUserAsRoleAdmin_givenEditUserRequest_thenReturnStatusOk() throws Exception {
-        MvcResult result = callCreateUserEndpoint("UserToEdit1");
+        MvcResult result = callCreateUserEndpoint(this.mockMvc, "UserToEdit1");
 
         var userId = objectMapper.readValue(result.getResponse().getContentAsString(), UserResponse.class).getId();
 
@@ -136,7 +138,7 @@ class UserManagementControllerTest {
     @Test
     @WithMockUser(authorities = "ROLE_ADMIN")
     public void whenEditUserAsRoleAdmin_givenEditUserRequestEmpty_thenReturnStatusOk() throws Exception {
-        MvcResult result = callCreateUserEndpoint("UserToEdit2");
+        MvcResult result = callCreateUserEndpoint(this.mockMvc, "UserToEdit2");
 
         var userId = objectMapper.readValue(result.getResponse().getContentAsString(), UserResponse.class).getId();
 
@@ -156,7 +158,7 @@ class UserManagementControllerTest {
     @Test
     @WithMockUser(authorities = "ROLE_ADMIN")
     public void whenEditUserAsRoleAdmin_givenEditUserRequestWithTooShortPassword_thenReturnStatusBadRequest() throws Exception {
-        MvcResult result = callCreateUserEndpoint("UserToEdit3");
+        MvcResult result = callCreateUserEndpoint(this.mockMvc, "UserToEdit3");
 
         var userId = objectMapper.readValue(result.getResponse().getContentAsString(), UserResponse.class).getId();
 
@@ -186,7 +188,7 @@ class UserManagementControllerTest {
     @Test
     @WithMockUser(authorities = "ROLE_ADMIN")
     public void whenDeleteUserAsRoleAdmin_givenCreatedUserId_thenReturnStatusOk() throws Exception {
-        MvcResult result = callCreateUserEndpoint("UserToDelete1");
+        MvcResult result = callCreateUserEndpoint(this.mockMvc, "UserToDelete1");
 
         var userId = objectMapper.readValue(result.getResponse().getContentAsString(), UserResponse.class).getId();
 
@@ -230,23 +232,15 @@ class UserManagementControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    private MvcResult callCreateUserEndpoint(String username) throws Exception {
-        return this.mockMvc.perform(post("/api/user")
-                .content(asJsonString(getCreateUserRequest(username)))
-                .contentType(MediaType.APPLICATION_JSON)
+    @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
+    public void whenGetAllUsers_thenReturnAllUsers() throws Exception {
+        callCreateUserEndpoint(this.mockMvc, "John");
+        callCreateUserEndpoint(this.mockMvc, "Artiem");
+        this.mockMvc.perform(get("/api/user/")
                 .accept(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.users").hasJsonPath());
     }
 
-    private CreateUserRequest getCreateUserRequest(String username) {
-        return CreateUserRequest.builder().username(username).password("Password1@").role("ROLE_USER").build();
-    }
-
-    public static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

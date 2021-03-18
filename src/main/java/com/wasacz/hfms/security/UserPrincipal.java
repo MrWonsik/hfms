@@ -20,7 +20,7 @@ public class UserPrincipal implements UserDetails {
         return new UserPrincipal(user);
     }
 
-    User getUser() {
+    public User getUser() {
         return this.user;
     }
 
