@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,7 +37,7 @@ public class UserManagementService {
 
     public UsersResponse getAllUsers() {
         List<User> allUsers = userRepository.findAll();
-        List<UserResponse> userLists = allUsers.stream().map(this::buildUserResponse).collect(Collectors.toList());
+        List<UserResponse> userLists = allUsers.stream().map(this::buildUserResponseWithDate).collect(Collectors.toList());
         return UsersResponse.builder().users(userLists).build();
     }
 
@@ -83,6 +85,17 @@ public class UserManagementService {
                 .username(user.getUsername())
                 .role(user.getRole())
                 .isEnabled(user.isEnabled())
+                .build();
+    }
+
+    private UserResponse buildUserResponseWithDate(User user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .role(user.getRole())
+                .isEnabled(user.isEnabled())
+                .createDate(LocalDate.ofInstant(user.getCreatedDate(), ZoneId.systemDefault()))
+                .updateDate(LocalDate.ofInstant(user.getLastModifiedDate(), ZoneId.systemDefault()))
                 .build();
     }
 
