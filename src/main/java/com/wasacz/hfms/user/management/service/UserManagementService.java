@@ -60,7 +60,7 @@ public class UserManagementService {
         userValidator.validate(id, editUserRequest, new UserEditValidator(userRepository));
         User userToUpdate = userRepository.getOne(id);
         if (Optional.ofNullable(editUserRequest.getPassword()).isPresent()) {
-            userToUpdate.setPassword(passwordEncoder.encode(userToUpdate.getPassword()));
+            userToUpdate.setPassword(passwordEncoder.encode(editUserRequest.getPassword()));
         }
         if (Optional.ofNullable(editUserRequest.getIsEnabled()).isPresent()) {
             userToUpdate.setEnabled(editUserRequest.getIsEnabled());
