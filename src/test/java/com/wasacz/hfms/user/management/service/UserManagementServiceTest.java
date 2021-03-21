@@ -6,6 +6,7 @@ import com.wasacz.hfms.persistence.UserRepository;
 import com.wasacz.hfms.user.management.controller.CreateUserRequest;
 import com.wasacz.hfms.user.management.controller.EditUserRequest;
 import com.wasacz.hfms.user.management.controller.UserResponse;
+import com.wasacz.hfms.user.management.controller.UsersResponse;
 import com.wasacz.hfms.user.management.service.validator.UserValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -141,5 +144,36 @@ class UserManagementServiceTest {
 
         //then
         assertEquals(userResponse.getId(), userId);
+    }
+
+    @Test
+    public void whenGetAllUser_thenReturnAllUsers() {
+        //given
+        User user1 = User.builder()
+                .username("username")
+                .password("superSecurePassword123!@!")
+                .role(Role.valueOf("ROLE_USER"))
+                .id(1L)
+                .build();
+        User user2 = User.builder()
+                .username("username2")
+                .password("superSecurePassword123!@!")
+                .role(Role.valueOf("ROLE_USER"))
+                .id(2L)
+                .build();
+        when(userRepository.findAll()).thenReturn(List.of(user1, user2));
+
+        //when
+        UsersResponse allUsers = userManagementService.getAllUsers();
+
+        //then
+        assertEquals(allUsers.getUsers().get(0).getId(), 1L);
+        assertEquals(allUsers.getUsers().get(0).getUsername(), "username");
+        assertEquals(allUsers.getUsers().get(0).getIsEnabled(), true);
+        assertEquals(allUsers.getUsers().get(0).getRole(), Role.ROLE_USER);
+        assertEquals(allUsers.getUsers().get(1).getId(), 2L);
+        assertEquals(allUsers.getUsers().get(1).getUsername(), "username2");
+        assertEquals(allUsers.getUsers().get(1).getIsEnabled(), true);
+        assertEquals(allUsers.getUsers().get(1).getRole(), Role.ROLE_USER);
     }
 }

@@ -23,6 +23,22 @@ public class ValidatorUtils {
         }
     }
 
+    static void isPasswordEquals(String newPassword, String repeatNewPassword) {
+        if(!newPassword.equals(repeatNewPassword)) {
+            String msg = "Passwords do not match.";
+            log.debug(msg);
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    static void isPasswordNotEquals(String newPassword, String oldPassword) {
+        if(newPassword.equals(oldPassword)) {
+            String msg = "New password cannot be the same as the old password.";
+            log.debug(msg);
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
     private static boolean isPasswordMeetRules(String password) {
         Pattern pattern = Pattern.compile(PASSWORD_REGEX_RULES);
         Matcher matcher = pattern.matcher(password);

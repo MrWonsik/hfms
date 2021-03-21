@@ -32,6 +32,12 @@ public class UserManagementController {
     @ExceptionHandler({InvalidValidateMethodArguments.class})
     public void handleServerErrors() {}
 
+    @GetMapping("")
+    @Secured({"ROLE_ADMIN"})
+    public ResponseEntity<?> getAllUsers() {
+        return ResponseEntity.status(HttpStatus.OK).body(userManagementService.getAllUsers());
+    }
+
     @PostMapping("")
     @Secured({"ROLE_ADMIN"})
     public ResponseEntity<?> createUser(@RequestBody CreateUserRequest user) {
