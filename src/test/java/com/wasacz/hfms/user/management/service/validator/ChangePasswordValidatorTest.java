@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static com.wasacz.hfms.helpers.UserCreatorStatic.PASSWORD;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class ChangePasswordValidatorTest {
@@ -39,9 +40,9 @@ class ChangePasswordValidatorTest {
         ChangePasswordRequest changePasswordRequest = ChangePasswordRequest.builder().oldPassword("incorrectOldPassword123!").newPassword("NewPassword!@#1").repeatedNewPassword("NewPassword!@#1").build();
 
         //when
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> changePasswordValidator.validate(passwordEncoder.encode(PASSWORD), changePasswordRequest),
-                "Incorrect old password.");
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> changePasswordValidator.validate(passwordEncoder.encode(PASSWORD), changePasswordRequest));
+        assertEquals("Incorrect old password.", exception.getMessage());
     }
 
     @Test
@@ -50,9 +51,9 @@ class ChangePasswordValidatorTest {
         ChangePasswordRequest changePasswordRequest = ChangePasswordRequest.builder().oldPassword(PASSWORD).newPassword("NewPassword!@#1").repeatedNewPassword("OtherNwePassword123!").build();
 
         //when
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> changePasswordValidator.validate(passwordEncoder.encode(PASSWORD), changePasswordRequest),
-                "Passwords do not match.");
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> changePasswordValidator.validate(passwordEncoder.encode(PASSWORD), changePasswordRequest));
+        assertEquals("Passwords do not match.", exception.getMessage());
     }
 
 
@@ -62,8 +63,8 @@ class ChangePasswordValidatorTest {
         ChangePasswordRequest changePasswordRequest = ChangePasswordRequest.builder().oldPassword(PASSWORD).newPassword(PASSWORD).repeatedNewPassword(PASSWORD).build();
 
         //when
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> changePasswordValidator.validate(passwordEncoder.encode(PASSWORD), changePasswordRequest),
-                "New password cannot be the same as the old password.");
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> changePasswordValidator.validate(passwordEncoder.encode(PASSWORD), changePasswordRequest));
+        assertEquals("New password cannot be the same as the old password.", exception.getMessage());
     }
 }
