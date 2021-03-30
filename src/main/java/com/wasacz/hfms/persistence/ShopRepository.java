@@ -10,7 +10,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 
     Optional<Shop> findByShopNameAndUser(String name, User user);
 
-    Optional<List<Shop>> findAllByUser(User user);
+    Optional<List<Shop>> findAllByUserAndIsDeletedFalse(User user);
 
     Optional<Shop> findByIdAndUser(Long id, User user);
 }

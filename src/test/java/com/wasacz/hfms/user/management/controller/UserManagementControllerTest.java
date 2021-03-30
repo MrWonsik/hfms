@@ -193,7 +193,6 @@ class UserManagementControllerTest {
         var userId = objectMapper.readValue(result.getResponse().getContentAsString(), UserResponse.class).getId();
 
         this.mockMvc.perform(delete("/api/user/" + userId)
-                .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -202,7 +201,6 @@ class UserManagementControllerTest {
     @WithMockUser(authorities = "ROLE_ADMIN")
     public void whenDeleteUserAsRoleAdmin_givenIncorrectUserId_thenReturnStatusBadRequest() throws Exception {
         this.mockMvc.perform(delete("/api/user/999999")
-                .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason("User with id 999999 not found."));

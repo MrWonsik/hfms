@@ -1,15 +1,13 @@
 package com.wasacz.hfms.expense.controller;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ShopsResponse {
-    private final List<ShopResponse> shops;
+    private List<ShopResponse> shops;
 }

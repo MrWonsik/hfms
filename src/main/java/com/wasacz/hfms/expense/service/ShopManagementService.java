@@ -23,14 +23,14 @@ public class ShopManagementService {
         this.shopRepository = shopRepository;
     }
 
-    public ShopsResponse getAllShops(User user) {
-        List<Shop> shops = shopRepository.findAllByUser(user).orElse(Collections.emptyList());
-        List<ShopResponse> shopResponseList = shops.stream().map(this::getShopResponse).collect(Collectors.toList());
-        return ShopsResponse.builder().shops(shopResponseList).build();
+    public ShopsResponse getAllNotDeletedShops(User user) {
+        List<Shop> shops = shopRepository.findAllByUserAndIsDeletedFalse(user).orElse(Collections.emptyList());
+        return new ShopsResponse(shops.stream().map(this::getShopResponse).collect(Collectors.toList()));
     }
 
     private ShopResponse getShopResponse(Shop shop) {
         return ShopResponse.builder()
+                .id(shop.getId())
                 .shopName(shop.getShopName())
                 .isDeleted(shop.isDeleted())
                 .createDate(LocalDate.ofInstant(shop.getCreatedDate(), ZoneId.systemDefault()))

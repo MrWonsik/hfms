@@ -5,8 +5,6 @@ import com.wasacz.hfms.expense.controller.ShopResponse;
 import com.wasacz.hfms.persistence.Shop;
 import com.wasacz.hfms.persistence.ShopRepository;
 import com.wasacz.hfms.persistence.User;
-import com.wasacz.hfms.user.management.service.validator.UserCreateValidator;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ShopManagementServiceTest {
+    final String SHOP_NAME = "Ikea";
 
     @Mock
     private ShopRepository shopRepository;
@@ -31,8 +30,8 @@ class ShopManagementServiceTest {
     @Test
     public void whenAddNewShop_givenNewShopRequest_thenSaveShop() {
         //given
-        final String SHOP_NAME = "Ikea";
-        NewShopRequest newShopRequest = NewShopRequest.builder().shopName(SHOP_NAME).build();
+        NewShopRequest newShopRequest = new NewShopRequest();
+        newShopRequest.setShopName(SHOP_NAME);
         User user = User.builder().id(1L).username("Test").build();
 
         Shop ikeaShop = Shop.builder().shopName(SHOP_NAME).user(user).isDeleted(false).build();
@@ -50,8 +49,8 @@ class ShopManagementServiceTest {
     @Test
     public void whenAddNewShop_givenNewShopRequestWithNameThatAlreadyExists_thenThrowException() {
         //given
-        final String SHOP_NAME = "Ikea";
-        NewShopRequest newShopRequest = NewShopRequest.builder().shopName(SHOP_NAME).build();
+        NewShopRequest newShopRequest = new NewShopRequest();
+        newShopRequest.setShopName(SHOP_NAME);
         User user = User.builder().id(1L).username("Test").build();
 
         Shop ikeaShop = Shop.builder().shopName(SHOP_NAME).user(user).isDeleted(false).build();
@@ -67,7 +66,6 @@ class ShopManagementServiceTest {
     @Test
     public void whenDeleteShop_givenShopId_thenSetShopAsDeleted() {
         //given
-        final String SHOP_NAME = "Ikea";
         User user = User.builder().id(1L).username("Test").build();
 
         Shop ikeaShopBeforeDeleted = Shop.builder().id(1L).shopName(SHOP_NAME).user(user).isDeleted(false).build();

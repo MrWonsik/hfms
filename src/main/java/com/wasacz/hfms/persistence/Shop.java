@@ -3,7 +3,6 @@ package com.wasacz.hfms.persistence;
 import com.sun.istack.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -20,7 +19,7 @@ public class Shop {
     private Long id;
 
     @NotNull
-    @Column(unique = true, updatable = false)
+    @Column(updatable = false)
     private String shopName;
 
     @NotNull

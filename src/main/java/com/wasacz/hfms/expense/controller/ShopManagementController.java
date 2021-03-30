@@ -31,7 +31,7 @@ public class ShopManagementController {
 
     @PostMapping("/")
     @Secured({"ROLE_USER"})
-    public ResponseEntity<?> addShop(@CurrentUser UserPrincipal user, NewShopRequest newShopRequest) {
+    public ResponseEntity<?> addShop(@CurrentUser UserPrincipal user, @RequestBody NewShopRequest newShopRequest) {
         ShopResponse shopResponse = shopManagementService.addNewShop(newShopRequest, user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(shopResponse);
     }
@@ -46,6 +46,6 @@ public class ShopManagementController {
     @GetMapping("/")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> getAllShopsByUser(@CurrentUser UserPrincipal user) {
-        return ResponseEntity.status(HttpStatus.OK).body(shopManagementService.getAllShops(user.getUser()));
+        return ResponseEntity.status(HttpStatus.OK).body(shopManagementService.getAllNotDeletedShops(user.getUser()));
     }
 }
