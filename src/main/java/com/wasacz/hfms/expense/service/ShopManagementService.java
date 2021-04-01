@@ -1,6 +1,6 @@
 package com.wasacz.hfms.expense.service;
 
-import com.wasacz.hfms.expense.controller.NewShopRequest;
+import com.wasacz.hfms.expense.controller.CreateShopRequest;
 import com.wasacz.hfms.expense.controller.ShopResponse;
 import com.wasacz.hfms.expense.controller.ShopsResponse;
 import com.wasacz.hfms.persistence.Shop;
@@ -9,6 +9,7 @@ import com.wasacz.hfms.persistence.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
@@ -34,12 +35,13 @@ public class ShopManagementService {
                 .shopName(shop.getShopName())
                 .isDeleted(shop.isDeleted())
                 .createDate(LocalDate.ofInstant(shop.getCreatedDate(), ZoneId.systemDefault()))
+                .createTime(LocalTime.ofInstant(shop.getCreatedDate(), ZoneId.systemDefault()))
                 .build();
     }
 
-    public ShopResponse addNewShop(NewShopRequest newShopRequest, User user) {
-        validateNewShopName(newShopRequest.getShopName(), user);
-        Shop savedShop = shopRepository.save(Shop.builder().shopName(newShopRequest.getShopName()).user(user).build());
+    public ShopResponse addNewShop(CreateShopRequest createShopRequest, User user) {
+        ShopValidator.validate(createShopRequest);
+        Shop savedShop = shopRepository.save(Shop.builder().shopName(createShopRequest.getShopName()).user(user).build());
         return getShopResponse(savedShop);
     }
 
@@ -48,12 +50,6 @@ public class ShopManagementService {
         shop.setDeleted(true);
         Shop deletedShop = shopRepository.save(shop);
         return getShopResponse(deletedShop);
-    }
-
-    private void validateNewShopName(String shopName, User user) {
-        if(shopRepository.findByShopNameAndUser(shopName, user).isPresent()) {
-            throw new IllegalArgumentException("Shop with this name exist.");
-        }
     }
 
 }

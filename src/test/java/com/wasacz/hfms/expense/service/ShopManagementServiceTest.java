@@ -1,12 +1,14 @@
 package com.wasacz.hfms.expense.service;
 
-import com.wasacz.hfms.expense.controller.NewShopRequest;
+import com.wasacz.hfms.expense.controller.CreateShopRequest;
 import com.wasacz.hfms.expense.controller.ShopResponse;
 import com.wasacz.hfms.persistence.Shop;
 import com.wasacz.hfms.persistence.ShopRepository;
 import com.wasacz.hfms.persistence.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -30,36 +32,33 @@ class ShopManagementServiceTest {
     @Test
     public void whenAddNewShop_givenNewShopRequest_thenSaveShop() {
         //given
-        NewShopRequest newShopRequest = new NewShopRequest();
-        newShopRequest.setShopName(SHOP_NAME);
+        CreateShopRequest createShopRequest = new CreateShopRequest();
+        createShopRequest.setShopName(SHOP_NAME);
         User user = User.builder().id(1L).username("Test").build();
 
         Shop ikeaShop = Shop.builder().shopName(SHOP_NAME).user(user).isDeleted(false).build();
-        when(shopRepository.findByShopNameAndUser(SHOP_NAME, user)).thenReturn(Optional.empty());
         when(shopRepository.save(any(Shop.class))).thenReturn(ikeaShop);
 
         //when
-        ShopResponse shopResponse = shopManagementService.addNewShop(newShopRequest, user);
+        ShopResponse shopResponse = shopManagementService.addNewShop(createShopRequest, user);
 
         //then
         assertEquals(shopResponse.getShopName(), ikeaShop.getShopName());
         assertFalse(shopResponse.isDeleted());
     }
 
-    @Test
-    public void whenAddNewShop_givenNewShopRequestWithNameThatAlreadyExists_thenThrowException() {
+    @ParameterizedTest
+    @NullAndEmptySource
+    public void whenAddNewShop_givenNewShopRequestWithEmptyName_thenThrowException(String shopName) {
         //given
-        NewShopRequest newShopRequest = new NewShopRequest();
-        newShopRequest.setShopName(SHOP_NAME);
+        CreateShopRequest createShopRequest = new CreateShopRequest();
+        createShopRequest.setShopName(shopName);
         User user = User.builder().id(1L).username("Test").build();
 
-        Shop ikeaShop = Shop.builder().shopName(SHOP_NAME).user(user).isDeleted(false).build();
-        when(shopRepository.findByShopNameAndUser(SHOP_NAME, user)).thenReturn(Optional.of(ikeaShop));
-
         //then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> shopManagementService.addNewShop(newShopRequest, user));
-        assertEquals(exception.getMessage(), "Shop with this name exist.");
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> shopManagementService.addNewShop(createShopRequest, user));
+        assertEquals(exception.getMessage(), "shopName cannot be blank.");
     }
 
 

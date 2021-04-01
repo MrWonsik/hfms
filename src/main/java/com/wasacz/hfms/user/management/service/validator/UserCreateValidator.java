@@ -2,6 +2,7 @@ package com.wasacz.hfms.user.management.service.validator;
 
 import com.wasacz.hfms.persistence.UserRepository;
 import com.wasacz.hfms.user.management.controller.CreateUserRequest;
+import com.wasacz.hfms.utils.ValidatorUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -22,8 +23,8 @@ public class UserCreateValidator implements ValidatorStrategy {
         }
         CreateUserRequest createUserRequest = (CreateUserRequest) request;
         ValidatorUtils.isFieldBlank(createUserRequest.getUsername(), "Username");
-        ValidatorUtils.validatePassword(createUserRequest.getPassword());
-        ValidatorUtils.validateRole(createUserRequest.getRole());
+        UserValidator.validatePassword(createUserRequest.getPassword());
+        UserValidator.validateRole(createUserRequest.getRole());
 
         if (userRepository.findByUsername(createUserRequest.getUsername()).isPresent()) {
             String msg = "Username is already used " + createUserRequest.getUsername() + "!";

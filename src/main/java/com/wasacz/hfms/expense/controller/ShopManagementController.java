@@ -23,7 +23,7 @@ public class ShopManagementController {
         this.shopManagementService = shopManagementService;
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
     public void handleValidationExceptions(RuntimeException ex, HttpServletResponse response) throws IOException {
         log.debug("API layer validation errors: {}", ex.getMessage());
         response.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
@@ -31,8 +31,8 @@ public class ShopManagementController {
 
     @PostMapping("/")
     @Secured({"ROLE_USER"})
-    public ResponseEntity<?> addShop(@CurrentUser UserPrincipal user, @RequestBody NewShopRequest newShopRequest) {
-        ShopResponse shopResponse = shopManagementService.addNewShop(newShopRequest, user.getUser());
+    public ResponseEntity<?> addShop(@CurrentUser UserPrincipal user, @RequestBody CreateShopRequest createShopRequest) {
+        ShopResponse shopResponse = shopManagementService.addNewShop(createShopRequest, user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(shopResponse);
     }
 

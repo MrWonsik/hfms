@@ -1,6 +1,7 @@
 package com.wasacz.hfms.user.management.service.validator;
 
 import com.wasacz.hfms.user.management.controller.ChangePasswordRequest;
+import com.wasacz.hfms.utils.ValidatorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -22,8 +23,8 @@ public class ChangePasswordValidator {
             throw new IllegalArgumentException(msg);
         };
 
-        ValidatorUtils.isPasswordEquals(changePasswordRequest.getNewPassword(), changePasswordRequest.getRepeatedNewPassword());
-        ValidatorUtils.isPasswordNotEquals(changePasswordRequest.getNewPassword(), changePasswordRequest.getOldPassword());
-        ValidatorUtils.validatePassword(changePasswordRequest.getNewPassword());
+        UserValidator.isPasswordEquals(changePasswordRequest.getNewPassword(), changePasswordRequest.getRepeatedNewPassword());
+        UserValidator.isPasswordNotEquals(changePasswordRequest.getNewPassword(), changePasswordRequest.getOldPassword());
+        UserValidator.validatePassword(changePasswordRequest.getNewPassword());
     }
 }

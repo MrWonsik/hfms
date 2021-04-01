@@ -49,7 +49,7 @@ class ShopManagementControllerTest {
     @WithMockUser(username = "user", authorities = "ROLE_USER")
     public void whenAddShop_givenNewShopRequest_thenReturnOkStatus() throws Exception {
         //given
-        NewShopRequest ikea = new NewShopRequest();
+        CreateShopRequest ikea = new CreateShopRequest();
         ikea.setShopName("ikea");
         this.mockMvc.perform(post("/api/shop/").with(user(currentUser))
                 .content(asJsonString(ikea))
@@ -61,29 +61,23 @@ class ShopManagementControllerTest {
 
     @Test
     @WithMockUser(username = "user", authorities = "ROLE_USER")
-    public void whenAddShopsWithTheSameNameAsTheSameUser_thenReturnBadRequestStatus() throws Exception {
+    public void whenAddShopsWithEmptyRequestBody_thenReturnBadRequestStatus() throws Exception {
         //given
-        NewShopRequest ikea = new NewShopRequest();
-        ikea.setShopName("ikea2");
-        this.mockMvc.perform(post("/api/shop/").with(user(currentUser))
-                .content(asJsonString(ikea))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        CreateShopRequest ikea = new CreateShopRequest();
 
         this.mockMvc.perform(post("/api/shop/").with(user(currentUser))
                 .content(asJsonString(ikea))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("Shop with this name exist."));
+                .andExpect(status().reason("shopName cannot be blank."));
     }
 
     @Test
     @WithMockUser(username = "user", authorities = "ROLE_USER")
     public void whenAddShopsWithTheSameNameAsDifferentUser_thenReturnOkStatus() throws Exception {
         //given
-        NewShopRequest ikea = new NewShopRequest();
+        CreateShopRequest ikea = new CreateShopRequest();
         ikea.setShopName("ikea3");
         this.mockMvc.perform(post("/api/shop/").with(user(currentUser))
                 .content(asJsonString(ikea))
@@ -103,7 +97,7 @@ class ShopManagementControllerTest {
     @WithMockUser(username = "user", authorities = "ROLE_USER")
     public void whenDeleteShop_thenReturnOkStatus() throws Exception {
         //given
-        NewShopRequest ikea = new NewShopRequest();
+        CreateShopRequest ikea = new CreateShopRequest();
         ikea.setShopName("ikea4");
 
         ShopResponse shopResponse = objectMapper.readValue(createNewShop(ikea).getResponse().getContentAsString(), ShopResponse.class);
@@ -116,9 +110,9 @@ class ShopManagementControllerTest {
     @WithMockUser(username = "user", authorities = "ROLE_USER")
     public void whenGetAllShops_thenReturnOkStatusAndOnlyNotDeletedShop() throws Exception {
         //given
-        NewShopRequest ikea = new NewShopRequest();
+        CreateShopRequest ikea = new CreateShopRequest();
         ikea.setShopName("ikea5");
-        NewShopRequest ikea2 = new NewShopRequest();
+        CreateShopRequest ikea2 = new CreateShopRequest();
         ikea.setShopName("ikea6");
 
         MvcResult newShop = createNewShop(ikea);
@@ -150,7 +144,7 @@ class ShopManagementControllerTest {
         assertTrue(shopsListResponse.isEmpty());
     }
 
-    private MvcResult createNewShop(NewShopRequest ikea) throws Exception {
+    private MvcResult createNewShop(CreateShopRequest ikea) throws Exception {
         return this.mockMvc.perform(post("/api/shop/").with(user(currentUser))
                 .content(asJsonString(ikea))
                 .contentType(MediaType.APPLICATION_JSON)

@@ -5,8 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NewShopRequest {
-    public NewShopRequest() {
+public class CreateShopRequest {
+    public CreateShopRequest() {
     }
 
     private String shopName;
