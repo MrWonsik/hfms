@@ -36,4 +36,11 @@ public class ExpenseCategoryManagementController {
         return ResponseEntity.status(HttpStatus.OK).body(expenseCategoryResponse);
     }
 
+    @GetMapping("/")
+    @Secured({"ROLE_USER"})
+    public ResponseEntity<?> getAllExpenseCategory(@CurrentUser UserPrincipal user) {
+        ExpenseCategoriesResponse expenseCategoryResponse = expenseCategoryManagementService.getAllExpenseCategory(user.getUser());
+        return ResponseEntity.status(HttpStatus.OK).body(expenseCategoryResponse);
+    }
+
 }

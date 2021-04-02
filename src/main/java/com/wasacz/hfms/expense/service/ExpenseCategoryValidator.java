@@ -9,7 +9,7 @@ public class ExpenseCategoryValidator {
 
     public static void validate(CreateExpenseCategoryRequest createRequest) {
         validateName(createRequest.getCategoryName());
-        validateHexColor(createRequest.getHexColor());
+        validateHexColor(createRequest.getColorHex());
     }
 
     private static void validateName(String categoryName) {

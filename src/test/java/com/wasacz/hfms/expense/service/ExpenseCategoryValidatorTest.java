@@ -16,7 +16,7 @@ class ExpenseCategoryValidatorTest {
         //given
         CreateExpenseCategoryRequest createExpenseCategoryRequest = CreateExpenseCategoryRequest.builder()
                 .categoryName("CategoryName")
-                .hexColor("#123123")
+                .colorHex("#123123")
                 .isFavourite(true)
                 .build();
 
@@ -41,7 +41,7 @@ class ExpenseCategoryValidatorTest {
         //given
         CreateExpenseCategoryRequest createExpenseCategoryRequest = CreateExpenseCategoryRequest.builder()
                 .categoryName("CategoryName")
-                .hexColor("#1")
+                .colorHex("#1")
                 .isFavourite(true)
                 .build();
 

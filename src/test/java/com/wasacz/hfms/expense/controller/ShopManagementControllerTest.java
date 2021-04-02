@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -46,7 +45,6 @@ class ShopManagementControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "user", authorities = "ROLE_USER")
     public void whenAddShop_givenNewShopRequest_thenReturnOkStatus() throws Exception {
         //given
         CreateShopRequest ikea = new CreateShopRequest();
@@ -60,7 +58,6 @@ class ShopManagementControllerTest {
 
 
     @Test
-    @WithMockUser(username = "user", authorities = "ROLE_USER")
     public void whenAddShopsWithEmptyRequestBody_thenReturnBadRequestStatus() throws Exception {
         //given
         CreateShopRequest ikea = new CreateShopRequest();
@@ -74,7 +71,6 @@ class ShopManagementControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "user", authorities = "ROLE_USER")
     public void whenAddShopsWithTheSameNameAsDifferentUser_thenReturnOkStatus() throws Exception {
         //given
         CreateShopRequest ikea = new CreateShopRequest();
@@ -94,7 +90,6 @@ class ShopManagementControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "user", authorities = "ROLE_USER")
     public void whenDeleteShop_thenReturnOkStatus() throws Exception {
         //given
         CreateShopRequest ikea = new CreateShopRequest();
@@ -107,7 +102,6 @@ class ShopManagementControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "user", authorities = "ROLE_USER")
     public void whenGetAllShops_thenReturnOkStatusAndOnlyNotDeletedShop() throws Exception {
         //given
         CreateShopRequest ikea = new CreateShopRequest();
@@ -132,7 +126,6 @@ class ShopManagementControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "user", authorities = "ROLE_USER")
     public void whenGetAllShopsForNewUSer_thenReturnOkStatusAndEmptyListResponse() throws Exception {
         //given
         MvcResult shops = this.mockMvc.perform(get("/api/shop/").with(user(currentUserMock.getCurrentUser("New_user", Role.ROLE_USER)))

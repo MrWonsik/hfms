@@ -8,10 +8,10 @@ import lombok.*;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExpenseCategoryResponse {
-    private final Long id;
+    private final long id;
     private final String categoryName;
-    private final String hexColor;
-    private final Boolean isFavourite;
+    private final String colorHex;
+    private final boolean isFavourite;
     private final boolean isDeleted;
     private final DateTime createDate;
 

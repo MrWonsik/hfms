@@ -31,9 +31,11 @@ public class ExpenseCategory {
     private String colorHex;
 
     @NotNull
+    @Builder.Default
     private Boolean isDeleted = false;
 
     @NotNull
+    @Builder.Default
     private Boolean isFavourite = false;
 
     @CreatedDate
