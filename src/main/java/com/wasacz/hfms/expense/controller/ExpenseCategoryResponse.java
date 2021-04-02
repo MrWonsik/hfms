@@ -1,10 +1,7 @@
 package com.wasacz.hfms.expense.controller;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.wasacz.hfms.utils.date.DateTime;
 import lombok.*;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -16,9 +13,6 @@ public class ExpenseCategoryResponse {
     private final String hexColor;
     private final Boolean isFavourite;
     private final boolean isDeleted;
-    @JsonFormat(pattern="yyyy-MM-dd")
-    private final LocalDate createDate;
-    @JsonFormat(pattern="HH:mm:ss")
-    private final LocalTime createTime;
+    private final DateTime createDate;
 
 }

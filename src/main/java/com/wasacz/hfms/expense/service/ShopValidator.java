@@ -10,6 +10,6 @@ public class ShopValidator {
     }
 
     private static void validateName(String shopName) {
-        ValidatorUtils.isFieldBlank(shopName, "shopName");
+        ValidatorUtils.handleFieldBlank(shopName, "shopName");
     }
 }

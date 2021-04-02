@@ -1,5 +1,6 @@
 package com.wasacz.hfms.expense.service;
 
+import com.wasacz.hfms.utils.date.DateTime;
 import com.wasacz.hfms.expense.controller.CreateShopRequest;
 import com.wasacz.hfms.expense.controller.ShopResponse;
 import com.wasacz.hfms.expense.controller.ShopsResponse;
@@ -8,9 +9,6 @@ import com.wasacz.hfms.persistence.ShopRepository;
 import com.wasacz.hfms.persistence.User;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,8 +32,7 @@ public class ShopManagementService {
                 .id(shop.getId())
                 .shopName(shop.getShopName())
                 .isDeleted(shop.isDeleted())
-                .createDate(LocalDate.ofInstant(shop.getCreatedDate(), ZoneId.systemDefault()))
-                .createTime(LocalTime.ofInstant(shop.getCreatedDate(), ZoneId.systemDefault()))
+                .createDate(new DateTime(shop.getCreatedDate()))
                 .build();
     }
 

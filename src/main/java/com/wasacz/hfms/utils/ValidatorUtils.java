@@ -12,7 +12,7 @@ import static org.apache.logging.log4j.util.Strings.isBlank;
 @Slf4j
 public class ValidatorUtils {
 
-    public static void isFieldBlank(String field, String fieldName) {
+    public static void handleFieldBlank(String field, String fieldName) {
         if (isBlank(field)) {
             String message = fieldName + " cannot be blank.";
             log.debug(message);

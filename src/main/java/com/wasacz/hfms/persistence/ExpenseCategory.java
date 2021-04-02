@@ -20,7 +20,7 @@ public class ExpenseCategory {
     private Long id;
 
     @NotNull
-    @Column(unique = true, updatable = false)
+    @Column(updatable = false)
     private String categoryName;
 
     @NotNull

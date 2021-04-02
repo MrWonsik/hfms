@@ -22,7 +22,7 @@ public class UserCreateValidator implements ValidatorStrategy {
             throw new InvalidValidateMethodArguments(msg);
         }
         CreateUserRequest createUserRequest = (CreateUserRequest) request;
-        ValidatorUtils.isFieldBlank(createUserRequest.getUsername(), "Username");
+        ValidatorUtils.handleFieldBlank(createUserRequest.getUsername(), "Username");
         UserValidator.validatePassword(createUserRequest.getPassword());
         UserValidator.validateRole(createUserRequest.getRole());
 

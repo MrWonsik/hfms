@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.wasacz.hfms.utils.ValidatorUtils.isFieldBlank;
+import static com.wasacz.hfms.utils.ValidatorUtils.handleFieldBlank;
 
 @Component
 @Slf4j
@@ -21,7 +21,7 @@ public class UserValidator {
     private final static String PASSWORD_REGEX_RULES = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,30}$";
 
     static void validatePassword(String password) {
-        isFieldBlank(password, "Password");
+        handleFieldBlank(password, "Password");
         if (!isPasswordMeetRules(password)) {
             String msg = "Password don't meet rules.";
             log.debug(msg);
@@ -52,7 +52,7 @@ public class UserValidator {
     }
 
     static void validateRole(String role) {
-        isFieldBlank(role, "Role");
+        handleFieldBlank(role, "Role");
 
         if (!EnumUtils.isValidEnum(Role.class, role)) {
             String msg = "Provided incorrect role.";
