@@ -43,7 +43,7 @@ public class ShopManagementService {
     }
 
     public ShopResponse deleteShop(Long shopId, User user) {
-        Shop shop = shopRepository.findByIdAndUser(shopId, user).orElseThrow(() -> new IllegalArgumentException("Shop not found."));
+        Shop shop = shopRepository.findByIdAndUserAndIsDeletedFalse(shopId, user).orElseThrow(() -> new IllegalArgumentException("Shop not found."));
         shop.setDeleted(true);
         Shop deletedShop = shopRepository.save(shop);
         return getShopResponse(deletedShop);

@@ -10,4 +10,7 @@ import java.util.Optional;
 public interface ExpenseCategoryRepository extends JpaRepository<ExpenseCategory, Long> {
 
      Optional<List<ExpenseCategory>> findAllByUserAndIsDeletedFalse(User user);
+
+     Optional<ExpenseCategory> findByIdAndUserAndIsDeletedFalse(long id, User user);
+
 }

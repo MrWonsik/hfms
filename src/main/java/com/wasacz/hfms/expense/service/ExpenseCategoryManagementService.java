@@ -1,10 +1,7 @@
 package com.wasacz.hfms.expense.service;
 
-import com.wasacz.hfms.expense.controller.ExpenseCategoriesResponse;
-import com.wasacz.hfms.expense.controller.ShopsResponse;
+import com.wasacz.hfms.expense.controller.*;
 import com.wasacz.hfms.utils.date.DateTime;
-import com.wasacz.hfms.expense.controller.CreateExpenseCategoryRequest;
-import com.wasacz.hfms.expense.controller.ExpenseCategoryResponse;
 import com.wasacz.hfms.persistence.ExpenseCategory;
 import com.wasacz.hfms.persistence.ExpenseCategoryRepository;
 import com.wasacz.hfms.persistence.User;
@@ -52,5 +49,23 @@ public class ExpenseCategoryManagementService {
     public ExpenseCategoriesResponse getAllExpenseCategory(User user) {
         List<ExpenseCategory> expenseCategories = expenseCategoryRepository.findAllByUserAndIsDeletedFalse(user).orElse(Collections.emptyList());
         return new ExpenseCategoriesResponse(expenseCategories.stream().map(this::getExpenseCategoryResponse).collect(Collectors.toList()));
+    }
+
+    public ExpenseCategoryResponse editExpenseCategory(long expenseCategoryId, EditExpenseCategoryRequest editExpenseCategoryRequest, User user) {
+        ExpenseCategory expenseCategory = expenseCategoryRepository
+                .findByIdAndUserAndIsDeletedFalse(expenseCategoryId, user)
+                .orElseThrow(() -> new IllegalArgumentException("Expense category not found."));
+        expenseCategory.setIsFavourite(editExpenseCategoryRequest.getIsFavourite());
+        ExpenseCategory updatedExpenseCategory = expenseCategoryRepository.save(expenseCategory);
+        return getExpenseCategoryResponse(updatedExpenseCategory);
+    }
+
+    public ExpenseCategoryResponse deleteExpenseCategory(long expenseCategoryId, User user) {
+        ExpenseCategory expenseCategory = expenseCategoryRepository
+                .findByIdAndUserAndIsDeletedFalse(expenseCategoryId, user)
+                .orElseThrow(() -> new IllegalArgumentException("Expense category not found."));
+        expenseCategory.setIsDeleted(true);
+        ExpenseCategory updatedExpenseCategory = expenseCategoryRepository.save(expenseCategory);
+        return getExpenseCategoryResponse(updatedExpenseCategory);
     }
 }

@@ -8,9 +8,7 @@ import java.util.Optional;
 public interface ShopRepository extends JpaRepository<Shop, Long> {
 
 
-    Optional<Shop> findByShopNameAndUser(String name, User user);
-
     Optional<List<Shop>> findAllByUserAndIsDeletedFalse(User user);
 
-    Optional<Shop> findByIdAndUser(Long id, User user);
+    Optional<Shop> findByIdAndUserAndIsDeletedFalse(Long id, User user);
 }

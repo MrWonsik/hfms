@@ -13,11 +13,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import java.util.List;
 
 import static com.wasacz.hfms.helpers.ObjectMapperStatic.asJsonString;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -42,7 +45,7 @@ class ExpenseCategoryManagementControllerTest {
     }
 
     @Test
-    public void whenAddExpenseCategory_givenCreateExepnseCategoryRequest_thenReturnOkStatus() throws Exception {
+    public void whenAddExpenseCategory_givenCreateExpenseCategoryRequest_thenReturnOkStatus() throws Exception {
         //given
         CreateExpenseCategoryRequest createExpenseCategoryRequest = CreateExpenseCategoryRequest
                 .builder()
@@ -59,7 +62,101 @@ class ExpenseCategoryManagementControllerTest {
     }
 
     @Test
-    public void whenAddExpenseCategory_givenCreateExepnseCategoryRequestOnlyWithName_thenReturnOkStatusAndHexColorIsRandom() throws Exception {
+    public void whenEditExpenseCategory_givenEditExpenseCategoryRequest_thenReturnOkStatus() throws Exception {
+        CreateExpenseCategoryRequest createExpenseCategoryRequest = CreateExpenseCategoryRequest
+                .builder()
+                .categoryName("Bike")
+                .colorHex("#F00")
+                .isFavourite(false)
+                .build();
+
+        MvcResult createdCategory = this.mockMvc.perform(post("/api/expense-category/").with(user(currentUser))
+                .content(asJsonString(createExpenseCategoryRequest))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        ExpenseCategoryResponse expenseCategoryResponse = objectMapper.readValue(createdCategory.getResponse().getContentAsString(), ExpenseCategoryResponse.class);
+
+        EditExpenseCategoryRequest editExpenseCategoryRequest = new EditExpenseCategoryRequest();
+        editExpenseCategoryRequest.setIsFavourite(true);
+
+        this.mockMvc.perform(put("/api/expense-category/" + expenseCategoryResponse.getId()).with(user(currentUser))
+                .content(asJsonString(editExpenseCategoryRequest))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.favourite").value(true));
+    }
+
+    @Test
+    public void whenEditExpenseCategory_givenIdThatNotExists_thenReturnBadRequest() throws Exception {
+
+        EditExpenseCategoryRequest editExpenseCategoryRequest = new EditExpenseCategoryRequest();
+        editExpenseCategoryRequest.setIsFavourite(true);
+
+        this.mockMvc.perform(put("/api/expense-category/" + 101010L).with(user(currentUser))
+                .content(asJsonString(editExpenseCategoryRequest))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Expense category not found."));
+    }
+
+    @Test
+    public void whenDeleteExpenseCategory_givenExpenseCategoryId_thenReturnOkStatus() throws Exception {
+        CreateExpenseCategoryRequest createExpenseCategoryRequest = CreateExpenseCategoryRequest
+                .builder()
+                .categoryName("Home")
+                .colorHex("#F00")
+                .isFavourite(false)
+                .build();
+
+        MvcResult createdCategory = this.mockMvc.perform(post("/api/expense-category/").with(user(currentUser))
+                .content(asJsonString(createExpenseCategoryRequest))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        ExpenseCategoryResponse expenseCategoryResponse = objectMapper.readValue(createdCategory.getResponse().getContentAsString(), ExpenseCategoryResponse.class);
+
+        EditExpenseCategoryRequest editExpenseCategoryRequest = new EditExpenseCategoryRequest();
+        editExpenseCategoryRequest.setIsFavourite(true);
+
+        this.mockMvc.perform(delete("/api/expense-category/" + expenseCategoryResponse.getId()).with(user(currentUser))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.deleted").value(true));
+    }
+
+    @Test
+    public void whenDeleteExpenseCategory_givenIdThatNotExists_thenReturnBadRequest() throws Exception {
+
+        EditExpenseCategoryRequest editExpenseCategoryRequest = new EditExpenseCategoryRequest();
+        editExpenseCategoryRequest.setIsFavourite(true);
+
+        this.mockMvc.perform(delete("/api/expense-category/" + 101010L).with(user(currentUser))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Expense category not found."));
+    }
+
+    @Test
+    public void whenGetAllExpenseCategoriesForNewUSer_thenReturnOkStatusAndEmptyListResponse() throws Exception {
+        //given
+        MvcResult expenseCategories = this.mockMvc.perform(get("/api/expense-category/").with(user(currentUserMock.getCurrentUser("New_user_expense", Role.ROLE_USER)))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        ExpenseCategoriesResponse expenseCategoriesResponse = objectMapper.readValue(expenseCategories.getResponse().getContentAsString(), ExpenseCategoriesResponse.class);
+        List<ExpenseCategoryResponse> expenseCategoriesListResponse = expenseCategoriesResponse.getExpenseCategories();
+        assertTrue(expenseCategoriesListResponse.isEmpty());
+    }
+
+    @Test
+    public void whenAddExpenseCategory_givenCreateExpenseCategoryRequestOnlyWithName_thenReturnOkStatusAndHexColorIsRandom() throws Exception {
         //given
         CreateExpenseCategoryRequest createExpenseCategoryRequest = CreateExpenseCategoryRequest
                 .builder()
@@ -81,7 +178,7 @@ class ExpenseCategoryManagementControllerTest {
     }
 
     @Test
-    public void whenAddExpenseCategory_givenCreateExepnseCategoryRequestWithIncorrectHexColor_thenReturnBadRequest() throws Exception {
+    public void whenAddExpenseCategory_givenCreateExpenseCategoryRequestWithIncorrectHexColor_thenReturnBadRequest() throws Exception {
         //given
         CreateExpenseCategoryRequest createExpenseCategoryRequest = CreateExpenseCategoryRequest
                 .builder()

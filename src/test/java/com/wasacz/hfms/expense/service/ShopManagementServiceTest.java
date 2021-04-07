@@ -69,7 +69,7 @@ class ShopManagementServiceTest {
 
         Shop ikeaShopBeforeDeleted = Shop.builder().id(1L).shopName(SHOP_NAME).user(user).isDeleted(false).build();
         Shop ikeaShopDeleted = Shop.builder().id(1L).shopName(SHOP_NAME).user(user).isDeleted(true).build();
-        when(shopRepository.findByIdAndUser(1L, user)).thenReturn(Optional.of(ikeaShopBeforeDeleted));
+        when(shopRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(ikeaShopBeforeDeleted));
         when(shopRepository.save(any(Shop.class))).thenReturn(ikeaShopDeleted);
 
         //when
@@ -84,7 +84,7 @@ class ShopManagementServiceTest {
         //given
         User user = User.builder().id(1L).username("Test").build();
 
-        when(shopRepository.findByIdAndUser(1L, user)).thenReturn(Optional.empty());
+        when(shopRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.empty());
 
         //then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,

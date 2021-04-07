@@ -43,4 +43,27 @@ public class ExpenseCategoryManagementController {
         return ResponseEntity.status(HttpStatus.OK).body(expenseCategoryResponse);
     }
 
+    @PutMapping("/{id}")
+    @Secured({"ROLE_USER"})
+    public ResponseEntity<?> editExpenseCategory(
+            @CurrentUser UserPrincipal user,
+            @PathVariable("id") long expenseCategoryId,
+            @RequestBody EditExpenseCategoryRequest editExpenseCategoryRequest) {
+
+        var expenseCategoryResponse = expenseCategoryManagementService
+                .editExpenseCategory(expenseCategoryId, editExpenseCategoryRequest, user.getUser());
+        return ResponseEntity.status(HttpStatus.OK).body(expenseCategoryResponse);
+    }
+
+    @DeleteMapping("/{id}")
+    @Secured({"ROLE_USER"})
+    public ResponseEntity<?> deleteExpenseCategory(
+            @PathVariable("id") long expenseCategoryId,
+            @CurrentUser UserPrincipal user) {
+
+        var expenseCategoryResponse = expenseCategoryManagementService
+                .deleteExpenseCategory(expenseCategoryId, user.getUser());
+        return ResponseEntity.status(HttpStatus.OK).body(expenseCategoryResponse);
+    }
+
 }
