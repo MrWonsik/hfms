@@ -2,7 +2,6 @@ package com.wasacz.hfms.helpers;
 
 import com.wasacz.hfms.user.management.controller.CreateUserRequest;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 

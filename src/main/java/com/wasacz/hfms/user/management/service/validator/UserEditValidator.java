@@ -2,6 +2,7 @@ package com.wasacz.hfms.user.management.service.validator;
 
 import com.wasacz.hfms.persistence.UserRepository;
 import com.wasacz.hfms.user.management.controller.EditUserRequest;
+import com.wasacz.hfms.utils.ValidatorUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class UserEditValidator implements ValidatorStrategy {
         }
         EditUserRequest editUserRequest = (EditUserRequest) request;
         if (Optional.ofNullable(editUserRequest.getPassword()).isPresent()) {
-            ValidatorUtils.validatePassword(editUserRequest.getPassword());
+            UserValidator.validatePassword(editUserRequest.getPassword());
         }
 
         if (userRepository.findById(id).isEmpty()) {

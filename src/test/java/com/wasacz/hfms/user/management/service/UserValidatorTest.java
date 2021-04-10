@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static com.wasacz.hfms.helpers.UserCreatorStatic.PASSWORD;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,10 +51,9 @@ class UserValidatorTest {
         when(userRepository.findByUsername(createUserRequest.getUsername())).thenReturn(Optional.of(user));
 
         //when and then
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository))
-                , "Username is already used username_that_already_used!"
-        );
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)));
+        assertEquals("Username is already used username_that_already_used!", exception.getMessage());
     }
 
     @ParameterizedTest
@@ -62,9 +62,10 @@ class UserValidatorTest {
         CreateUserRequest createUserRequest = CreateUserRequest.builder().username(username).password(PASSWORD).role("ROLE_USER").build();
 
 
-        Assertions.assertThrows(IllegalStateException.class,
-                () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)),
-                "Username cannot be blank.");
+        IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
+                () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)));
+        assertEquals("Username cannot be blank.", exception.getMessage());
+
     }
 
     @ParameterizedTest
@@ -73,8 +74,10 @@ class UserValidatorTest {
         CreateUserRequest createUserRequest = CreateUserRequest.builder().username("Username").password(password).role("ROLE_USER").build();
 
 
-        Assertions.assertThrows(IllegalStateException.class, () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)),
-                "Password cannot be blank.");
+        IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
+                () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)));
+        assertEquals("Password cannot be blank.", exception.getMessage());
+
     }
 
     @Test
@@ -82,8 +85,10 @@ class UserValidatorTest {
         CreateUserRequest createUserRequest = CreateUserRequest.builder().username("Username").password("nie poprawne haslo").role("ROLE_USER").build();
 
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)),
-                "Password don't meet rules.");
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)));
+        assertEquals("Password don't meet rules.", exception.getMessage());
+
     }
 
     @ParameterizedTest
@@ -92,30 +97,32 @@ class UserValidatorTest {
         CreateUserRequest createUserRequest = CreateUserRequest.builder().username("Username").password(PASSWORD).role(role).build();
 
 
-        Assertions.assertThrows(IllegalStateException.class, () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)),
-                "Role cannot be blank.");
+        IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
+                () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)));
+        assertEquals("Role cannot be blank.", exception.getMessage());
     }
 
     @Test
     public void whenValidateCreateUserRequest_givenRoleThatNotExists_thenThrowException() {
         CreateUserRequest createUserRequest = CreateUserRequest.builder().username("Username").password(PASSWORD).role("ROLE_THAT_NOT_EXISTS").build();
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)),
-                "Provided incorrect role.");
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)));
+        assertEquals("Provided incorrect role.", exception.getMessage());
     }
 
     @Test
     public void whenValidateCreateUserRequest_givenNullCreateUserRequest_thenThrowException() {
-        Assertions.assertThrows(InvalidValidateMethodArguments.class,
-                () -> userValidator.validate(1L, null, new UserCreateValidator(userRepository))
-                , "Incorrect arguments pass to validate method in CreateUserRequest.class!");
+        InvalidValidateMethodArguments exception = Assertions.assertThrows(InvalidValidateMethodArguments.class,
+                () -> userValidator.validate(1L, null, new UserCreateValidator(userRepository)));
+        assertEquals("Incorrect arguments pass to validate method in UserCreatorValidator.class!", exception.getMessage());
     }
 
     @Test
     public void whenValidateCreateUserRequest_givenNullCreateUserRequestAndNullUserId_thenThrowException() {
-        Assertions.assertThrows(InvalidValidateMethodArguments.class,
-                () -> userValidator.validate(null, null, new UserCreateValidator(userRepository))
-                , "Incorrect arguments pass to validate method in CreateUserRequest.class!");
+        InvalidValidateMethodArguments exception = Assertions.assertThrows(InvalidValidateMethodArguments.class,
+                () -> userValidator.validate(null, null, new UserCreateValidator(userRepository)));
+        assertEquals("Incorrect arguments pass to validate method in UserCreatorValidator.class!", exception.getMessage());
     }
 
     @Test
@@ -172,9 +179,9 @@ class UserValidatorTest {
         EditUserRequest editUserRequest = EditUserRequest.builder().build();
 
         //when
-        Assertions.assertThrows(InvalidValidateMethodArguments.class,
-                () -> userValidator.validate(null, editUserRequest, new UserEditValidator(userRepository))
-                , "Incorrect arguments pass to validate method in EditUserRequest.class!");
+        InvalidValidateMethodArguments exception = Assertions.assertThrows(InvalidValidateMethodArguments.class,
+                () -> userValidator.validate(null, editUserRequest, new UserEditValidator(userRepository)));
+        assertEquals("Incorrect arguments pass to validate method in EditUserRequest.class!", exception.getMessage());
     }
 
     @Test
@@ -183,16 +190,17 @@ class UserValidatorTest {
         User user = User.builder().username("Username").password(PASSWORD).role(Role.ROLE_USER).id(1L).build();
 
         //when
-        Assertions.assertThrows(InvalidValidateMethodArguments.class,
-                () -> userValidator.validate(user.getId(), null, new UserEditValidator(userRepository))
-                , "Incorrect arguments pass to validate method in EditUserRequest.class!");
+        InvalidValidateMethodArguments exception = Assertions.assertThrows(InvalidValidateMethodArguments.class,
+                () -> userValidator.validate(user.getId(), null, new UserEditValidator(userRepository)));
+        assertEquals("Incorrect arguments pass to validate method in EditUserRequest.class!", exception.getMessage());
+
     }
 
     @Test
     public void whenValidateEditUserRequest_givenNullEditUserRequestAndNullUserId_thenThrowException() {
-        Assertions.assertThrows(InvalidValidateMethodArguments.class,
-                () -> userValidator.validate(null, null, new UserEditValidator(userRepository))
-                , "Incorrect arguments pass to validate method in EditUserRequest.class!");
+        InvalidValidateMethodArguments exception = Assertions.assertThrows(InvalidValidateMethodArguments.class,
+                () -> userValidator.validate(null, null, new UserEditValidator(userRepository)));
+        assertEquals("Incorrect arguments pass to validate method in EditUserRequest.class!", exception.getMessage());
     }
 
     @Test
@@ -201,17 +209,17 @@ class UserValidatorTest {
         EditUserRequest editUserRequest = EditUserRequest.builder().build();
 
         //when
-        Assertions.assertThrows(InvalidValidateMethodArguments.class,
-                () -> userValidator.validate(null, editUserRequest, new UserEditValidator(userRepository))
-                , "Incorrect arguments pass to validate method in EditUserRequest.class!");
+        InvalidValidateMethodArguments exception = Assertions.assertThrows(InvalidValidateMethodArguments.class,
+                () -> userValidator.validate(null, editUserRequest, new UserEditValidator(userRepository)));
+        assertEquals("Incorrect arguments pass to validate method in EditUserRequest.class!", exception.getMessage());
     }
 
 
     @Test
     public void whenValidateDeleteUser_givenNullUserRequestAndNullUserId_thenThrowException() {
-        Assertions.assertThrows(InvalidValidateMethodArguments.class,
-                () -> userValidator.validate(null, null, new UserDeleteValidator(userRepository))
-                , "Incorrect arguments pass to validate method in UserDeleteValidator.class!");
+        InvalidValidateMethodArguments exception = Assertions.assertThrows(InvalidValidateMethodArguments.class,
+                () -> userValidator.validate(null, null, new UserDeleteValidator(userRepository)));
+        assertEquals("Incorrect arguments pass to validate method in UserDeleteValidator.class!", exception.getMessage());
     }
 
     @Test
@@ -220,8 +228,8 @@ class UserValidatorTest {
         EditUserRequest editUserRequest = EditUserRequest.builder().build();
 
         //when
-        Assertions.assertThrows(InvalidValidateMethodArguments.class,
-                () -> userValidator.validate(null, editUserRequest, new UserDeleteValidator(userRepository))
-                , "Incorrect arguments pass to validate method iadadn UserDeleteValidator.class!");
+        InvalidValidateMethodArguments exception = Assertions.assertThrows(InvalidValidateMethodArguments.class,
+                () -> userValidator.validate(null, editUserRequest, new UserDeleteValidator(userRepository)));
+        assertEquals("Incorrect arguments pass to validate method in UserDeleteValidator.class!", exception.getMessage());
     }
 }

@@ -1,17 +1,13 @@
 package com.wasacz.hfms.user.management.controller;
 
-import com.wasacz.hfms.helpers.UserCreatorStatic;
+import com.wasacz.hfms.helpers.CurrentUserMock;
 import com.wasacz.hfms.persistence.Role;
-import com.wasacz.hfms.persistence.User;
-import com.wasacz.hfms.security.UserPrincipal;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static com.wasacz.hfms.helpers.ObjectMapperStatic.asJsonString;
@@ -29,10 +25,10 @@ class ChangePasswordControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private CurrentUserMock currentUserMock;
+
 
     @Test
-    @WithMockUser(authorities = "ROLE_ADMIN")
     public void whenChangePasswordAsAdmin_givenCorrectChangePasswordRequest_thenReturnStatusOk() throws Exception {
         ChangePasswordRequest changePasswordRequest = ChangePasswordRequest.builder()
                 .newPassword("newPassword!23@")
@@ -40,9 +36,7 @@ class ChangePasswordControllerTest {
                 .oldPassword(PASSWORD)
                 .build();
 
-        User user = User.builder().username("Test").password(passwordEncoder.encode(PASSWORD)).role(Role.ROLE_ADMIN).id(1L).build();
-
-        this.mockMvc.perform(post("/api/user/password").with(user(new UserPrincipal(user)))
+        this.mockMvc.perform(post("/api/user/password").with(user(currentUserMock.getCurrentUser("Test", Role.ROLE_ADMIN)))
                 .content(asJsonString(changePasswordRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -58,9 +52,7 @@ class ChangePasswordControllerTest {
                 .oldPassword(PASSWORD)
                 .build();
 
-        User user = User.builder().username("Test").password(passwordEncoder.encode(PASSWORD)).role(Role.ROLE_USER).id(1L).build();
-
-        this.mockMvc.perform(post("/api/user/password").with(user(new UserPrincipal(user)))
+        this.mockMvc.perform(post("/api/user/password").with(user(currentUserMock.getCurrentUser("Test2", Role.ROLE_ADMIN)))
                 .content(asJsonString(changePasswordRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -75,9 +67,7 @@ class ChangePasswordControllerTest {
                 .oldPassword("incorrectOldPassword123!!")
                 .build();
 
-        User user = User.builder().username("Test").password(passwordEncoder.encode(PASSWORD)).role(Role.ROLE_USER).id(1L).build();
-
-        this.mockMvc.perform(post("/api/user/password").with(user(new UserPrincipal(user)))
+        this.mockMvc.perform(post("/api/user/password").with(user(currentUserMock.getCurrentUser("Test3", Role.ROLE_ADMIN)))
                 .content(asJsonString(changePasswordRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -100,6 +90,4 @@ class ChangePasswordControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
-
-
 }
