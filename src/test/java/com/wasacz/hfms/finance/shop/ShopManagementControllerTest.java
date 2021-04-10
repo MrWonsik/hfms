@@ -1,6 +1,9 @@
-package com.wasacz.hfms.expense.controller;
+package com.wasacz.hfms.finance.shop;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wasacz.hfms.finance.shop.CreateShopRequest;
+import com.wasacz.hfms.finance.shop.ShopResponse;
+import com.wasacz.hfms.finance.shop.ShopsResponse;
 import com.wasacz.hfms.helpers.CurrentUserMock;
 import com.wasacz.hfms.persistence.Role;
 import com.wasacz.hfms.security.UserPrincipal;

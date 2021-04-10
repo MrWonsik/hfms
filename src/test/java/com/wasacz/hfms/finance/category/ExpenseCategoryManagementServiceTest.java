@@ -1,17 +1,20 @@
-package com.wasacz.hfms.expense.service;
+package com.wasacz.hfms.finance.category;
 
-import com.wasacz.hfms.expense.controller.CreateExpenseCategoryRequest;
-import com.wasacz.hfms.expense.controller.EditExpenseCategoryRequest;
-import com.wasacz.hfms.expense.controller.ExpenseCategoryResponse;
-import com.wasacz.hfms.persistence.ExpenseCategory;
-import com.wasacz.hfms.persistence.ExpenseCategoryRepository;
-import com.wasacz.hfms.persistence.User;
+import com.wasacz.hfms.finance.category.expense.ExpenseCategoryObj;
+import com.wasacz.hfms.finance.category.expense.ExpenseCategoryVersionService;
+import com.wasacz.hfms.finance.category.expense.ExpenseCategoryManagementService;
+import com.wasacz.hfms.finance.category.expense.ExpenseCategoryResponse;
+import com.wasacz.hfms.finance.category.expense.ExpenseCategoryVersionResponse;
+import com.wasacz.hfms.persistence.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
+import java.time.YearMonth;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,14 +27,19 @@ class ExpenseCategoryManagementServiceTest {
     @Mock
     private ExpenseCategoryRepository expenseCategoryRepository;
 
+    @Mock
+    private ExpenseCategoryVersionRepository expenseCategoryVersionRepository;
+
+    @Mock
+    private ExpenseCategoryVersionService expenseCategoryVersionService;
+
     @InjectMocks
     private ExpenseCategoryManagementService expenseCategoryManagementService;
 
     @Test
     public void whenAddExpenseCategory_givenCreateExpenseCategoryResponse_thenSaveExpenseCategory() {
         //given
-        CreateExpenseCategoryRequest createExpenseCategoryRequest = CreateExpenseCategoryRequest
-                .builder()
+        ExpenseCategoryObj expenseCategoryObj = ExpenseCategoryObj.builder()
                 .categoryName("Car")
                 .colorHex("#F00")
                 .isFavourite(false)
@@ -47,23 +55,46 @@ class ExpenseCategoryManagementServiceTest {
                 .user(user)
                 .isDeleted(false)
                 .build();
+
+        YearMonth now = YearMonth.now();
+        ExpenseCategoryVersion expenseCategoryVersion = ExpenseCategoryVersion
+                .builder()
+                .id(1L)
+                .expenseCategory(expenseCategory)
+                .maximumCost(BigDecimal.TEN)
+                .validMonth(now)
+                .build();
+        ExpenseCategoryVersionResponse expenseCategoryVersionResponse = ExpenseCategoryVersionResponse
+                .builder()
+                .id(1L)
+                .maximumCost(BigDecimal.TEN.doubleValue())
+                .validMonth(now)
+                .isValid(true)
+                .build();
+
         when(expenseCategoryRepository.save(any(ExpenseCategory.class))).thenReturn(expenseCategory);
+        when(expenseCategoryVersionService.saveCategory(any(ExpenseCategoryObj.class), any(ExpenseCategory.class))).thenReturn(expenseCategoryVersion);
+        when(expenseCategoryVersionService.getNewestCategoryVersion(any(ExpenseCategory.class))).thenReturn(expenseCategoryVersionResponse);
+        when(expenseCategoryVersionService.getCategoryVersions(any(ExpenseCategory.class))).thenReturn(List.of(expenseCategoryVersionResponse));
 
         //when
-        ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryManagementService.addExpenseCategory(createExpenseCategoryRequest, user);
+        ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryManagementService.addExpenseCategory(expenseCategoryObj, user);
 
         //then
-        assertEquals(expenseCategoryResponse.getCategoryName(), createExpenseCategoryRequest.getCategoryName());
+        assertEquals(expenseCategoryResponse.getCategoryName(), expenseCategoryObj.getCategoryName());
         assertFalse(expenseCategoryResponse.isDeleted());
-        assertEquals(expenseCategoryResponse.getColorHex(), createExpenseCategoryRequest.getColorHex());
-        assertEquals(expenseCategoryResponse.isFavourite(), createExpenseCategoryRequest.getIsFavourite());
+        assertEquals(expenseCategoryResponse.getColorHex(), expenseCategoryObj.getColorHex());
+        assertEquals(expenseCategoryResponse.isFavourite(), expenseCategoryObj.getIsFavourite());
+        ExpenseCategoryVersionResponse currentVersion = expenseCategoryResponse.getCurrentVersion();
+        assertEquals(currentVersion.getId(), expenseCategoryVersionResponse.getId());
+        assertEquals(currentVersion.getMaximumCost(), expenseCategoryVersionResponse.getMaximumCost());
+        assertEquals(currentVersion.getValidMonth(), expenseCategoryVersionResponse.getValidMonth());
+        assertTrue(currentVersion.isValid());
     }
 
     @Test
     public void whenEditExpenseCategory_givenEditExpenseCategoryRequest_thenReturnEditedExpenseCategory() {
         //given
-        EditExpenseCategoryRequest editExpenseCategoryRequest = new EditExpenseCategoryRequest();
-        editExpenseCategoryRequest.setIsFavourite(true);
         User user = User.builder().id(1L).username("Test").build();
 
         ExpenseCategory expenseCategory = ExpenseCategory
@@ -79,10 +110,10 @@ class ExpenseCategoryManagementServiceTest {
         when(expenseCategoryRepository.save(any(ExpenseCategory.class))).thenReturn(expenseCategory);
 
         //when
-        ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryManagementService.editExpenseCategory(1L, editExpenseCategoryRequest, user);
+        ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryManagementService.setAsFavourite(1L, true, user);
 
         //then
-        assertEquals(expenseCategoryResponse.isFavourite(), editExpenseCategoryRequest.getIsFavourite());
+        assertTrue(expenseCategoryResponse.isFavourite());
         assertFalse(expenseCategoryResponse.isDeleted());
     }
 
@@ -120,7 +151,7 @@ class ExpenseCategoryManagementServiceTest {
 
         //then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> expenseCategoryManagementService.editExpenseCategory(1L, null, user));
+                () -> expenseCategoryManagementService.setAsFavourite(1L, false, user));
         assertEquals(exception.getMessage(), "Expense category not found.");
     }
 

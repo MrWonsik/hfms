@@ -1,6 +1,6 @@
-package com.wasacz.hfms.expense.service;
+package com.wasacz.hfms.finance.shop;
 
-import com.wasacz.hfms.expense.controller.CreateShopRequest;
+import com.wasacz.hfms.finance.shop.CreateShopRequest;
 import com.wasacz.hfms.utils.ValidatorUtils;
 
 public class ShopValidator {

@@ -1,6 +1,5 @@
-package com.wasacz.hfms.expense.controller;
+package com.wasacz.hfms.finance.shop;
 
-import com.wasacz.hfms.expense.service.ShopManagementService;
 import com.wasacz.hfms.security.CurrentUser;
 import com.wasacz.hfms.security.UserPrincipal;
 import lombok.extern.slf4j.Slf4j;

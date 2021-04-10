@@ -1,6 +1,5 @@
-package com.wasacz.hfms.expense.controller;
+package com.wasacz.hfms.finance.category.expense;
 
-import com.wasacz.hfms.expense.service.ExpenseCategoryManagementService;
 import com.wasacz.hfms.security.CurrentUser;
 import com.wasacz.hfms.security.UserPrincipal;
 import lombok.extern.slf4j.Slf4j;
@@ -29,29 +28,10 @@ public class ExpenseCategoryManagementController {
         response.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     }
 
-    @PostMapping("/")
-    @Secured({"ROLE_USER"})
-    public ResponseEntity<?> addExpenseCategory(@CurrentUser UserPrincipal user, @RequestBody CreateExpenseCategoryRequest createExpenseCategoryRequest) {
-        ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryManagementService.addExpenseCategory(createExpenseCategoryRequest, user.getUser());
-        return ResponseEntity.status(HttpStatus.OK).body(expenseCategoryResponse);
-    }
-
     @GetMapping("/")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> getAllExpenseCategory(@CurrentUser UserPrincipal user) {
         ExpenseCategoriesResponse expenseCategoryResponse = expenseCategoryManagementService.getAllExpenseCategory(user.getUser());
-        return ResponseEntity.status(HttpStatus.OK).body(expenseCategoryResponse);
-    }
-
-    @PutMapping("/{id}")
-    @Secured({"ROLE_USER"})
-    public ResponseEntity<?> editExpenseCategory(
-            @CurrentUser UserPrincipal user,
-            @PathVariable("id") long expenseCategoryId,
-            @RequestBody EditExpenseCategoryRequest editExpenseCategoryRequest) {
-
-        var expenseCategoryResponse = expenseCategoryManagementService
-                .editExpenseCategory(expenseCategoryId, editExpenseCategoryRequest, user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(expenseCategoryResponse);
     }
 

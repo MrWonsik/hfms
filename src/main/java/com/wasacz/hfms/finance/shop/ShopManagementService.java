@@ -1,9 +1,6 @@
-package com.wasacz.hfms.expense.service;
+package com.wasacz.hfms.finance.shop;
 
 import com.wasacz.hfms.utils.date.DateTime;
-import com.wasacz.hfms.expense.controller.CreateShopRequest;
-import com.wasacz.hfms.expense.controller.ShopResponse;
-import com.wasacz.hfms.expense.controller.ShopsResponse;
 import com.wasacz.hfms.persistence.Shop;
 import com.wasacz.hfms.persistence.ShopRepository;
 import com.wasacz.hfms.persistence.User;
