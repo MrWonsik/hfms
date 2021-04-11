@@ -1,11 +1,7 @@
 package com.wasacz.hfms.finance.category;
 
 import com.wasacz.hfms.finance.category.controller.CreateCategoryRequest;
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryObj;
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryVersionService;
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryManagementService;
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryResponse;
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryVersionResponse;
+import com.wasacz.hfms.finance.category.expense.*;
 import com.wasacz.hfms.persistence.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -94,7 +90,7 @@ class ExpenseCategoryManagementServiceTest {
     }
 
     @Test
-    public void whenEditExpenseCategory_givenEditExpenseCategoryRequest_thenReturnEditedExpenseCategory() {
+    public void whenSetAsFavouriteExpenseCategory_givenEditExpenseCategoryRequest_thenReturnEditedExpenseCategory() {
         //given
         User user = User.builder().id(1L).username("Test").build();
 
@@ -144,7 +140,7 @@ class ExpenseCategoryManagementServiceTest {
 
 
     @Test
-    public void whenEditExpenseCategory_givenIdThatDontExists_thenThrowException() {
+    public void whenSetAsFavouriteExpenseCategory_givenIdThatDontExists_thenThrowException() {
         //given
         User user = User.builder().id(1L).username("Test").build();
 
