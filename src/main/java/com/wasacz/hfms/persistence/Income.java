@@ -14,28 +14,22 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "users")
-public class User {
-
+public class Income {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
     @Column(unique = true, updatable = false)
-    private String username;
+    private String incomeName;
 
     @NotNull
-    private String password;
+    @ManyToOne
+    private IncomeCategory category;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(updatable = false)
-    private Role role;
-
-    @NotNull
-    @Builder.Default
-    private boolean isEnabled = true;
+    @ManyToOne
+    private User user;
 
     @CreatedDate
     @Builder.Default

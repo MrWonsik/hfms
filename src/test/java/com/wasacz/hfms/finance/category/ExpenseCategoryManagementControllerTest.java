@@ -1,7 +1,9 @@
 package com.wasacz.hfms.finance.category;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoriesResponse;
+import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
+import com.wasacz.hfms.finance.category.controller.CategoryIsFavouriteRequest;
+import com.wasacz.hfms.finance.category.controller.CreateCategoryRequest;
 import com.wasacz.hfms.finance.category.expense.ExpenseCategoryResponse;
 import com.wasacz.hfms.helpers.CurrentUserMock;
 import com.wasacz.hfms.persistence.Role;
@@ -54,10 +56,9 @@ class ExpenseCategoryManagementControllerTest {
                 .categoryName("Car")
                 .colorHex("#F00")
                 .isFavourite(false)
-                .categoryType(CategoryType.EXPENSE)
                 .build();
 
-        MvcResult createdCategoryResult = this.mockMvc.perform(post("/api/category/").with(user(currentUser))
+        MvcResult createdCategoryResult = this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
                 .content(asJsonString(createCategoryRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -77,10 +78,9 @@ class ExpenseCategoryManagementControllerTest {
                 .categoryName("Bike")
                 .colorHex("#F00")
                 .isFavourite(false)
-                .categoryType(CategoryType.EXPENSE)
                 .build();
 
-        MvcResult createdCategory = this.mockMvc.perform(post("/api/category/").with(user(currentUser))
+        MvcResult createdCategory = this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
                 .content(asJsonString(createCategoryRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -88,12 +88,9 @@ class ExpenseCategoryManagementControllerTest {
 
         ExpenseCategoryResponse expenseCategoryResponse = objectMapper.readValue(createdCategory.getResponse().getContentAsString(), ExpenseCategoryResponse.class);
 
-        CategoryIsFavouriteRequest categoryIsFavouriteRequest = CategoryIsFavouriteRequest.builder()
-                .isFavourite(true)
-                .categoryType(CategoryType.EXPENSE)
-                .build();
+        CategoryIsFavouriteRequest categoryIsFavouriteRequest = new CategoryIsFavouriteRequest(true);
 
-        this.mockMvc.perform(patch("/api/category/" + expenseCategoryResponse.getId()).with(user(currentUser))
+        this.mockMvc.perform(patch("/api/category/expense/" + expenseCategoryResponse.getId()).with(user(currentUser))
                 .content(asJsonString(categoryIsFavouriteRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -104,12 +101,10 @@ class ExpenseCategoryManagementControllerTest {
     @Test
     public void whenEditExpenseCategory_givenIdThatNotExists_thenReturnBadRequest() throws Exception {
 
-        CategoryIsFavouriteRequest categoryIsFavouriteRequest = CategoryIsFavouriteRequest.builder()
-                .isFavourite(true)
-                .categoryType(CategoryType.EXPENSE)
-                .build();
+        CategoryIsFavouriteRequest categoryIsFavouriteRequest = new CategoryIsFavouriteRequest(true);
 
-        this.mockMvc.perform(patch("/api/category/" + 101010L).with(user(currentUser))
+
+        this.mockMvc.perform(patch("/api/category/expense/" + 101010L).with(user(currentUser))
                 .content(asJsonString(categoryIsFavouriteRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -124,10 +119,9 @@ class ExpenseCategoryManagementControllerTest {
                 .categoryName("Home")
                 .colorHex("#F00")
                 .isFavourite(false)
-                .categoryType(CategoryType.EXPENSE)
                 .build();
 
-        MvcResult createdCategory = this.mockMvc.perform(post("/api/category/").with(user(currentUser))
+        MvcResult createdCategory = this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
                 .content(asJsonString(createCategoryRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -135,12 +129,10 @@ class ExpenseCategoryManagementControllerTest {
 
         ExpenseCategoryResponse expenseCategoryResponse = objectMapper.readValue(createdCategory.getResponse().getContentAsString(), ExpenseCategoryResponse.class);
 
-        CategoryIsFavouriteRequest categoryIsFavouriteRequest = CategoryIsFavouriteRequest.builder()
-                .isFavourite(true)
-                .categoryType(CategoryType.EXPENSE)
-                .build();
+        CategoryIsFavouriteRequest categoryIsFavouriteRequest = new CategoryIsFavouriteRequest(true);
 
-        this.mockMvc.perform(delete("/api/expense-category/" + expenseCategoryResponse.getId()).with(user(currentUser))
+
+        this.mockMvc.perform(delete("/api/category/expense/" + expenseCategoryResponse.getId()).with(user(currentUser))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -150,12 +142,10 @@ class ExpenseCategoryManagementControllerTest {
     @Test
     public void whenDeleteExpenseCategory_givenIdThatNotExists_thenReturnBadRequest() throws Exception {
 
-        CategoryIsFavouriteRequest categoryIsFavouriteRequest = CategoryIsFavouriteRequest.builder()
-                .isFavourite(true)
-                .categoryType(CategoryType.EXPENSE)
-                .build();
+        CategoryIsFavouriteRequest categoryIsFavouriteRequest = new CategoryIsFavouriteRequest(true);
 
-        this.mockMvc.perform(delete("/api/expense-category/" + 101010L).with(user(currentUser))
+
+        this.mockMvc.perform(delete("/api/category/expense/" + 101010L).with(user(currentUser))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -165,12 +155,12 @@ class ExpenseCategoryManagementControllerTest {
     @Test
     public void whenGetAllExpenseCategoriesForNewUSer_thenReturnOkStatusAndEmptyListResponse() throws Exception {
         //given
-        MvcResult expenseCategories = this.mockMvc.perform(get("/api/expense-category/").with(user(currentUserMock.getCurrentUser("New_user_expense", Role.ROLE_USER)))
+        MvcResult expenseCategories = this.mockMvc.perform(get("/api/category/expense/").with(user(currentUserMock.getCurrentUser("New_user_expense", Role.ROLE_USER)))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
-        ExpenseCategoriesResponse expenseCategoriesResponse = objectMapper.readValue(expenseCategories.getResponse().getContentAsString(), ExpenseCategoriesResponse.class);
-        List<ExpenseCategoryResponse> expenseCategoriesListResponse = expenseCategoriesResponse.getExpenseCategories();
+        CategoriesResponse categoryResponse = objectMapper.readValue(expenseCategories.getResponse().getContentAsString(), CategoriesResponse.class);
+        List<ExpenseCategoryResponse> expenseCategoriesListResponse = (List<ExpenseCategoryResponse>) categoryResponse.getExpenseCategories();
         assertTrue(expenseCategoriesListResponse.isEmpty());
     }
 
@@ -180,10 +170,9 @@ class ExpenseCategoryManagementControllerTest {
         CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
                 .builder()
                 .categoryName("Car")
-                .categoryType(CategoryType.EXPENSE)
                 .build();
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/category/").with(user(currentUser))
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
                 .content(asJsonString(createCategoryRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -205,10 +194,9 @@ class ExpenseCategoryManagementControllerTest {
                 .categoryName("Car")
                 .colorHex("F00000")
                 .isFavourite(false)
-                .categoryType(CategoryType.EXPENSE)
                 .build();
 
-        this.mockMvc.perform(post("/api/category/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
                 .content(asJsonString(createCategoryRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -219,10 +207,9 @@ class ExpenseCategoryManagementControllerTest {
     @Test
     public void whenAddExpenseCategoryWithoutCategoryName_thenReturnBadRequestStatus() throws Exception {
         //given
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest.builder().categoryType(CategoryType.EXPENSE)
-                .build();
+        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest.builder().build();
 
-        this.mockMvc.perform(post("/api/category/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
                 .content(asJsonString(createCategoryRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -235,12 +222,12 @@ class ExpenseCategoryManagementControllerTest {
         //given
         CreateCategoryRequest createCategoryRequest = CreateCategoryRequest.builder().build();
 
-        this.mockMvc.perform(post("/api/category/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/category/emptyCategory/").with(user(currentUser))
                 .content(asJsonString(createCategoryRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("Category is required."));
+                .andExpect(status().reason("Incorrect category type."));
     }
 
 

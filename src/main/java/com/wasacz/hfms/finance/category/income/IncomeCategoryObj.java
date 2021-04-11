@@ -1,5 +1,6 @@
-package com.wasacz.hfms.finance.category;
+package com.wasacz.hfms.finance.category.income;
 
+import com.wasacz.hfms.finance.category.AbstractCategory;
 import lombok.Builder;
 import lombok.Getter;
 

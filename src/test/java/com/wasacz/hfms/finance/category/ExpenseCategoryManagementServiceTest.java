@@ -1,5 +1,6 @@
 package com.wasacz.hfms.finance.category;
 
+import com.wasacz.hfms.finance.category.controller.CreateCategoryRequest;
 import com.wasacz.hfms.finance.category.expense.ExpenseCategoryObj;
 import com.wasacz.hfms.finance.category.expense.ExpenseCategoryVersionService;
 import com.wasacz.hfms.finance.category.expense.ExpenseCategoryManagementService;
@@ -39,7 +40,7 @@ class ExpenseCategoryManagementServiceTest {
     @Test
     public void whenAddExpenseCategory_givenCreateExpenseCategoryResponse_thenSaveExpenseCategory() {
         //given
-        ExpenseCategoryObj expenseCategoryObj = ExpenseCategoryObj.builder()
+        CreateCategoryRequest expenseCategoryObj = CreateCategoryRequest.builder()
                 .categoryName("Car")
                 .colorHex("#F00")
                 .isFavourite(false)
@@ -78,7 +79,7 @@ class ExpenseCategoryManagementServiceTest {
         when(expenseCategoryVersionService.getCategoryVersions(any(ExpenseCategory.class))).thenReturn(List.of(expenseCategoryVersionResponse));
 
         //when
-        ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryManagementService.addExpenseCategory(expenseCategoryObj, user);
+        ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryManagementService.addCategory(expenseCategoryObj, user);
 
         //then
         assertEquals(expenseCategoryResponse.getCategoryName(), expenseCategoryObj.getCategoryName());
@@ -135,7 +136,7 @@ class ExpenseCategoryManagementServiceTest {
         when(expenseCategoryRepository.save(any(ExpenseCategory.class))).thenReturn(expenseCategory);
 
         //when
-        ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryManagementService.deleteExpenseCategory(1L, user);
+        ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryManagementService.deleteCategory(1L, user);
 
         //then
         assertTrue(expenseCategoryResponse.isDeleted());
@@ -164,7 +165,7 @@ class ExpenseCategoryManagementServiceTest {
 
         //then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> expenseCategoryManagementService.deleteExpenseCategory(1L, user));
+                () -> expenseCategoryManagementService.deleteCategory(1L, user));
         assertEquals(exception.getMessage(), "Expense category not found.");
     }
 }

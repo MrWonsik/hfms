@@ -12,6 +12,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+//TODO: add update current version, and add posibility to add version for next month..
+
 @Service
 public class ExpenseCategoryVersionService {
 

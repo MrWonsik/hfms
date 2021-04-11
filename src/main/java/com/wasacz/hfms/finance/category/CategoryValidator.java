@@ -1,6 +1,7 @@
 package com.wasacz.hfms.finance.category;
 
 import com.wasacz.hfms.finance.category.expense.ExpenseCategoryObj;
+import com.wasacz.hfms.finance.category.income.IncomeCategoryObj;
 import com.wasacz.hfms.utils.ValidatorUtils;
 
 import java.math.BigDecimal;
@@ -13,6 +14,11 @@ public class CategoryValidator {
         validateName(expenseCategory.getCategoryName());
         validateHexColor(expenseCategory.getColorHex());
         validateMaximumCost(expenseCategory.getMaximumCost());
+    }
+
+    public static void validate(IncomeCategoryObj incomeCategory) {
+        validateName(incomeCategory.getCategoryName());
+        validateHexColor(incomeCategory.getColorHex());
     }
 
     private static void validateMaximumCost(BigDecimal maximumCost) {
