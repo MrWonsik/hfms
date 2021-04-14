@@ -1,10 +1,8 @@
-package com.wasacz.hfms.finance.category;
+package com.wasacz.hfms.finance.category.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
-import com.wasacz.hfms.finance.category.controller.CategoryIsFavouriteRequest;
-import com.wasacz.hfms.finance.category.controller.CreateCategoryRequest;
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryResponse;
+import com.wasacz.hfms.finance.category.CategoryType;
+import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
 import com.wasacz.hfms.finance.category.income.IncomeCategoryResponse;
 import com.wasacz.hfms.helpers.CurrentUserMock;
 import com.wasacz.hfms.persistence.Role;
@@ -59,17 +57,24 @@ class CategoryManagementControllerTest {
                 .isFavourite(false)
                 .build();
 
-        MvcResult createdCategoryResult = this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
+        var expenseCategoryResponse = (ExpenseCategoryResponse) createCategoryAndReturn(createCategoryRequest, CategoryType.EXPENSE);
+
+        assertFalse(expenseCategoryResponse.getExpenseCategoryVersions().isEmpty());
+        assertNotNull(expenseCategoryResponse.getCurrentVersion());
+    }
+
+    private AbstractCategoryResponse createCategoryAndReturn(CreateCategoryRequest createCategoryRequest, CategoryType type) throws Exception {
+        MvcResult createdCategoryResult = this.mockMvc.perform(post("/api/category/" + type.name() + "/").with(user(currentUser))
                 .content(asJsonString(createCategoryRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-
-        ExpenseCategoryResponse expenseCategoryResponse = objectMapper.readValue(createdCategoryResult.getResponse().getContentAsString(), ExpenseCategoryResponse.class);
-
-        assertFalse(expenseCategoryResponse.getExpenseCategoryVersions().isEmpty());
-        assertNotNull(expenseCategoryResponse.getCurrentVersion());
+        if(type.equals(CategoryType.EXPENSE)) {
+            return objectMapper.readValue(createdCategoryResult.getResponse().getContentAsString(), ExpenseCategoryResponse.class);
+        } else {
+            return objectMapper.readValue(createdCategoryResult.getResponse().getContentAsString(), IncomeCategoryResponse.class);
+        }
     }
 
     @Test
@@ -167,13 +172,8 @@ class CategoryManagementControllerTest {
                 .categoryName("Car")
                 .build();
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
-                .content(asJsonString(createCategoryRequest))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andReturn();
+        var expenseCategoryResponse = createCategoryAndReturn(createCategoryRequest, CategoryType.EXPENSE);
 
-        ExpenseCategoryResponse expenseCategoryResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ExpenseCategoryResponse.class);
         assertFalse(expenseCategoryResponse.getColorHex().isEmpty());
         assertEquals("Car", expenseCategoryResponse.getCategoryName());
         assertFalse(expenseCategoryResponse.isDeleted());
@@ -235,15 +235,7 @@ class CategoryManagementControllerTest {
                 .isFavourite(false)
                 .build();
 
-        MvcResult createdCategoryResult = this.mockMvc.perform(post("/api/category/income/").with(user(currentUser))
-                .content(asJsonString(createCategoryRequest))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        IncomeCategoryResponse incomeCategoryResponse = objectMapper.readValue(createdCategoryResult.getResponse().getContentAsString(), IncomeCategoryResponse.class);
-
+        var incomeCategoryResponse = createCategoryAndReturn(createCategoryRequest, CategoryType.INCOME);
         assertFalse(incomeCategoryResponse.isFavourite());
         assertEquals("#F00", incomeCategoryResponse.getColorHex());
     }
@@ -257,13 +249,7 @@ class CategoryManagementControllerTest {
                 .isFavourite(false)
                 .build();
 
-        MvcResult createdCategory = this.mockMvc.perform(post("/api/category/income/").with(user(currentUser))
-                .content(asJsonString(createCategoryRequest))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        IncomeCategoryResponse incomeCategoryResponse = objectMapper.readValue(createdCategory.getResponse().getContentAsString(), IncomeCategoryResponse.class);
+        var incomeCategoryResponse = createCategoryAndReturn(createCategoryRequest, CategoryType.INCOME);
 
         CategoryIsFavouriteRequest categoryIsFavouriteRequest = new CategoryIsFavouriteRequest(true);
 
@@ -297,13 +283,7 @@ class CategoryManagementControllerTest {
                 .isFavourite(false)
                 .build();
 
-        MvcResult createdCategory = this.mockMvc.perform(post("/api/category/income/").with(user(currentUser))
-                .content(asJsonString(createCategoryRequest))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        IncomeCategoryResponse incomeCategoryResponse = objectMapper.readValue(createdCategory.getResponse().getContentAsString(), IncomeCategoryResponse.class);
+        var incomeCategoryResponse = createCategoryAndReturn(createCategoryRequest, CategoryType.INCOME);
 
         this.mockMvc.perform(delete("/api/category/income/" + incomeCategoryResponse.getId()).with(user(currentUser))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -342,13 +322,7 @@ class CategoryManagementControllerTest {
                 .categoryName("Work")
                 .build();
 
-        MvcResult createdCategory = this.mockMvc.perform(post("/api/category/income/").with(user(currentUser))
-                .content(asJsonString(createCategoryRequest))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andReturn();
-
-        IncomeCategoryResponse incomeCategoryResponse = objectMapper.readValue(createdCategory.getResponse().getContentAsString(), IncomeCategoryResponse.class);
+        var incomeCategoryResponse = createCategoryAndReturn(createCategoryRequest, CategoryType.INCOME);
 
         assertFalse(incomeCategoryResponse.getColorHex().isEmpty());
         assertEquals("Work", incomeCategoryResponse.getCategoryName());

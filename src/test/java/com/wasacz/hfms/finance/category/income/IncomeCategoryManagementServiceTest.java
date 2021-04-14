@@ -1,4 +1,4 @@
-package com.wasacz.hfms.finance.category;
+package com.wasacz.hfms.finance.category.income;
 
 import com.wasacz.hfms.finance.category.controller.CreateCategoryRequest;
 import com.wasacz.hfms.finance.category.income.IncomeCategoryManagementService;

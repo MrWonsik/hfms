@@ -21,7 +21,7 @@ public class CategoryValidator {
         validateHexColor(incomeCategory.getColorHex());
     }
 
-    private static void validateMaximumCost(BigDecimal maximumCost) {
+    public static void validateMaximumCost(BigDecimal maximumCost) {
         if(maximumCost == null) {
             return;
         }

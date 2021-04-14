@@ -1,7 +1,9 @@
-package com.wasacz.hfms.finance.category;
+package com.wasacz.hfms.finance.category.expense;
 
 import com.wasacz.hfms.finance.category.controller.CreateCategoryRequest;
-import com.wasacz.hfms.finance.category.expense.*;
+import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
+import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryVersionMapper;
+import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryVersionResponse;
 import com.wasacz.hfms.persistence.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +18,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,10 +28,13 @@ class ExpenseCategoryManagementServiceTest {
     private ExpenseCategoryRepository expenseCategoryRepository;
 
     @Mock
-    private ExpenseCategoryVersionRepository expenseCategoryVersionRepository;
+    private ExpenseCategoryVersionService expenseCategoryVersionService;
 
     @Mock
-    private ExpenseCategoryVersionService expenseCategoryVersionService;
+    private ExpenseCategorySaver expenseCategorySaver;
+
+    @Mock
+    private ExpenseCategoryVersionMapper expenseCategoryVersionMapper;
 
     @InjectMocks
     private ExpenseCategoryManagementService expenseCategoryManagementService;
@@ -69,10 +75,11 @@ class ExpenseCategoryManagementServiceTest {
                 .isValid(true)
                 .build();
 
-        when(expenseCategoryRepository.save(any(ExpenseCategory.class))).thenReturn(expenseCategory);
-        when(expenseCategoryVersionService.saveCategory(any(ExpenseCategoryObj.class), any(ExpenseCategory.class))).thenReturn(expenseCategoryVersion);
-        when(expenseCategoryVersionService.getNewestCategoryVersion(any(ExpenseCategory.class))).thenReturn(expenseCategoryVersionResponse);
-        when(expenseCategoryVersionService.getCategoryVersions(any(ExpenseCategory.class))).thenReturn(List.of(expenseCategoryVersionResponse));
+        when(expenseCategorySaver.saveExpenseCategory(any(ExpenseCategoryObj.class), any(User.class))).thenReturn(expenseCategoryVersion);
+        when(expenseCategoryVersionService.getCurrentCategoryVersion(any(ExpenseCategory.class))).thenReturn(expenseCategoryVersion);
+        when(expenseCategoryVersionService.getCategoryVersions(any(ExpenseCategory.class))).thenReturn(List.of(expenseCategoryVersion));
+        when(expenseCategoryVersionMapper.mapExpenseCategoryVersionToResponse(any(ExpenseCategoryVersion.class))).thenReturn(expenseCategoryVersionResponse);
+        when(expenseCategoryVersionMapper.mapExpenseCategoryVersionsListToResponse(anyList())).thenReturn(List.of(expenseCategoryVersionResponse));
 
         //when
         ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryManagementService.addCategory(expenseCategoryObj, user);
@@ -83,9 +90,9 @@ class ExpenseCategoryManagementServiceTest {
         assertEquals(expenseCategoryResponse.getColorHex(), expenseCategoryObj.getColorHex());
         assertEquals(expenseCategoryResponse.isFavourite(), expenseCategoryObj.getIsFavourite());
         ExpenseCategoryVersionResponse currentVersion = expenseCategoryResponse.getCurrentVersion();
-        assertEquals(currentVersion.getId(), expenseCategoryVersionResponse.getId());
-        assertEquals(currentVersion.getMaximumCost(), expenseCategoryVersionResponse.getMaximumCost());
-        assertEquals(currentVersion.getValidMonth(), expenseCategoryVersionResponse.getValidMonth());
+        assertEquals(currentVersion.getId(), expenseCategoryVersion.getId());
+        assertEquals(currentVersion.getMaximumCost(), expenseCategoryVersion.getMaximumCost().doubleValue());
+        assertEquals(currentVersion.getValidMonth(), expenseCategoryVersion.getValidMonth());
         assertTrue(currentVersion.isValid());
     }
 
