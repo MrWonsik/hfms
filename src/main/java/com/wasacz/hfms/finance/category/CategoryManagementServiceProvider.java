@@ -49,4 +49,9 @@ public class CategoryManagementServiceProvider {
             case INCOME -> incomeCategoryManagementService;
         };
     }
+
+    public AbstractCategoryResponse editCategory(long id, String newCategoryName, String newColorHex, User user, CategoryType categoryType) {
+        ICategoryManagementService categoryManagementService = getService(categoryType);
+        return categoryManagementService.editCategory(id, newCategoryName, newColorHex, user);
+    }
 }

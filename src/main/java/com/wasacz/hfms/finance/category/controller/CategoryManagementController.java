@@ -46,7 +46,7 @@ public class CategoryManagementController {
         return ResponseEntity.status(HttpStatus.OK).body(abstractCategoryResponse);
     }
 
-    @PatchMapping("/{type}/{id}")
+    @PatchMapping("/{type}/favourite/{id}")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> setCategoryAsFavourite(@CurrentUser UserPrincipal user,
                                                     @PathVariable("id") long categoryId,
@@ -71,6 +71,16 @@ public class CategoryManagementController {
                                                    @PathVariable("type") CategoryType categoryType) {
         CategoriesResponse categoriesResponse = categoryManagementServiceProvider.getAllCategories(user.getUser(), categoryType);
         return ResponseEntity.status(HttpStatus.OK).body(categoriesResponse);
+    }
+
+    @PatchMapping("/{type}/{id}")
+    @Secured({"ROLE_USER"})
+    public ResponseEntity<?> editCategory(@CurrentUser UserPrincipal user,
+                                                    @PathVariable("id") long categoryId,
+                                                    @PathVariable("type") CategoryType categoryType,
+                                                    @RequestBody EditCategoryRequest editCategoryRequest) {
+        AbstractCategoryResponse abstractCategoryResponse = categoryManagementServiceProvider.editCategory(categoryId, editCategoryRequest.getCategoryName(), editCategoryRequest.getColorHex(), user.getUser(), categoryType);
+        return ResponseEntity.status(HttpStatus.OK).body(abstractCategoryResponse);
     }
 
 }

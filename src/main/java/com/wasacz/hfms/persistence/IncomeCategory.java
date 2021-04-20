@@ -19,7 +19,6 @@ public class IncomeCategory {
     private Long id;
 
     @NotNull
-    @Column(updatable = false)
     private String categoryName;
 
     @NotNull

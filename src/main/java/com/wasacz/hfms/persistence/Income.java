@@ -20,7 +20,7 @@ public class Income {
     private Long id;
 
     @NotNull
-    @Column(unique = true, updatable = false)
+    @Column(unique = true)
     private String incomeName;
 
     @NotNull

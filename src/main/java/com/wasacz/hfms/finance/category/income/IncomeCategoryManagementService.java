@@ -1,5 +1,6 @@
 package com.wasacz.hfms.finance.category.income;
 
+import com.wasacz.hfms.finance.category.controller.AbstractCategoryResponse;
 import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
 import com.wasacz.hfms.finance.category.CategoryValidator;
 import com.wasacz.hfms.finance.category.controller.CreateCategoryRequest;
@@ -29,7 +30,7 @@ public class IncomeCategoryManagementService implements ICategoryManagementServi
         CategoryValidator.validate(incomeCategoryObj);
         IncomeCategory incomeCategoryPersistence = buildIncomeCategory(incomeCategoryObj, user);
         IncomeCategory savedIncomeCategory = incomeCategoryRepository.save(incomeCategoryPersistence);
-        return getIncomeCategoryResponse(savedIncomeCategory);
+        return mapIncomeCategoryResponse(savedIncomeCategory);
     }
 
     private IncomeCategoryObj getIncomeCategoryObj(CreateCategoryRequest request) {
@@ -42,28 +43,48 @@ public class IncomeCategoryManagementService implements ICategoryManagementServi
 
     @Override
     public IncomeCategoryResponse setAsFavourite(long categoryId, boolean isFavourite, User user) {
-        IncomeCategory incomeCategoryToUpdate = incomeCategoryRepository
-                .findByIdAndUserAndIsDeletedFalse(categoryId, user)
-                .orElseThrow(() -> new IllegalArgumentException("Income category not found."));
+        IncomeCategory incomeCategoryToUpdate = findByIdAndUser(categoryId, user);
         incomeCategoryToUpdate.setIsFavourite(isFavourite);
         IncomeCategory updatedExpenseCategory = incomeCategoryRepository.save(incomeCategoryToUpdate);
-        return getIncomeCategoryResponse(updatedExpenseCategory);
+        return mapIncomeCategoryResponse(updatedExpenseCategory);
+    }
+
+    private IncomeCategory findByIdAndUser(long categoryId, User user) {
+        return incomeCategoryRepository
+                .findByIdAndUserAndIsDeletedFalse(categoryId, user)
+                .orElseThrow(() -> new IllegalArgumentException("Income category not found."));
     }
 
     @Override
     public IncomeCategoryResponse deleteCategory(long expenseCategoryId, User user) {
-        IncomeCategory incomeCategory = incomeCategoryRepository
-                .findByIdAndUserAndIsDeletedFalse(expenseCategoryId, user)
-                .orElseThrow(() -> new IllegalArgumentException("Income category not found."));
+        IncomeCategory incomeCategory = findByIdAndUser(expenseCategoryId, user);
         incomeCategory.setIsDeleted(true);
         IncomeCategory updatedExpenseCategory = incomeCategoryRepository.save(incomeCategory);
-        return getIncomeCategoryResponse(updatedExpenseCategory);
+        return mapIncomeCategoryResponse(updatedExpenseCategory);
     }
 
     @Override
     public CategoriesResponse getAllCategories(User user) {
         List<IncomeCategory> incomeCategories = incomeCategoryRepository.findAllByUserAndIsDeletedFalse(user).orElse(Collections.emptyList());
-        return new CategoriesResponse(incomeCategories.stream().map(this::getIncomeCategoryResponse).collect(Collectors.toList()));
+        return new CategoriesResponse(incomeCategories.stream().map(this::mapIncomeCategoryResponse).collect(Collectors.toList()));
+    }
+
+    @Override
+    public AbstractCategoryResponse editCategory(long id, String newCategoryName, String newColorHex, User user) {
+        CategoryValidator.validateHexColor(newColorHex);
+        IncomeCategory incomeCategory = findByIdAndUser(id, user);
+        if(newColorHex == null && newCategoryName == null) {
+            return mapIncomeCategoryResponse(incomeCategory);
+        }
+
+        if(newColorHex != null) {
+            incomeCategory.setColorHex(newColorHex);
+        }
+        if(newCategoryName != null) {
+            incomeCategory.setCategoryName(newCategoryName);
+        }
+        IncomeCategory updatedIncomeCategory = incomeCategoryRepository.save(incomeCategory);
+        return mapIncomeCategoryResponse(updatedIncomeCategory);
     }
 
     private IncomeCategory buildIncomeCategory(IncomeCategoryObj incomeCategoryObj, User user) {
@@ -75,7 +96,7 @@ public class IncomeCategoryManagementService implements ICategoryManagementServi
                 .build();
     }
 
-    private IncomeCategoryResponse getIncomeCategoryResponse(IncomeCategory incomeCategory) {
+    private IncomeCategoryResponse mapIncomeCategoryResponse(IncomeCategory incomeCategory) {
         return IncomeCategoryResponse.builder()
                 .id(incomeCategory.getId())
                 .categoryName(incomeCategory.getCategoryName())

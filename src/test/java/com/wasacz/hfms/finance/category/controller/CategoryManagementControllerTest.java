@@ -96,7 +96,7 @@ class CategoryManagementControllerTest {
 
         CategoryIsFavouriteRequest categoryIsFavouriteRequest = new CategoryIsFavouriteRequest(true);
 
-        this.mockMvc.perform(patch("/api/category/expense/" + expenseCategoryResponse.getId()).with(user(currentUser))
+        this.mockMvc.perform(patch("/api/category/expense/favourite/" + expenseCategoryResponse.getId()).with(user(currentUser))
                 .content(asJsonString(categoryIsFavouriteRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -110,7 +110,7 @@ class CategoryManagementControllerTest {
         CategoryIsFavouriteRequest categoryIsFavouriteRequest = new CategoryIsFavouriteRequest(true);
 
 
-        this.mockMvc.perform(patch("/api/category/expense/" + 101010L).with(user(currentUser))
+        this.mockMvc.perform(patch("/api/category/expense/favourite/" + 101010L).with(user(currentUser))
                 .content(asJsonString(categoryIsFavouriteRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -253,7 +253,7 @@ class CategoryManagementControllerTest {
 
         CategoryIsFavouriteRequest categoryIsFavouriteRequest = new CategoryIsFavouriteRequest(true);
 
-        this.mockMvc.perform(patch("/api/category/income/" + incomeCategoryResponse.getId()).with(user(currentUser))
+        this.mockMvc.perform(patch("/api/category/income/favourite/" + incomeCategoryResponse.getId()).with(user(currentUser))
                 .content(asJsonString(categoryIsFavouriteRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -266,7 +266,7 @@ class CategoryManagementControllerTest {
 
         CategoryIsFavouriteRequest categoryIsFavouriteRequest = new CategoryIsFavouriteRequest(true);
 
-        this.mockMvc.perform(patch("/api/category/income/" + 101010L).with(user(currentUser))
+        this.mockMvc.perform(patch("/api/category/income/favourite/" + 101010L).with(user(currentUser))
                 .content(asJsonString(categoryIsFavouriteRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))

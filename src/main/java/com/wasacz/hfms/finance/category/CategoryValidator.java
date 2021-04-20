@@ -34,7 +34,7 @@ public class CategoryValidator {
         ValidatorUtils.handleFieldBlank(categoryName, "categoryName");
     }
 
-    private static void validateHexColor(String hexColor) {
+    public static void validateHexColor(String hexColor) {
         if(hexColor == null) {
             return;
         }

@@ -15,4 +15,5 @@ public interface ICategoryManagementService {
 
      CategoriesResponse getAllCategories(User user);
 
+    AbstractCategoryResponse editCategory(long id, String newCategoryName, String newColorHex, User user);
 }

@@ -76,6 +76,24 @@ public class ExpenseCategoryManagementService implements ICategoryManagementServ
         return new CategoriesResponse(expenseCategories.stream().map(this::mapExpenseCategoryResponse).collect(Collectors.toList()));
     }
 
+    @Override
+    public ExpenseCategoryResponse editCategory(long id, String newCategoryName, String newColorHex, User user) {
+        CategoryValidator.validateHexColor(newColorHex);
+        ExpenseCategory expenseCategory = findByIdAndUser(id, user);
+        if(newColorHex == null && newCategoryName == null) {
+            return mapExpenseCategoryResponse(expenseCategory);
+        }
+
+        if(newColorHex != null) {
+            expenseCategory.setColorHex(newColorHex);
+        }
+        if(newCategoryName != null) {
+            expenseCategory.setCategoryName(newCategoryName);
+        }
+        ExpenseCategory updatedExpenseCategory = expenseCategoryRepository.save(expenseCategory);
+        return mapExpenseCategoryResponse(updatedExpenseCategory);
+    }
+
 
     private ExpenseCategoryResponse mapExpenseCategoryResponse(ExpenseCategory expenseCategory) {
         return ExpenseCategoryResponse.builder()
