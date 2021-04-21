@@ -361,4 +361,38 @@ class CategoryManagementControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason("categoryName cannot be blank."));
     }
+
+    @Test
+    public void whenEditIncomeCategory_thenReturnOkStatus() throws Exception {
+        //given
+        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
+                .builder()
+                .categoryName("Bike")
+                .colorHex("#F00")
+                .isFavourite(false)
+                .build();
+
+        MvcResult createdCategory = this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
+                .content(asJsonString(createCategoryRequest))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        ExpenseCategoryResponse expenseCategoryResponse = objectMapper.readValue(createdCategory.getResponse().getContentAsString(), ExpenseCategoryResponse.class);
+
+        EditCategoryRequest editCategoryRequest = new EditCategoryRequest("NewName", "#aaa");
+
+        MvcResult editedCategory = this.mockMvc.perform(patch("/api/category/expense/" + expenseCategoryResponse.getId()).with(user(currentUser))
+                .content(asJsonString(editCategoryRequest))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ExpenseCategoryResponse editedCategoryResponse = objectMapper.readValue(editedCategory.getResponse().getContentAsString(), ExpenseCategoryResponse.class);
+
+        assertEquals("NewName", editedCategoryResponse.getCategoryName());
+        assertEquals("#aaa", editedCategoryResponse.getColorHex());
+
+    }
 }

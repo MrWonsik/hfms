@@ -24,12 +24,9 @@ public class ExpenseCategoryVersionService {
         this.expenseCategorySaver = expenseCategorySaver;
     }
 
-    public ExpenseCategoryVersion getCurrentCategoryVersion(ExpenseCategory expenseCategory) {
-        if (expenseCategory == null) {
-            throw new IllegalStateException("Expense category is null.");
-        }
+    public ExpenseCategoryVersion getCurrentCategoryVersion(Long expenseCategoryId) {
         List<ExpenseCategoryVersion> expenseCategoryVersions = expenseCategoryVersionRepository
-                .findByExpenseCategory(expenseCategory).orElseThrow(() -> {
+                .findByExpenseCategoryId(expenseCategoryId).orElseThrow(() -> {
                     throw new IllegalStateException("Expense category versions is empty!");
                 });
         return obtainCurrentCategoryVersion(expenseCategoryVersions);
@@ -46,11 +43,9 @@ public class ExpenseCategoryVersionService {
         return newestVersionOptional.get();
     }
 
-
-
-    public List<ExpenseCategoryVersion> getCategoryVersions(ExpenseCategory expenseCategory) {
+    public List<ExpenseCategoryVersion> getCategoryVersions(Long expenseCategoryId) {
         return expenseCategoryVersionRepository
-                .findByExpenseCategory(expenseCategory).orElse(Collections.emptyList());
+                .findByExpenseCategoryId(expenseCategoryId).orElse(Collections.emptyList());
     }
 
     public ExpenseCategoryVersion addNewVersionForNextMonth(User user, long categoryId, Double newMaximumCost) {
@@ -69,8 +64,8 @@ public class ExpenseCategoryVersionService {
 
     public ExpenseCategoryVersion editCategoryVersion(User user, long categoryId, Double newMaximumCost) {
         CategoryValidator.validateMaximumCost(BigDecimal.valueOf(newMaximumCost));
-        ExpenseCategory category = findExpenseCategoryByIdAndUser(categoryId, user);
-        ExpenseCategoryVersion currentCategoryVersion = getCurrentCategoryVersion(category);
+        findExpenseCategoryByIdAndUser(categoryId, user);
+        ExpenseCategoryVersion currentCategoryVersion = getCurrentCategoryVersion(categoryId);
         return updateCategory(currentCategoryVersion, newMaximumCost);
     }
 

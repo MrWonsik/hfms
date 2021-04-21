@@ -78,17 +78,16 @@ public class ExpenseCategoryManagementService implements ICategoryManagementServ
 
     @Override
     public ExpenseCategoryResponse editCategory(long id, String newCategoryName, String newColorHex, User user) {
-        CategoryValidator.validateHexColor(newColorHex);
+        CategoryValidator.validateBeforeEdit(newCategoryName, newColorHex);
         ExpenseCategory expenseCategory = findByIdAndUser(id, user);
         if(newColorHex == null && newCategoryName == null) {
             return mapExpenseCategoryResponse(expenseCategory);
         }
-
-        if(newColorHex != null) {
-            expenseCategory.setColorHex(newColorHex);
-        }
         if(newCategoryName != null) {
             expenseCategory.setCategoryName(newCategoryName);
+        }
+        if(newColorHex != null) {
+            expenseCategory.setColorHex(newColorHex);
         }
         ExpenseCategory updatedExpenseCategory = expenseCategoryRepository.save(expenseCategory);
         return mapExpenseCategoryResponse(updatedExpenseCategory);
@@ -103,10 +102,10 @@ public class ExpenseCategoryManagementService implements ICategoryManagementServ
                 .isDeleted(expenseCategory.getIsDeleted())
                 .isFavourite(expenseCategory.getIsFavourite())
                 .currentVersion(expenseCategoryVersionMapper.mapExpenseCategoryVersionToResponse(
-                        expenseCategoryVersionService.getCurrentCategoryVersion(expenseCategory))
+                        expenseCategoryVersionService.getCurrentCategoryVersion(expenseCategory.getId()))
                 )
                 .expenseCategoryVersions(expenseCategoryVersionMapper.mapExpenseCategoryVersionsListToResponse(
-                        expenseCategoryVersionService.getCategoryVersions(expenseCategory))
+                        expenseCategoryVersionService.getCategoryVersions(expenseCategory.getId()))
                 )
                 .createDate(new DateTime(expenseCategory.getCreatedDate()))
                 .build();

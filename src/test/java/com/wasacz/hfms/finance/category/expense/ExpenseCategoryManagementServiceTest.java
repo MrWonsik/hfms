@@ -19,7 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ExpenseCategoryManagementServiceTest {
@@ -76,8 +76,8 @@ class ExpenseCategoryManagementServiceTest {
                 .build();
 
         when(expenseCategorySaver.saveExpenseCategory(any(ExpenseCategoryObj.class), any(User.class))).thenReturn(expenseCategoryVersion);
-        when(expenseCategoryVersionService.getCurrentCategoryVersion(any(ExpenseCategory.class))).thenReturn(expenseCategoryVersion);
-        when(expenseCategoryVersionService.getCategoryVersions(any(ExpenseCategory.class))).thenReturn(List.of(expenseCategoryVersion));
+        when(expenseCategoryVersionService.getCurrentCategoryVersion(any(Long.class))).thenReturn(expenseCategoryVersion);
+        when(expenseCategoryVersionService.getCategoryVersions(any(Long.class))).thenReturn(List.of(expenseCategoryVersion));
         when(expenseCategoryVersionMapper.mapExpenseCategoryVersionToResponse(any(ExpenseCategoryVersion.class))).thenReturn(expenseCategoryVersionResponse);
         when(expenseCategoryVersionMapper.mapExpenseCategoryVersionsListToResponse(anyList())).thenReturn(List.of(expenseCategoryVersionResponse));
 
@@ -170,5 +170,151 @@ class ExpenseCategoryManagementServiceTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> expenseCategoryManagementService.deleteCategory(1L, user));
         assertEquals(exception.getMessage(), "Expense category not found.");
+    }
+
+    @Test
+    public void whenEditExpenseCategory_givenEditCategoryRequest_thenEditCategory() {
+        //given
+        User user = User.builder().id(1L).username("Test").build();
+
+        ExpenseCategory expenseCategory = ExpenseCategory
+                .builder()
+                .id(1L)
+                .categoryName("someName")
+                .colorHex("#bbb")
+                .user(user)
+                .isDeleted(false)
+                .build();
+        ExpenseCategory expenseCategoryUpdated = ExpenseCategory
+                .builder()
+                .id(1L)
+                .categoryName("CategoryName")
+                .colorHex("#aaa")
+                .user(user)
+                .isDeleted(false)
+                .build();
+        when(expenseCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(expenseCategory));
+        when(expenseCategoryRepository.save(any(ExpenseCategory.class))).thenReturn(expenseCategoryUpdated);
+
+        //when
+        ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryManagementService.editCategory(1L, "CategoryName", "#aaa", user);
+
+        //then
+        assertEquals(expenseCategoryUpdated.getCategoryName(), expenseCategoryResponse.getCategoryName());
+        assertEquals(expenseCategoryUpdated.getColorHex(), expenseCategoryResponse.getColorHex());
+    }
+
+    @Test
+    public void whenEditExpenseCategory_givenEditCategoryRequestWithNullParams_thenEditCategory() {
+        //given
+        User user = User.builder().id(1L).username("Test").build();
+
+        ExpenseCategory expenseCategory = ExpenseCategory
+                .builder()
+                .id(1L)
+                .categoryName("someName")
+                .colorHex("#bbb")
+                .user(user)
+                .isDeleted(false)
+                .build();
+
+        when(expenseCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(expenseCategory));
+
+        //when
+        ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryManagementService.editCategory(1L, null, null, user);
+
+        //then
+        verify(expenseCategoryRepository, times(0)).save(any(ExpenseCategory.class));
+        assertEquals(expenseCategory.getCategoryName(), expenseCategoryResponse.getCategoryName());
+        assertEquals(expenseCategory.getColorHex(), expenseCategoryResponse.getColorHex());
+    }
+
+    @Test
+    public void whenEditExpenseCategory_givenEditCategoryRequestWithoutCategoryName_thenEditCategory() {
+        //given
+        User user = User.builder().id(1L).username("Test").build();
+
+        ExpenseCategory expenseCategory = ExpenseCategory
+                .builder()
+                .id(1L)
+                .categoryName("someName")
+                .colorHex("#bbb")
+                .user(user)
+                .isDeleted(false)
+                .build();
+        ExpenseCategory expenseCategoryUpdated = ExpenseCategory
+                .builder()
+                .id(1L)
+                .categoryName("someName")
+                .colorHex("#aaa")
+                .user(user)
+                .isDeleted(false)
+                .build();
+        when(expenseCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(expenseCategory));
+        when(expenseCategoryRepository.save(any(ExpenseCategory.class))).thenReturn(expenseCategoryUpdated);
+
+        //when
+        ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryManagementService.editCategory(1L, null, "#aaa", user);
+
+        //then
+        assertEquals(expenseCategory.getCategoryName(), expenseCategoryResponse.getCategoryName());
+        assertEquals(expenseCategoryUpdated.getCategoryName(), expenseCategoryResponse.getCategoryName());
+        assertEquals(expenseCategoryUpdated.getColorHex(), expenseCategoryResponse.getColorHex());
+    }
+
+
+    @Test
+    public void whenEditExpenseCategory_givenEditCategoryRequestWithoutHexColor_thenEditCategory() {
+        //given
+        User user = User.builder().id(1L).username("Test").build();
+
+        ExpenseCategory expenseCategory = ExpenseCategory
+                .builder()
+                .id(1L)
+                .categoryName("someName")
+                .colorHex("#bbb")
+                .user(user)
+                .isDeleted(false)
+                .build();
+        ExpenseCategory expenseCategoryUpdated = ExpenseCategory
+                .builder()
+                .id(1L)
+                .categoryName("CategoryName")
+                .colorHex("#bbb")
+                .user(user)
+                .isDeleted(false)
+                .build();
+        when(expenseCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(expenseCategory));
+        when(expenseCategoryRepository.save(any(ExpenseCategory.class))).thenReturn(expenseCategoryUpdated);
+
+        //when
+        ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryManagementService.editCategory(1L, "CategoryName", null, user);
+
+        //then
+        assertEquals(expenseCategory.getColorHex(), expenseCategoryResponse.getColorHex());
+        assertEquals(expenseCategoryUpdated.getCategoryName(), expenseCategoryResponse.getCategoryName());
+        assertEquals(expenseCategoryUpdated.getColorHex(), expenseCategoryResponse.getColorHex());
+    }
+
+    @Test
+    public void whenEditExpenseCategory_givenEditCategoryRequestWithIncorrectCategoryName_thenThrowException() {
+        //given
+        User user = User.builder().id(1L).username("Test").build();
+
+        //then
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> expenseCategoryManagementService.editCategory(1L, "", null, user));
+        assertEquals(exception.getMessage(), "categoryName cannot be blank.");
+    }
+
+    @Test
+    public void whenEditExpenseCategory_givenEditCategoryRequestWithIncorrectHexColor_thenThrowException() {
+        //given
+        User user = User.builder().id(1L).username("Test").build();
+
+        //then
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> expenseCategoryManagementService.editCategory(1L, null, "#aaaaaa00", user));
+        assertEquals(exception.getMessage(), "Incorrect hex color provided.");
     }
 }

@@ -70,8 +70,8 @@ public class IncomeCategoryManagementService implements ICategoryManagementServi
     }
 
     @Override
-    public AbstractCategoryResponse editCategory(long id, String newCategoryName, String newColorHex, User user) {
-        CategoryValidator.validateHexColor(newColorHex);
+    public IncomeCategoryResponse editCategory(long id, String newCategoryName, String newColorHex, User user) {
+        CategoryValidator.validateBeforeEdit(newCategoryName, newColorHex);
         IncomeCategory incomeCategory = findByIdAndUser(id, user);
         if(newColorHex == null && newCategoryName == null) {
             return mapIncomeCategoryResponse(incomeCategory);

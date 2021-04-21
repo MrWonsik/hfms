@@ -34,7 +34,7 @@ public class ExpenseCategorySaver {
                 .build();
     }
 
-    public ExpenseCategoryVersion saveExpenseCategoryVersion(BigDecimal maximumCost, ExpenseCategory expenseCategoryPersistence) {
+    private ExpenseCategoryVersion saveExpenseCategoryVersion(BigDecimal maximumCost, ExpenseCategory expenseCategoryPersistence) {
         ExpenseCategoryVersion expenseCategoryVersion = buildExpenseCategoryVersionPersistence(maximumCost, expenseCategoryPersistence);
         return expenseCategoryVersionRepository.save(expenseCategoryVersion);
     }

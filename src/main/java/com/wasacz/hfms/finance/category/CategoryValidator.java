@@ -21,6 +21,13 @@ public class CategoryValidator {
         validateHexColor(incomeCategory.getColorHex());
     }
 
+    public static void validateBeforeEdit(String categoryName, String hexColor) {
+        if(categoryName != null) {
+            validateName(categoryName);
+        }
+        validateHexColor(hexColor);
+    }
+
     public static void validateMaximumCost(BigDecimal maximumCost) {
         if(maximumCost == null) {
             return;

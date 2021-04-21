@@ -63,16 +63,16 @@ class ExpenseCategoryVersionServiceTest {
 
         ExpenseCategoryVersion previousMonth = ExpenseCategoryVersion
                 .builder()
-                .id(1L)
+                .id(3L)
                 .expenseCategory(expenseCategory)
                 .maximumCost(BigDecimal.TEN)
                 .validMonth(YearMonth.now().minusMonths(1))
                 .build();
 
-        when(repository.findByExpenseCategory(any(ExpenseCategory.class))).thenReturn(Optional.of(List.of(previousMonth, currentVersion, nextMonth)));
+        when(repository.findByExpenseCategoryId(any(Long.class))).thenReturn(Optional.of(List.of(previousMonth, currentVersion, nextMonth)));
 
         //when
-        ExpenseCategoryVersion currentCategoryVersion = service.getCurrentCategoryVersion(expenseCategory);
+        ExpenseCategoryVersion currentCategoryVersion = service.getCurrentCategoryVersion(1L);
 
         //then
         assertEquals(currentVersion.getValidMonth(), currentCategoryVersion.getValidMonth());
@@ -105,16 +105,16 @@ class ExpenseCategoryVersionServiceTest {
 
         ExpenseCategoryVersion previousVersion = ExpenseCategoryVersion
                 .builder()
-                .id(1L)
+                .id(3L)
                 .expenseCategory(expenseCategory)
                 .maximumCost(BigDecimal.TEN)
                 .validMonth(YearMonth.now().minusMonths(3))
                 .build();
 
-        when(repository.findByExpenseCategory(any(ExpenseCategory.class))).thenReturn(Optional.of(List.of(previousVersion, nextMonth)));
+        when(repository.findByExpenseCategoryId(any(Long.class))).thenReturn(Optional.of(List.of(previousVersion, nextMonth)));
 
         //when
-        ExpenseCategoryVersion currentCategoryVersion = service.getCurrentCategoryVersion(expenseCategory);
+        ExpenseCategoryVersion currentCategoryVersion = service.getCurrentCategoryVersion(1L);
 
         //then
         assertEquals(previousVersion.getValidMonth(), currentCategoryVersion.getValidMonth());
@@ -122,36 +122,15 @@ class ExpenseCategoryVersionServiceTest {
         assertEquals(previousVersion.getId(), currentCategoryVersion.getId());
     }
 
-    @Test
-    public void whenGetCurrentCategoryVersion_givenNull_thenThrowException() {
-        //given
-        User user = User.builder().id(1L).username("Test").build();
-
-        //when and then
-        IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () -> service.getCurrentCategoryVersion(null));
-        assertEquals("Expense category is null.", illegalStateException.getMessage());
-    }
-
     @Test //CornerCase!!!
     public void whenGetCurrentCategoryVersion_givenExpenseCategoryWihtoutVersion_thenThrowException() {
         //given
         User user = User.builder().id(1L).username("Test").build();
 
-        ExpenseCategory expenseCategory = ExpenseCategory
-                .builder()
-                .id(1L)
-                .categoryName("Car")
-                .colorHex("#F00")
-                .isFavourite(false)
-                .user(user)
-                .isDeleted(false)
-                .build();
-
-
-        when(repository.findByExpenseCategory(any(ExpenseCategory.class))).thenReturn(Optional.empty());
+        when(repository.findByExpenseCategoryId(any(Long.class))).thenReturn(Optional.empty());
 
         //when and then
-        IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () -> service.getCurrentCategoryVersion(expenseCategory));
+        IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () -> service.getCurrentCategoryVersion(1L));
         assertEquals("Expense category versions is empty!", illegalStateException.getMessage());
     }
 
@@ -179,10 +158,10 @@ class ExpenseCategoryVersionServiceTest {
                 .build();
 
 
-        when(repository.findByExpenseCategory(any(ExpenseCategory.class))).thenReturn(Optional.of(List.of(nextMonth)));
+        when(repository.findByExpenseCategoryId(any(Long.class))).thenReturn(Optional.of(List.of(nextMonth)));
 
         //when and then
-        IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () -> service.getCurrentCategoryVersion(expenseCategory));
+        IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () -> service.getCurrentCategoryVersion(1L));
         assertEquals("Not found current version!", illegalStateException.getMessage());
     }
 
