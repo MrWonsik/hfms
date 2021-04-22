@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
@@ -20,7 +21,6 @@ public class Expense {
     private Long id;
 
     @NotNull
-    @Column(unique = true, updatable = false)
     private String expenseName;
 
     @NotNull
@@ -34,6 +34,9 @@ public class Expense {
     @NotNull
     @ManyToOne
     private User user;
+
+    @NotNull
+    private BigDecimal cost;
 
     @CreatedDate
     @Builder.Default

@@ -23,8 +23,6 @@ public class ExpensePosition {
     @NotNull
     private String expensePositionName;
 
-    private String manufacturer;
-
     private BigDecimal size;
 
     @NotNull

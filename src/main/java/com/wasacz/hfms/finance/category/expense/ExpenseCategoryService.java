@@ -2,7 +2,7 @@ package com.wasacz.hfms.finance.category.expense;
 
 import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
 import com.wasacz.hfms.finance.category.CategoryValidator;
-import com.wasacz.hfms.finance.category.controller.CreateCategoryRequest;
+import com.wasacz.hfms.finance.category.controller.CategoryObj;
 import com.wasacz.hfms.finance.category.ICategoryManagementService;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryVersionMapper;
@@ -17,14 +17,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class ExpenseCategoryManagementService implements ICategoryManagementService {
+public class ExpenseCategoryService implements ICategoryManagementService {
 
     private final ExpenseCategoryRepository expenseCategoryRepository;
     private final ExpenseCategorySaver expenseCategorySaver;
     private final ExpenseCategoryVersionService expenseCategoryVersionService;
     private final ExpenseCategoryVersionMapper expenseCategoryVersionMapper;
 
-    public ExpenseCategoryManagementService(ExpenseCategoryRepository expenseCategoryRepository, ExpenseCategorySaver expenseCategorySaver, ExpenseCategoryVersionService expenseCategoryVersionService, ExpenseCategoryVersionMapper expenseCategoryVersionMapper) {
+    public ExpenseCategoryService(ExpenseCategoryRepository expenseCategoryRepository, ExpenseCategorySaver expenseCategorySaver, ExpenseCategoryVersionService expenseCategoryVersionService, ExpenseCategoryVersionMapper expenseCategoryVersionMapper) {
         this.expenseCategoryRepository = expenseCategoryRepository;
         this.expenseCategorySaver = expenseCategorySaver;
         this.expenseCategoryVersionService = expenseCategoryVersionService;
@@ -32,14 +32,14 @@ public class ExpenseCategoryManagementService implements ICategoryManagementServ
     }
 
     @Override
-    public ExpenseCategoryResponse addCategory(CreateCategoryRequest categoryRequest, User user) {
+    public ExpenseCategoryResponse addCategory(CategoryObj categoryRequest, User user) {
         ExpenseCategoryObj expenseCategoryObj = getExpenseCategoryObj(categoryRequest);
         CategoryValidator.validate(expenseCategoryObj);
         ExpenseCategoryVersion expenseCategoryVersionSaved = expenseCategorySaver.saveExpenseCategory(expenseCategoryObj, user);
         return mapExpenseCategoryResponse(expenseCategoryVersionSaved.getExpenseCategory());
     }
 
-    private ExpenseCategoryObj getExpenseCategoryObj(CreateCategoryRequest request) {
+    private ExpenseCategoryObj getExpenseCategoryObj(CategoryObj request) {
         return ExpenseCategoryObj.builder()
                 .categoryName(request.getCategoryName())
                 .colorHex(request.getColorHex())
@@ -103,10 +103,10 @@ public class ExpenseCategoryManagementService implements ICategoryManagementServ
                 .isFavourite(expenseCategory.getIsFavourite())
                 .currentVersion(expenseCategoryVersionMapper.mapExpenseCategoryVersionToResponse(
                         expenseCategoryVersionService.getCurrentCategoryVersion(expenseCategory.getId()))
-                )
+                ) //TODO: improve it
                 .expenseCategoryVersions(expenseCategoryVersionMapper.mapExpenseCategoryVersionsListToResponse(
                         expenseCategoryVersionService.getCategoryVersions(expenseCategory.getId()))
-                )
+                ) //TODO: improve it
                 .createDate(new DateTime(expenseCategory.getCreatedDate()))
                 .build();
     }

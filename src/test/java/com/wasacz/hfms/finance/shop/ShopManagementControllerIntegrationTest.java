@@ -1,9 +1,6 @@
 package com.wasacz.hfms.finance.shop;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wasacz.hfms.finance.shop.CreateShopRequest;
-import com.wasacz.hfms.finance.shop.ShopResponse;
-import com.wasacz.hfms.finance.shop.ShopsResponse;
 import com.wasacz.hfms.helpers.CurrentUserMock;
 import com.wasacz.hfms.persistence.Role;
 import com.wasacz.hfms.security.UserPrincipal;
@@ -29,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ShopManagementControllerTest {
+class ShopManagementControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -50,8 +47,7 @@ class ShopManagementControllerTest {
     @Test
     public void whenAddShop_givenNewShopRequest_thenReturnOkStatus() throws Exception {
         //given
-        CreateShopRequest ikea = new CreateShopRequest();
-        ikea.setShopName("ikea");
+        ShopObj ikea = ShopObj.builder().shopName("ikea").build();
         this.mockMvc.perform(post("/api/shop/").with(user(currentUser))
                 .content(asJsonString(ikea))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -63,7 +59,7 @@ class ShopManagementControllerTest {
     @Test
     public void whenAddShopsWithEmptyRequestBody_thenReturnBadRequestStatus() throws Exception {
         //given
-        CreateShopRequest ikea = new CreateShopRequest();
+        ShopObj ikea = ShopObj.builder().build();
 
         this.mockMvc.perform(post("/api/shop/").with(user(currentUser))
                 .content(asJsonString(ikea))
@@ -76,8 +72,8 @@ class ShopManagementControllerTest {
     @Test
     public void whenAddShopsWithTheSameNameAsDifferentUser_thenReturnOkStatus() throws Exception {
         //given
-        CreateShopRequest ikea = new CreateShopRequest();
-        ikea.setShopName("ikea3");
+        ShopObj ikea = ShopObj.builder().shopName("ikea3").build();
+
         this.mockMvc.perform(post("/api/shop/").with(user(currentUser))
                 .content(asJsonString(ikea))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -95,8 +91,7 @@ class ShopManagementControllerTest {
     @Test
     public void whenDeleteShop_thenReturnOkStatus() throws Exception {
         //given
-        CreateShopRequest ikea = new CreateShopRequest();
-        ikea.setShopName("ikea4");
+        ShopObj ikea = ShopObj.builder().shopName("ikea4").build();
 
         ShopResponse shopResponse = objectMapper.readValue(createNewShop(ikea).getResponse().getContentAsString(), ShopResponse.class);
         this.mockMvc.perform(delete("/api/shop/" + shopResponse.getId()).with(user(currentUser))
@@ -107,10 +102,9 @@ class ShopManagementControllerTest {
     @Test
     public void whenGetAllShops_thenReturnOkStatusAndOnlyNotDeletedShop() throws Exception {
         //given
-        CreateShopRequest ikea = new CreateShopRequest();
-        ikea.setShopName("ikea5");
-        CreateShopRequest ikea2 = new CreateShopRequest();
-        ikea.setShopName("ikea6");
+        ShopObj ikea = ShopObj.builder().shopName("ikea5").build();
+        ShopObj ikea2 = ShopObj.builder().shopName("ikea5").build();
+
 
         MvcResult newShop = createNewShop(ikea);
         createNewShop(ikea2);
@@ -140,7 +134,7 @@ class ShopManagementControllerTest {
         assertTrue(shopsListResponse.isEmpty());
     }
 
-    private MvcResult createNewShop(CreateShopRequest ikea) throws Exception {
+    private MvcResult createNewShop(ShopObj ikea) throws Exception {
         return this.mockMvc.perform(post("/api/shop/").with(user(currentUser))
                 .content(asJsonString(ikea))
                 .contentType(MediaType.APPLICATION_JSON)

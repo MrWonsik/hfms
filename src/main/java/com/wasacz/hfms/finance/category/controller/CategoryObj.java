@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class CreateCategoryRequest {
+public class CategoryObj {
     private final String categoryName;
     private final String colorHex;
     private final Boolean isFavourite;

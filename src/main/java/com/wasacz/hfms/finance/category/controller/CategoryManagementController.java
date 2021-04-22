@@ -1,6 +1,6 @@
 package com.wasacz.hfms.finance.category.controller;
 
-import com.wasacz.hfms.finance.category.CategoryManagementServiceProvider;
+import com.wasacz.hfms.finance.category.CategoryServiceProvider;
 import com.wasacz.hfms.finance.category.CategoryType;
 import com.wasacz.hfms.security.CurrentUser;
 import com.wasacz.hfms.security.UserPrincipal;
@@ -19,10 +19,10 @@ import java.io.IOException;
 @RequestMapping("/api/category")
 public class CategoryManagementController {
 
-    private final CategoryManagementServiceProvider categoryManagementServiceProvider;
+    private final CategoryServiceProvider categoryServiceProvider;
 
-    public CategoryManagementController(CategoryManagementServiceProvider categoryManagementServiceProvider) {
-        this.categoryManagementServiceProvider = categoryManagementServiceProvider;
+    public CategoryManagementController(CategoryServiceProvider categoryServiceProvider) {
+        this.categoryServiceProvider = categoryServiceProvider;
     }
 
     @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
@@ -41,8 +41,8 @@ public class CategoryManagementController {
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> addCategory(@CurrentUser UserPrincipal user,
                                          @PathVariable("type") CategoryType categoryType,
-                                         @RequestBody CreateCategoryRequest createCategoryRequest) {
-        AbstractCategoryResponse abstractCategoryResponse = categoryManagementServiceProvider.addCategory(createCategoryRequest, user.getUser(), categoryType);
+                                         @RequestBody CategoryObj categoryObj) {
+        AbstractCategoryResponse abstractCategoryResponse = categoryServiceProvider.addCategory(categoryObj, user.getUser(), categoryType);
         return ResponseEntity.status(HttpStatus.OK).body(abstractCategoryResponse);
     }
 
@@ -52,7 +52,7 @@ public class CategoryManagementController {
                                                     @PathVariable("id") long categoryId,
                                                     @PathVariable("type") CategoryType categoryType,
                                                     @RequestBody CategoryIsFavouriteRequest categoryIsFavouriteRequest) {
-        AbstractCategoryResponse abstractCategoryResponse = categoryManagementServiceProvider.setAsFavourite(categoryId, categoryIsFavouriteRequest, user.getUser(), categoryType);
+        AbstractCategoryResponse abstractCategoryResponse = categoryServiceProvider.setAsFavourite(categoryId, categoryIsFavouriteRequest, user.getUser(), categoryType);
         return ResponseEntity.status(HttpStatus.OK).body(abstractCategoryResponse);
     }
 
@@ -61,7 +61,7 @@ public class CategoryManagementController {
     public ResponseEntity<?> deleteCategory(@CurrentUser UserPrincipal user,
                                             @PathVariable("id") long categoryId,
                                             @PathVariable("type") CategoryType categoryType) {
-        AbstractCategoryResponse abstractCategoryResponse = categoryManagementServiceProvider.deleteCategory(categoryId, user.getUser(), categoryType);
+        AbstractCategoryResponse abstractCategoryResponse = categoryServiceProvider.deleteCategory(categoryId, user.getUser(), categoryType);
         return ResponseEntity.status(HttpStatus.OK).body(abstractCategoryResponse);
     }
 
@@ -69,7 +69,7 @@ public class CategoryManagementController {
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> getAllExpenseCategory(@CurrentUser UserPrincipal user,
                                                    @PathVariable("type") CategoryType categoryType) {
-        CategoriesResponse categoriesResponse = categoryManagementServiceProvider.getAllCategories(user.getUser(), categoryType);
+        CategoriesResponse categoriesResponse = categoryServiceProvider.getAllCategories(user.getUser(), categoryType);
         return ResponseEntity.status(HttpStatus.OK).body(categoriesResponse);
     }
 
@@ -79,7 +79,7 @@ public class CategoryManagementController {
                                                     @PathVariable("id") long categoryId,
                                                     @PathVariable("type") CategoryType categoryType,
                                                     @RequestBody EditCategoryRequest editCategoryRequest) {
-        AbstractCategoryResponse abstractCategoryResponse = categoryManagementServiceProvider.editCategory(categoryId, editCategoryRequest.getCategoryName(), editCategoryRequest.getColorHex(), user.getUser(), categoryType);
+        AbstractCategoryResponse abstractCategoryResponse = categoryServiceProvider.editCategory(categoryId, editCategoryRequest.getCategoryName(), editCategoryRequest.getColorHex(), user.getUser(), categoryType);
         return ResponseEntity.status(HttpStatus.OK).body(abstractCategoryResponse);
     }
 

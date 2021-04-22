@@ -3,23 +3,23 @@ package com.wasacz.hfms.finance.category;
 import com.wasacz.hfms.finance.category.controller.AbstractCategoryResponse;
 import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
 import com.wasacz.hfms.finance.category.controller.CategoryIsFavouriteRequest;
-import com.wasacz.hfms.finance.category.controller.CreateCategoryRequest;
+import com.wasacz.hfms.finance.category.controller.CategoryObj;
 import com.wasacz.hfms.persistence.User;
 import org.springframework.stereotype.Service;
 
 
 @Service
-public class CategoryManagementServiceProvider {
+public class CategoryServiceProvider {
 
-    private final ICategoryManagementService expenseCategoryManagementService;
-    private final ICategoryManagementService incomeCategoryManagementService;
+    private final ICategoryManagementService expenseCategoryService;
+    private final ICategoryManagementService incomeCategoryService;
 
-    public CategoryManagementServiceProvider(ICategoryManagementService expenseCategoryManagementService, ICategoryManagementService incomeCategoryManagementService) {
-        this.expenseCategoryManagementService = expenseCategoryManagementService;
-        this.incomeCategoryManagementService = incomeCategoryManagementService;
+    public CategoryServiceProvider(ICategoryManagementService expenseCategoryService, ICategoryManagementService incomeCategoryService) {
+        this.expenseCategoryService = expenseCategoryService;
+        this.incomeCategoryService = incomeCategoryService;
     }
 
-    public AbstractCategoryResponse addCategory(CreateCategoryRequest request, User user, CategoryType categoryType) {
+    public AbstractCategoryResponse addCategory(CategoryObj request, User user, CategoryType categoryType) {
         ICategoryManagementService categoryManagementService = getService(categoryType);
         return categoryManagementService.addCategory(request, user);
     }
@@ -45,8 +45,8 @@ public class CategoryManagementServiceProvider {
         }
 
         return switch (categoryType) {
-            case EXPENSE -> expenseCategoryManagementService;
-            case INCOME -> incomeCategoryManagementService;
+            case EXPENSE -> expenseCategoryService;
+            case INCOME -> incomeCategoryService;
         };
     }
 

@@ -1,9 +1,8 @@
 package com.wasacz.hfms.finance.category.income;
 
-import com.wasacz.hfms.finance.category.controller.AbstractCategoryResponse;
 import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
 import com.wasacz.hfms.finance.category.CategoryValidator;
-import com.wasacz.hfms.finance.category.controller.CreateCategoryRequest;
+import com.wasacz.hfms.finance.category.controller.CategoryObj;
 import com.wasacz.hfms.finance.category.ICategoryManagementService;
 import com.wasacz.hfms.persistence.*;
 import com.wasacz.hfms.utils.date.DateTime;
@@ -16,16 +15,16 @@ import java.util.stream.Collectors;
 import static com.wasacz.hfms.utils.HexColorUtils.getRandomHexColor;
 
 @Service
-public class IncomeCategoryManagementService implements ICategoryManagementService {
+public class IncomeCategoryService implements ICategoryManagementService {
 
     private final IncomeCategoryRepository incomeCategoryRepository;
 
-    public IncomeCategoryManagementService(IncomeCategoryRepository incomeCategoryRepository) {
+    public IncomeCategoryService(IncomeCategoryRepository incomeCategoryRepository) {
         this.incomeCategoryRepository = incomeCategoryRepository;
     }
 
     @Override
-    public IncomeCategoryResponse addCategory(CreateCategoryRequest categoryRequest, User user) {
+    public IncomeCategoryResponse addCategory(CategoryObj categoryRequest, User user) {
         IncomeCategoryObj incomeCategoryObj = getIncomeCategoryObj(categoryRequest);
         CategoryValidator.validate(incomeCategoryObj);
         IncomeCategory incomeCategoryPersistence = buildIncomeCategory(incomeCategoryObj, user);
@@ -33,7 +32,7 @@ public class IncomeCategoryManagementService implements ICategoryManagementServi
         return mapIncomeCategoryResponse(savedIncomeCategory);
     }
 
-    private IncomeCategoryObj getIncomeCategoryObj(CreateCategoryRequest request) {
+    private IncomeCategoryObj getIncomeCategoryObj(CategoryObj request) {
         return IncomeCategoryObj.builder()
                 .categoryName(request.getCategoryName())
                 .colorHex(request.getColorHex())

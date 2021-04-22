@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class CategoryManagementControllerTest {
+class CategoryControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -50,22 +50,22 @@ class CategoryManagementControllerTest {
     @Test
     public void whenAddExpenseCategory_givenCreateExpenseCategoryRequest_thenReturnOkStatus() throws Exception {
         //given
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
+        CategoryObj categoryObj = CategoryObj
                 .builder()
                 .categoryName("Car")
                 .colorHex("#F00")
                 .isFavourite(false)
                 .build();
 
-        var expenseCategoryResponse = (ExpenseCategoryResponse) createCategoryAndReturn(createCategoryRequest, CategoryType.EXPENSE);
+        var expenseCategoryResponse = (ExpenseCategoryResponse) createCategoryAndReturn(categoryObj, CategoryType.EXPENSE);
 
         assertFalse(expenseCategoryResponse.getExpenseCategoryVersions().isEmpty());
         assertNotNull(expenseCategoryResponse.getCurrentVersion());
     }
 
-    private AbstractCategoryResponse createCategoryAndReturn(CreateCategoryRequest createCategoryRequest, CategoryType type) throws Exception {
+    private AbstractCategoryResponse createCategoryAndReturn(CategoryObj categoryObj, CategoryType type) throws Exception {
         MvcResult createdCategoryResult = this.mockMvc.perform(post("/api/category/" + type.name() + "/").with(user(currentUser))
-                .content(asJsonString(createCategoryRequest))
+                .content(asJsonString(categoryObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -79,7 +79,7 @@ class CategoryManagementControllerTest {
 
     @Test
     public void whenEditExpenseCategory_givenEditExpenseCategoryRequest_thenReturnOkStatus() throws Exception {
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
+        CategoryObj categoryObj = CategoryObj
                 .builder()
                 .categoryName("Bike")
                 .colorHex("#F00")
@@ -87,7 +87,7 @@ class CategoryManagementControllerTest {
                 .build();
 
         MvcResult createdCategory = this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
-                .content(asJsonString(createCategoryRequest))
+                .content(asJsonString(categoryObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -120,7 +120,7 @@ class CategoryManagementControllerTest {
 
     @Test
     public void whenDeleteExpenseCategory_givenExpenseCategoryId_thenReturnOkStatus() throws Exception {
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
+        CategoryObj categoryObj = CategoryObj
                 .builder()
                 .categoryName("Home")
                 .colorHex("#F00")
@@ -128,7 +128,7 @@ class CategoryManagementControllerTest {
                 .build();
 
         MvcResult createdCategory = this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
-                .content(asJsonString(createCategoryRequest))
+                .content(asJsonString(categoryObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -167,12 +167,12 @@ class CategoryManagementControllerTest {
     @Test
     public void whenAddExpenseCategory_givenCreateExpenseCategoryRequestOnlyWithName_thenReturnOkStatusAndHexColorIsRandom() throws Exception {
         //given
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
+        CategoryObj categoryObj = CategoryObj
                 .builder()
                 .categoryName("Car")
                 .build();
 
-        var expenseCategoryResponse = createCategoryAndReturn(createCategoryRequest, CategoryType.EXPENSE);
+        var expenseCategoryResponse = createCategoryAndReturn(categoryObj, CategoryType.EXPENSE);
 
         assertFalse(expenseCategoryResponse.getColorHex().isEmpty());
         assertEquals("Car", expenseCategoryResponse.getCategoryName());
@@ -184,7 +184,7 @@ class CategoryManagementControllerTest {
     @Test
     public void whenAddExpenseCategory_givenCreateExpenseCategoryRequestWithIncorrectHexColor_thenReturnBadRequest() throws Exception {
         //given
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
+        CategoryObj categoryObj = CategoryObj
                 .builder()
                 .categoryName("Car")
                 .colorHex("F00000")
@@ -192,7 +192,7 @@ class CategoryManagementControllerTest {
                 .build();
 
         this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
-                .content(asJsonString(createCategoryRequest))
+                .content(asJsonString(categoryObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -202,10 +202,10 @@ class CategoryManagementControllerTest {
     @Test
     public void whenAddExpenseCategoryWithoutCategoryName_thenReturnBadRequestStatus() throws Exception {
         //given
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest.builder().build();
+        CategoryObj categoryObj = CategoryObj.builder().build();
 
         this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
-                .content(asJsonString(createCategoryRequest))
+                .content(asJsonString(categoryObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -215,10 +215,10 @@ class CategoryManagementControllerTest {
     @Test
     public void whenAddCategoryWithWrongCategoryType_thenReturnBadRequestStatus() throws Exception {
         //given
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest.builder().build();
+        CategoryObj categoryObj = CategoryObj.builder().build();
 
         this.mockMvc.perform(post("/api/category/emptyCategory/").with(user(currentUser))
-                .content(asJsonString(createCategoryRequest))
+                .content(asJsonString(categoryObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -228,28 +228,28 @@ class CategoryManagementControllerTest {
     @Test
     public void whenAddIncomeCategory_givenCreateCategoryRequest_thenReturnOkStatus() throws Exception {
         //given
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
+        CategoryObj categoryObj = CategoryObj
                 .builder()
                 .categoryName("Work")
                 .colorHex("#F00")
                 .isFavourite(false)
                 .build();
 
-        var incomeCategoryResponse = createCategoryAndReturn(createCategoryRequest, CategoryType.INCOME);
+        var incomeCategoryResponse = createCategoryAndReturn(categoryObj, CategoryType.INCOME);
         assertFalse(incomeCategoryResponse.isFavourite());
         assertEquals("#F00", incomeCategoryResponse.getColorHex());
     }
 
     @Test
     public void whenSetAsFavouriteIncomeCategory_givenIsFavoriteCategoryRequest_thenReturnOkStatus() throws Exception {
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
+        CategoryObj categoryObj = CategoryObj
                 .builder()
                 .categoryName("Bike")
                 .colorHex("#F00")
                 .isFavourite(false)
                 .build();
 
-        var incomeCategoryResponse = createCategoryAndReturn(createCategoryRequest, CategoryType.INCOME);
+        var incomeCategoryResponse = createCategoryAndReturn(categoryObj, CategoryType.INCOME);
 
         CategoryIsFavouriteRequest categoryIsFavouriteRequest = new CategoryIsFavouriteRequest(true);
 
@@ -276,14 +276,14 @@ class CategoryManagementControllerTest {
 
     @Test
     public void whenDeleteIncomeCategory_givenIncomeCategoryId_thenReturnOkStatus() throws Exception {
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
+        CategoryObj categoryObj = CategoryObj
                 .builder()
                 .categoryName("Home")
                 .colorHex("#F00")
                 .isFavourite(false)
                 .build();
 
-        var incomeCategoryResponse = createCategoryAndReturn(createCategoryRequest, CategoryType.INCOME);
+        var incomeCategoryResponse = createCategoryAndReturn(categoryObj, CategoryType.INCOME);
 
         this.mockMvc.perform(delete("/api/category/income/" + incomeCategoryResponse.getId()).with(user(currentUser))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -317,12 +317,12 @@ class CategoryManagementControllerTest {
     @Test
     public void whenAddIncomeCategory_givenCreateCategoryRequestOnlyWithName_thenReturnOkStatusAndHexColorIsRandom() throws Exception {
         //given
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
+        CategoryObj categoryObj = CategoryObj
                 .builder()
                 .categoryName("Work")
                 .build();
 
-        var incomeCategoryResponse = createCategoryAndReturn(createCategoryRequest, CategoryType.INCOME);
+        var incomeCategoryResponse = createCategoryAndReturn(categoryObj, CategoryType.INCOME);
 
         assertFalse(incomeCategoryResponse.getColorHex().isEmpty());
         assertEquals("Work", incomeCategoryResponse.getCategoryName());
@@ -334,7 +334,7 @@ class CategoryManagementControllerTest {
     @Test
     public void whenAddIncomeCategory_givenCreateCategoryRequestWithIncorrectHexColor_thenReturnBadRequest() throws Exception {
         //given
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
+        CategoryObj categoryObj = CategoryObj
                 .builder()
                 .categoryName("Work")
                 .colorHex("F00000")
@@ -342,7 +342,7 @@ class CategoryManagementControllerTest {
                 .build();
 
         this.mockMvc.perform(post("/api/category/income/").with(user(currentUser))
-                .content(asJsonString(createCategoryRequest))
+                .content(asJsonString(categoryObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -352,10 +352,10 @@ class CategoryManagementControllerTest {
     @Test
     public void whenAddIncomeCategoryWithoutCategoryName_thenReturnBadRequestStatus() throws Exception {
         //given
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest.builder().build();
+        CategoryObj categoryObj = CategoryObj.builder().build();
 
         this.mockMvc.perform(post("/api/category/income/").with(user(currentUser))
-                .content(asJsonString(createCategoryRequest))
+                .content(asJsonString(categoryObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -365,7 +365,7 @@ class CategoryManagementControllerTest {
     @Test
     public void whenEditIncomeCategory_thenReturnOkStatus() throws Exception {
         //given
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
+        CategoryObj categoryObj = CategoryObj
                 .builder()
                 .categoryName("Bike")
                 .colorHex("#F00")
@@ -373,7 +373,7 @@ class CategoryManagementControllerTest {
                 .build();
 
         MvcResult createdCategory = this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
-                .content(asJsonString(createCategoryRequest))
+                .content(asJsonString(categoryObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
