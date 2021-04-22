@@ -7,7 +7,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.List;
 
 @Entity
 @Getter
@@ -15,31 +14,30 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class ExpenseCategory {
+public class Income {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    private String categoryName;
+    @Column(unique = true)
+    private String incomeName;
+
+    @NotNull
+    @ManyToOne
+    private IncomeCategory category;
 
     @NotNull
     @ManyToOne
     private User user;
 
-    @NotNull
-    private String colorHex;
-
-    @NotNull
-    @Builder.Default
-    private Boolean isDeleted = false;
-
-    @NotNull
-    @Builder.Default
-    private Boolean isFavourite = false;
-
     @CreatedDate
     @Builder.Default
     @Column(nullable = false, updatable = false)
     private final Instant createdDate = Instant.now();
+
+    @LastModifiedDate
+    @Builder.Default
+    @Column(nullable = false)
+    private final Instant lastModifiedDate = Instant.now();
 }

@@ -37,13 +37,11 @@ public class User {
     @Builder.Default
     private boolean isEnabled = true;
 
-    //TODO: add this field to test cases
     @CreatedDate
     @Builder.Default
     @Column(nullable = false, updatable = false)
     private final Instant createdDate = Instant.now();
 
-    //TODO: add this field to test cases
     @LastModifiedDate
     @Builder.Default
     @Column(nullable = false)

@@ -9,6 +9,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 @Entity
 @Getter
@@ -22,13 +23,14 @@ public class ExpenseCategoryVersion {
     private Long id;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private ExpenseCategory expenseCategory;
 
     private BigDecimal maximumCost;
 
     @NotNull
-    private LocalDate validMonth;
+    @Builder.Default
+    private YearMonth validMonth = YearMonth.now();
 
     @CreatedDate
     @Builder.Default
