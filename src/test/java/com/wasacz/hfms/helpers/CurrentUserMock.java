@@ -19,7 +19,7 @@ public class CurrentUserMock {
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public UserPrincipal getCurrentUser(String username, Role role) {
+    public UserPrincipal createMockUser(String username, Role role) {
         User user = User.builder().username(username).password(passwordEncoder.encode(PASSWORD)).role(role).build();
         userRepository.save(user);
         return new UserPrincipal(user);

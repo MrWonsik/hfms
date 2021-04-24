@@ -1,6 +1,5 @@
 package com.wasacz.hfms.finance.category.expense;
 
-import com.wasacz.hfms.finance.category.controller.CategoryObj;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryVersionMapper;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryVersionResponse;
@@ -42,7 +41,7 @@ class ExpenseCategoryServiceTest {
     @Test
     public void whenAddExpenseCategory_givenCreateExpenseCategoryResponse_thenSaveExpenseCategory() {
         //given
-        CategoryObj expenseCategoryObj = CategoryObj.builder()
+        ExpenseCategoryObj expenseCategoryObj = ExpenseCategoryObj.builder()
                 .categoryName("Car")
                 .colorHex("#F00")
                 .isFavourite(false)

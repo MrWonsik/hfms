@@ -1,7 +1,6 @@
 package com.wasacz.hfms.finance.expense;
 
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 
 @Getter

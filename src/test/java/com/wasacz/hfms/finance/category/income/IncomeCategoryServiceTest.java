@@ -1,6 +1,5 @@
 package com.wasacz.hfms.finance.category.income;
 
-import com.wasacz.hfms.finance.category.controller.CategoryObj;
 import com.wasacz.hfms.persistence.IncomeCategory;
 import com.wasacz.hfms.persistence.IncomeCategoryRepository;
 import com.wasacz.hfms.persistence.User;
@@ -28,7 +27,7 @@ class IncomeCategoryServiceTest {
     @Test
     public void whenAddIncomeCategory_givenCreateCategoryResponse_thenSaveExpenseCategory() {
         //given
-        CategoryObj categoryObj = CategoryObj.builder()
+        IncomeCategoryObj categoryObj = IncomeCategoryObj.builder()
                 .categoryName("Work")
                 .colorHex("#F00")
                 .isFavourite(false)

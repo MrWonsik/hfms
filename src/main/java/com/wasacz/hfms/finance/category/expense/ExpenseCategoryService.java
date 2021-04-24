@@ -1,23 +1,22 @@
 package com.wasacz.hfms.finance.category.expense;
 
+import com.wasacz.hfms.finance.category.AbstractCategory;
+import com.wasacz.hfms.finance.category.CategoryType;
 import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
 import com.wasacz.hfms.finance.category.CategoryValidator;
-import com.wasacz.hfms.finance.category.controller.CategoryObj;
-import com.wasacz.hfms.finance.category.ICategoryManagementService;
+import com.wasacz.hfms.finance.category.ICategoryService;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryVersionMapper;
 import com.wasacz.hfms.persistence.*;
 import com.wasacz.hfms.utils.date.DateTime;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class ExpenseCategoryService implements ICategoryManagementService {
+public class ExpenseCategoryService implements ICategoryService {
 
     private final ExpenseCategoryRepository expenseCategoryRepository;
     private final ExpenseCategorySaver expenseCategorySaver;
@@ -32,20 +31,14 @@ public class ExpenseCategoryService implements ICategoryManagementService {
     }
 
     @Override
-    public ExpenseCategoryResponse addCategory(CategoryObj categoryRequest, User user) {
-        ExpenseCategoryObj expenseCategoryObj = getExpenseCategoryObj(categoryRequest);
+    public ExpenseCategoryResponse addCategory(AbstractCategory categoryRequest, User user) {
+        if(!(categoryRequest instanceof ExpenseCategoryObj)) {
+            throw new IllegalStateException("Incorrect object!");
+        }
+        ExpenseCategoryObj expenseCategoryObj = (ExpenseCategoryObj) categoryRequest;
         CategoryValidator.validate(expenseCategoryObj);
         ExpenseCategoryVersion expenseCategoryVersionSaved = expenseCategorySaver.saveExpenseCategory(expenseCategoryObj, user);
         return mapExpenseCategoryResponse(expenseCategoryVersionSaved.getExpenseCategory());
-    }
-
-    private ExpenseCategoryObj getExpenseCategoryObj(CategoryObj request) {
-        return ExpenseCategoryObj.builder()
-                .categoryName(request.getCategoryName())
-                .colorHex(request.getColorHex())
-                .isFavourite(request.getIsFavourite())
-                .maximumCost(BigDecimal.valueOf(Optional.ofNullable(request.getMaximumCost()).orElse(0d)))
-                .build();
     }
 
     @Override
@@ -91,6 +84,11 @@ public class ExpenseCategoryService implements ICategoryManagementService {
         }
         ExpenseCategory updatedExpenseCategory = expenseCategoryRepository.save(expenseCategory);
         return mapExpenseCategoryResponse(updatedExpenseCategory);
+    }
+
+    @Override
+    public CategoryType getService() {
+        return CategoryType.EXPENSE;
     }
 
 

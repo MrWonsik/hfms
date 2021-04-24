@@ -1,9 +1,10 @@
 package com.wasacz.hfms.finance.category.income;
 
+import com.wasacz.hfms.finance.category.AbstractCategory;
+import com.wasacz.hfms.finance.category.CategoryType;
 import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
 import com.wasacz.hfms.finance.category.CategoryValidator;
-import com.wasacz.hfms.finance.category.controller.CategoryObj;
-import com.wasacz.hfms.finance.category.ICategoryManagementService;
+import com.wasacz.hfms.finance.category.ICategoryService;
 import com.wasacz.hfms.persistence.*;
 import com.wasacz.hfms.utils.date.DateTime;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 import static com.wasacz.hfms.utils.HexColorUtils.getRandomHexColor;
 
 @Service
-public class IncomeCategoryService implements ICategoryManagementService {
+public class IncomeCategoryService implements ICategoryService {
 
     private final IncomeCategoryRepository incomeCategoryRepository;
 
@@ -24,20 +25,15 @@ public class IncomeCategoryService implements ICategoryManagementService {
     }
 
     @Override
-    public IncomeCategoryResponse addCategory(CategoryObj categoryRequest, User user) {
-        IncomeCategoryObj incomeCategoryObj = getIncomeCategoryObj(categoryRequest);
+    public IncomeCategoryResponse addCategory(AbstractCategory categoryRequest, User user) {
+        if(!(categoryRequest instanceof IncomeCategoryObj)) {
+            throw new IllegalStateException("Incorrect object implementation.");
+        }
+        IncomeCategoryObj incomeCategoryObj = (IncomeCategoryObj) categoryRequest;
         CategoryValidator.validate(incomeCategoryObj);
         IncomeCategory incomeCategoryPersistence = buildIncomeCategory(incomeCategoryObj, user);
         IncomeCategory savedIncomeCategory = incomeCategoryRepository.save(incomeCategoryPersistence);
         return mapIncomeCategoryResponse(savedIncomeCategory);
-    }
-
-    private IncomeCategoryObj getIncomeCategoryObj(CategoryObj request) {
-        return IncomeCategoryObj.builder()
-                .categoryName(request.getCategoryName())
-                .colorHex(request.getColorHex())
-                .isFavourite(request.getIsFavourite())
-                .build();
     }
 
     @Override
@@ -84,6 +80,11 @@ public class IncomeCategoryService implements ICategoryManagementService {
         }
         IncomeCategory updatedIncomeCategory = incomeCategoryRepository.save(incomeCategory);
         return mapIncomeCategoryResponse(updatedIncomeCategory);
+    }
+
+    @Override
+    public CategoryType getService() {
+        return CategoryType.INCOME;
     }
 
     private IncomeCategory buildIncomeCategory(IncomeCategoryObj incomeCategoryObj, User user) {

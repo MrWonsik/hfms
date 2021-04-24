@@ -1,17 +1,24 @@
 package com.wasacz.hfms.finance.expense;
 
+import com.wasacz.hfms.finance.AbstractFinance;
+import com.wasacz.hfms.finance.AbstractFinanceResponse;
+import com.wasacz.hfms.finance.FinanceType;
+import com.wasacz.hfms.finance.IFinanceService;
+import com.wasacz.hfms.finance.expense.Controller.ExpenseResponse;
 import com.wasacz.hfms.finance.shop.ShopManagementService;
 import com.wasacz.hfms.finance.shop.ShopValidator;
 import com.wasacz.hfms.persistence.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
-public class ExpenseService {
+public class ExpenseService implements IFinanceService {
 
     private final ExpenseRepository expenseRepository;
     private final ExpenseCategoryRepository expenseCategoryRepository;
@@ -25,20 +32,6 @@ public class ExpenseService {
         this.shopRepository = shopRepository;
         this.expensePositionService = expensePositionService;
         this.receiptFileService = receiptFileService;
-    }
-
-    @Transactional
-    public ExpenseResponse addExpense(ExpenseObj expenseObj, User user, MultipartFile receiptFile) {
-        ExpenseValidator.validateExpense(expenseObj);
-        Expense savedExpense = expenseRepository.save(Expense.builder()
-                .expenseName(expenseObj.getExpenseName())
-                .category(obtainCategory(expenseObj.getCategoryId(), user))
-                .cost(BigDecimal.valueOf(expenseObj.getCost()))
-                .shop(obtainShop(expenseObj, user))
-                .build());
-        receiptFileService.saveFile(receiptFile, savedExpense.getId(), expenseObj.getExpenseName(), user.getUsername());
-        List<ExpensePosition> expensePositionList = expensePositionService.addExpensePositions(savedExpense, expenseObj.getExpensePositions());
-        return ExpenseMapper.mapExpenseToResponse(savedExpense, expensePositionList, null);
     }
 
     private ExpenseCategory obtainCategory(Long categoryId, User user) {
@@ -60,5 +53,42 @@ public class ExpenseService {
         }
         return null;
 
+    }
+
+    @Override
+    public ExpenseResponse add(AbstractFinance expenseObj, User user, MultipartFile file) {
+        if(!(expenseObj instanceof ExpenseObj)) {
+            throw new IllegalStateException("Incorrect object!");
+        }
+        ExpenseObj expense = (ExpenseObj) expenseObj;
+        ExpenseValidator.validateFinance(expense);
+        Expense savedExpense = expenseRepository.save(Expense.builder()
+                .expenseName(expense.getExpenseName())
+                .category(obtainCategory(expense.getCategoryId(), user))
+                .cost(BigDecimal.valueOf(expense.getCost()))
+                .shop(obtainShop(expense, user))
+                .user(user)
+                .build());
+        ReceiptFile receiptFile = receiptFileService.saveFile(file, savedExpense, expense.getExpenseName(), user.getUsername());
+        List<ExpensePosition> expensePositionList = expensePositionService.addExpensePositions(savedExpense, expense.getExpensePositions());
+        return ExpenseMapper.mapExpenseToResponse(savedExpense, expensePositionList, receiptFile != null ? receiptFile.getId() : null);
+    }
+
+    @Override
+    public List<AbstractFinanceResponse> getAll(User user) {
+        Optional<List<Expense>> expensesByUser = expenseRepository.findAllByUser(user);
+        List<Expense> allExpenses = expensesByUser.orElseGet(Collections::emptyList);
+        return allExpenses.stream().map(expense -> {
+            Optional<List<ExpensePosition>> expensePositionList = expensePositionService.getExpensePositionList(expense.getId());
+            Optional<ReceiptFile> receiptFile = receiptFileService.getFileByExpense(expense.getId());
+            return ExpenseMapper.mapExpenseToResponse(expense,
+                    expensePositionList.orElse(Collections.emptyList()),
+                    receiptFile.map(ReceiptFile::getId).orElse(null));
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public FinanceType getService() {
+        return FinanceType.EXPENSE;
     }
 }

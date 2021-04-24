@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +31,10 @@ public class ExpensePositionService {
                 .stream()
                 .map(expensePositionObj -> saveExpensePosition(expense, expensePositionObj))
                 .collect(Collectors.toList());
+    }
+
+    public Optional<List<ExpensePosition>> getExpensePositionList(Long expenseId) {
+        return expensePositionRepository.findAllByExpenseId(expenseId);
     }
 
     private ExpensePosition saveExpensePosition(Expense expense, ExpensePositionObj expensePositionObj) {

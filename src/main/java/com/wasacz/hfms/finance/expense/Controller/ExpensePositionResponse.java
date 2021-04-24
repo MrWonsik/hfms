@@ -1,4 +1,4 @@
-package com.wasacz.hfms.finance.expense;
+package com.wasacz.hfms.finance.expense.Controller;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

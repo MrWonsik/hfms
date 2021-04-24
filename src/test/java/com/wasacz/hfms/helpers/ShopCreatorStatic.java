@@ -1,6 +1,5 @@
 package com.wasacz.hfms.helpers;
 
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryObj;
 import com.wasacz.hfms.finance.shop.ShopObj;
 import com.wasacz.hfms.security.UserPrincipal;
 import org.springframework.http.MediaType;

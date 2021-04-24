@@ -1,5 +1,7 @@
 package com.wasacz.hfms.finance.expense;
 
+import com.wasacz.hfms.finance.expense.Controller.ExpensePositionResponse;
+import com.wasacz.hfms.finance.expense.Controller.ExpenseResponse;
 import com.wasacz.hfms.persistence.Expense;
 import com.wasacz.hfms.persistence.ExpensePosition;
 import com.wasacz.hfms.utils.date.DateTime;

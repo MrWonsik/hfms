@@ -1,10 +1,8 @@
-package com.wasacz.hfms.expense;
+package com.wasacz.hfms.finance.expense;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
-import com.wasacz.hfms.finance.expense.ExpenseObj;
-import com.wasacz.hfms.finance.expense.ExpensePositionObj;
-import com.wasacz.hfms.finance.expense.ExpenseResponse;
+import com.wasacz.hfms.finance.expense.Controller.ExpenseResponse;
 import com.wasacz.hfms.finance.shop.ShopObj;
 import com.wasacz.hfms.finance.shop.ShopResponse;
 import com.wasacz.hfms.helpers.CategoryCreatorStatic;
@@ -13,6 +11,7 @@ import com.wasacz.hfms.helpers.FileToMultipartFileConverter;
 import com.wasacz.hfms.helpers.ShopCreatorStatic;
 import com.wasacz.hfms.persistence.Role;
 import com.wasacz.hfms.security.UserPrincipal;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -24,22 +23,23 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.wasacz.hfms.helpers.ObjectMapperStatic.asJsonString;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ExpenseControllerIntegrationTest {
+public class FinanceControllerIntegrationTest {
 
     @Value("${app.receipt.storage.path}")
     private String destinationPath;
@@ -61,8 +61,8 @@ public class ExpenseControllerIntegrationTest {
 
     @BeforeAll
     public void setup() throws Exception {
-        //TODO: delete all images from savedReceipt before start tests here...
-        currentUser = currentUserMock.getCurrentUser("User_expense", Role.ROLE_USER);
+        FileUtils.cleanDirectory(new File(destinationPath));
+        currentUser = currentUserMock.createMockUser("User_expense", Role.ROLE_USER);
         MvcResult shop = ShopCreatorStatic.callCreateShopEndpoint(mockMvc, "existing_shop", currentUser);
         shopResponse = objectMapper.readValue(shop.getResponse().getContentAsString(), ShopResponse.class);
         MvcResult category = CategoryCreatorStatic.callCreateExpenseCategoryEndpoint(mockMvc, "categoryName", currentUser);
@@ -71,18 +71,7 @@ public class ExpenseControllerIntegrationTest {
 
     @Test
     public void whenAddExpense_givenExpenseObjRequestWithShopName_thenReturnOkStatus() throws Exception {
-        ExpenseObj expenseObj = ExpenseObj.builder()
-                .expenseName("expense_2021_04_22")
-                .cost(129.99)
-                .shop(ShopObj.builder().shopName("new_ikea").build())
-                .categoryId(expenseCategoryResponse.getId())
-                .build();
-        MvcResult expense = this.mockMvc.perform(multipart("/api/expense/").file(FileToMultipartFileConverter.convertFileToMultiPart("src/test/resources/receipt_test.jpg")).with(user(currentUser))
-                .content(asJsonString(expenseObj))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
+        MvcResult expense = createExpense("expense_2021_04_22", 129.99, "new_ikea", currentUser, expenseCategoryResponse.getId());
 
         ExpenseResponse expenseResponse = objectMapper.readValue(expense.getResponse().getContentAsString(), ExpenseResponse.class);
 
@@ -90,17 +79,54 @@ public class ExpenseControllerIntegrationTest {
         assertEquals("new_ikea", expenseResponse.getShopName());
         assertEquals(129.99, expenseResponse.getCost());
         assertTrue(expenseResponse.getExpensePositionList().isEmpty());
+        assertNull(expenseResponse.getReceiptId());
+    }
+
+    private MvcResult createExpense(String expenseName, Double cost, String shopName, UserPrincipal user, Long categoryId) throws Exception {
+        ExpenseObj expenseObj = ExpenseObj.builder()
+                .expenseName(expenseName)
+                .cost(129.99)
+                .shop(ShopObj.builder().shopName("new_ikea").build())
+                .categoryId(categoryId)
+                .build();
+        return this.mockMvc.perform(multipart("/api/finance/expense/").with(user(user))
+                .content(asJsonString(expenseObj))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
     }
 
     @Test
-    public void whenAddExpense_givenExpenseObjRequestWithShopId_thenReturnOkStatus() throws Exception {
+    public void whenGetAllExpense_givenExpenseObjRequestWithShopName_thenReturnOkStatus() throws Exception {
+        UserPrincipal user = currentUserMock.createMockUser("User_expense_for_get_all", Role.ROLE_USER);
+        MvcResult category = CategoryCreatorStatic.callCreateExpenseCategoryEndpoint(mockMvc, "Shoping", user);
+        ExpenseCategoryResponse categoryResponse = objectMapper.readValue(category.getResponse().getContentAsString(), ExpenseCategoryResponse.class);
+
+        createExpense("Icecream",12.99,"Biedronka", user, categoryResponse.getId());
+        createExpense("Milk",3.00,"Biedronka", user, categoryResponse.getId());
+        createExpense("Egg",8.99,"Biedronka", user, categoryResponse.getId());
+
+        MvcResult expenseList = this.mockMvc.perform(get("/api/finance/expense/").with(user(user))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<ExpenseResponse> expenseResponse = Arrays.asList(objectMapper.readValue(expenseList.getResponse().getContentAsString(), ExpenseResponse[].class));
+
+        assertEquals(3, expenseResponse.size());
+    }
+
+    @Test
+    public void whenAddExpense_givenExpenseObjRequestWithShopIdAndReceiptFile_thenReturnOkStatus() throws Exception {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
                 .cost(129.99)
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
                 .build();
-        MvcResult expense = this.mockMvc.perform(post("/api/expense/").with(user(currentUser))
+        MvcResult expense = this.mockMvc.perform(multipart("/api/finance/expense/").file(FileToMultipartFileConverter.convertFileToMultiPart("src/test/resources/receipt_test.jpg")).with(user(currentUser))
                 .content(asJsonString(expenseObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -114,6 +140,7 @@ public class ExpenseControllerIntegrationTest {
         assertEquals("existing_shop", expenseResponse.getShopName());
         assertEquals(129.99, expenseResponse.getCost());
         assertTrue(expenseResponse.getExpensePositionList().isEmpty());
+        assertNotNull(expenseResponse.getReceiptId());
     }
 
     @Test
@@ -123,7 +150,7 @@ public class ExpenseControllerIntegrationTest {
                 .cost(129.99)
                 .categoryId(expenseCategoryResponse.getId())
                 .build();
-        MvcResult expense = this.mockMvc.perform(post("/api/expense/").with(user(currentUser))
+        MvcResult expense = this.mockMvc.perform(post("/api/finance/expense/").with(user(currentUser))
                 .content(asJsonString(expenseObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -150,7 +177,7 @@ public class ExpenseControllerIntegrationTest {
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions)
                 .build();
-        MvcResult expense = this.mockMvc.perform(post("/api/expense/").with(user(currentUser))
+        MvcResult expense = this.mockMvc.perform(post("/api/finance/expense/").with(user(currentUser))
                 .content(asJsonString(expenseObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -177,7 +204,7 @@ public class ExpenseControllerIntegrationTest {
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions)
                 .build();
-        this.mockMvc.perform(post("/api/expense/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/finance/expense/").with(user(currentUser))
                 .content(asJsonString(expenseObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -195,7 +222,7 @@ public class ExpenseControllerIntegrationTest {
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions)
                 .build();
-        this.mockMvc.perform(post("/api/expense/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/finance/expense/").with(user(currentUser))
                 .content(asJsonString(expenseObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -210,7 +237,7 @@ public class ExpenseControllerIntegrationTest {
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions2)
                 .build();
-        this.mockMvc.perform(post("/api/expense/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/finance/expense/").with(user(currentUser))
                 .content(asJsonString(expenseObj2))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -228,7 +255,7 @@ public class ExpenseControllerIntegrationTest {
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions)
                 .build();
-        this.mockMvc.perform(post("/api/expense/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/finance/expense/").with(user(currentUser))
                 .content(asJsonString(expenseObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -243,7 +270,7 @@ public class ExpenseControllerIntegrationTest {
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions2)
                 .build();
-        this.mockMvc.perform(post("/api/expense/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/finance/expense/").with(user(currentUser))
                 .content(asJsonString(expenseObj2))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -267,7 +294,7 @@ public class ExpenseControllerIntegrationTest {
                 .cost(129.99)
                 .categoryId(expenseCategoryResponse.getId())
                 .build();
-        this.mockMvc.perform(post("/api/expense/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/finance/expense/").with(user(currentUser))
                 .content(asJsonString(expenseObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -282,7 +309,7 @@ public class ExpenseControllerIntegrationTest {
                 .cost(129.99)
                 .categoryId(99999L)
                 .build();
-        this.mockMvc.perform(post("/api/expense/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/finance/expense/").with(user(currentUser))
                 .content(asJsonString(expenseObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -296,7 +323,7 @@ public class ExpenseControllerIntegrationTest {
                 .expenseName("expense_2021_04_22")
                 .cost(129.99)
                 .build();
-        this.mockMvc.perform(post("/api/expense/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/finance/expense/").with(user(currentUser))
                 .content(asJsonString(expenseObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -311,7 +338,7 @@ public class ExpenseControllerIntegrationTest {
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
                 .build();
-        this.mockMvc.perform(post("/api/expense/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/finance/expense/").with(user(currentUser))
                 .content(asJsonString(expenseObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -327,7 +354,7 @@ public class ExpenseControllerIntegrationTest {
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
                 .build();
-        this.mockMvc.perform(post("/api/expense/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/finance/expense/").with(user(currentUser))
                 .content(asJsonString(expenseObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -340,7 +367,7 @@ public class ExpenseControllerIntegrationTest {
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
                 .build();
-        this.mockMvc.perform(post("/api/expense/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/finance/expense/").with(user(currentUser))
                 .content(asJsonString(expenseObj2))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))

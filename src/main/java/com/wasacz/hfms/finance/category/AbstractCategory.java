@@ -1,9 +1,18 @@
 package com.wasacz.hfms.finance.category;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.wasacz.hfms.finance.category.expense.ExpenseCategoryObj;
+import com.wasacz.hfms.finance.category.income.IncomeCategoryObj;
+import lombok.*;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonSubTypes(
+        {
+                @JsonSubTypes.Type(value = IncomeCategoryObj.class, name = "IncomeCategoryObj"),
+                @JsonSubTypes.Type(value = ExpenseCategoryObj.class, name = "ExpenseCategoryObj")
+        }
+)
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractCategory {
