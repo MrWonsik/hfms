@@ -13,8 +13,8 @@ public class ExpenseObj extends AbstractFinance {
     private final List<ExpensePositionObj> expensePositions;
 
     @Builder
-    public ExpenseObj(Long id, Long categoryId, String expenseName, Double cost, ShopObj shop, List<ExpensePositionObj> expensePositions) {
-        super(id, categoryId, expenseName, cost);
+    public ExpenseObj(Long id, Long categoryId, String expenseName, Double cost, ShopObj shop, List<ExpensePositionObj> expensePositions, String type) {
+        super(id, categoryId, expenseName, cost, type);
         this.shop = shop;
         this.expensePositions = expensePositions;
     }
