@@ -58,7 +58,7 @@ public class ExpenseService implements IFinanceService {
     @Override
     public ExpenseResponse add(AbstractFinance expenseObj, User user, MultipartFile file) {
         if(!(expenseObj instanceof ExpenseObj)) {
-            throw new IllegalStateException("Incorrect object!");
+            throw new IllegalStateException("Incorrect abstractFinance implementation!");
         }
         ExpenseObj expense = (ExpenseObj) expenseObj;
         ExpenseValidator.validateFinance(expense);

@@ -3,7 +3,6 @@ package com.wasacz.hfms.finance.expense.Controller;
 import com.wasacz.hfms.finance.AbstractFinance;
 import com.wasacz.hfms.finance.AbstractFinanceResponse;
 import com.wasacz.hfms.finance.FinanceType;
-import com.wasacz.hfms.finance.IFinanceService;
 import com.wasacz.hfms.security.CurrentUser;
 import com.wasacz.hfms.security.UserPrincipal;
 import lombok.extern.slf4j.Slf4j;

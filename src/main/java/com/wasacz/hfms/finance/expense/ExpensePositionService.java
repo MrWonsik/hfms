@@ -22,7 +22,7 @@ public class ExpensePositionService {
 
     public List<ExpensePosition> addExpensePositions(Expense expense, List<ExpensePositionObj> expensePositions) {
         if(expense == null) {
-            throw new IllegalStateException("Expense is null.");
+            throw new IllegalStateException("Incorrect expense.");
         }
         if(expensePositions == null || expensePositions.isEmpty()) {
             return Collections.emptyList();

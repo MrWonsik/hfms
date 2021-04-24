@@ -6,11 +6,11 @@ import com.wasacz.hfms.finance.category.expense.ExpenseCategoryObj;
 import com.wasacz.hfms.finance.category.income.IncomeCategoryObj;
 import lombok.*;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "categoryType")
 @JsonSubTypes(
         {
-                @JsonSubTypes.Type(value = IncomeCategoryObj.class, name = "IncomeCategoryObj"),
-                @JsonSubTypes.Type(value = ExpenseCategoryObj.class, name = "ExpenseCategoryObj")
+                @JsonSubTypes.Type(value = IncomeCategoryObj.class, name = "INCOME"),
+                @JsonSubTypes.Type(value = ExpenseCategoryObj.class, name = "EXPENSE")
         }
 )
 @Getter
@@ -19,4 +19,5 @@ public abstract class AbstractCategory {
     private final String categoryName;
     private final String colorHex;
     private final Boolean isFavourite;
+    private final String categoryType;
 }

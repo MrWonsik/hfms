@@ -7,10 +7,10 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "financeType")
 @JsonSubTypes(
         {
-                @JsonSubTypes.Type(value = ExpenseObj.class, name = "ExpenseObj"),
+                @JsonSubTypes.Type(value = ExpenseObj.class, name = "EXPENSE"),
         }
     )
 @Getter
@@ -20,4 +20,5 @@ public abstract class AbstractFinance {
     private final Long categoryId;
     private final String expenseName;
     private final Double cost;
+    private final String financeType;
 }
