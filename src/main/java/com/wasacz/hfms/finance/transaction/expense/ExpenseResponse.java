@@ -1,14 +1,13 @@
-package com.wasacz.hfms.finance.expense.Controller;
+package com.wasacz.hfms.finance.transaction.expense;
 
-import com.wasacz.hfms.finance.AbstractFinanceResponse;
-import com.wasacz.hfms.finance.expense.Controller.ExpensePositionResponse;
+import com.wasacz.hfms.finance.transaction.AbstractTransactionResponse;
 import com.wasacz.hfms.utils.date.DateTime;
 import lombok.*;
 
 import java.util.List;
 
 @Getter
-public class ExpenseResponse extends AbstractFinanceResponse {
+public class ExpenseResponse extends AbstractTransactionResponse {
 
 
     private final String shopName;

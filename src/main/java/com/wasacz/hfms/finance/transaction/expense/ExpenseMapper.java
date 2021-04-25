@@ -1,7 +1,5 @@
-package com.wasacz.hfms.finance.expense;
+package com.wasacz.hfms.finance.transaction.expense;
 
-import com.wasacz.hfms.finance.expense.Controller.ExpensePositionResponse;
-import com.wasacz.hfms.finance.expense.Controller.ExpenseResponse;
 import com.wasacz.hfms.persistence.Expense;
 import com.wasacz.hfms.persistence.ExpensePosition;
 import com.wasacz.hfms.utils.date.DateTime;
@@ -12,6 +10,7 @@ import java.util.stream.Collectors;
 public class ExpenseMapper {
     static ExpenseResponse mapExpenseToResponse(Expense expense, List<ExpensePosition> expensePositionList, Long receiptId) {
         return ExpenseResponse.builder()
+                .id(expense.getId())
                 .expenseName(expense.getExpenseName())
                 .shopName(expense.getShop() != null ? expense.getShop().getShopName() : null)
                 .cost(expense.getCost().doubleValue())

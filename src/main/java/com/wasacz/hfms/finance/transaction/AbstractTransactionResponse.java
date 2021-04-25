@@ -1,4 +1,4 @@
-package com.wasacz.hfms.finance;
+package com.wasacz.hfms.finance.transaction;
 
 import com.wasacz.hfms.utils.date.DateTime;
 import lombok.AccessLevel;
@@ -7,9 +7,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AbstractFinanceResponse {
+public abstract class AbstractTransactionResponse {
     private final Long id;
-    private final String expenseName;
+    private final String name;
     private final Double cost;
     private final DateTime createdDate;
 }

@@ -1,12 +1,12 @@
-package com.wasacz.hfms.finance.expense;
+package com.wasacz.hfms.finance.transaction.expense;
 
-import com.wasacz.hfms.finance.AbstractFinance;
+import com.wasacz.hfms.finance.transaction.AbstractTransaction;
 import com.wasacz.hfms.utils.ValidatorUtils;
 
 public class ExpenseValidator {
 
-    public static void validateFinance(AbstractFinance expenseObj) {
-        ValidatorUtils.handleFieldBlank(expenseObj.getExpenseName(), "expenseName");
+    public static void validateFinance(AbstractTransaction expenseObj) {
+        ValidatorUtils.handleFieldBlank(expenseObj.getName(), "expenseName");
         isNotNullAndBiggerThanZero(expenseObj.getCost(), "Cost must be bigger than 0.");
     }
 

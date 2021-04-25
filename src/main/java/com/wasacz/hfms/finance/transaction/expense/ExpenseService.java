@@ -1,10 +1,9 @@
-package com.wasacz.hfms.finance.expense;
+package com.wasacz.hfms.finance.transaction.expense;
 
-import com.wasacz.hfms.finance.AbstractFinance;
-import com.wasacz.hfms.finance.AbstractFinanceResponse;
-import com.wasacz.hfms.finance.FinanceType;
-import com.wasacz.hfms.finance.IFinanceService;
-import com.wasacz.hfms.finance.expense.Controller.ExpenseResponse;
+import com.wasacz.hfms.finance.transaction.AbstractTransaction;
+import com.wasacz.hfms.finance.transaction.AbstractTransactionResponse;
+import com.wasacz.hfms.finance.transaction.TransactionType;
+import com.wasacz.hfms.finance.transaction.ITransactionService;
 import com.wasacz.hfms.finance.shop.ShopManagementService;
 import com.wasacz.hfms.finance.shop.ShopValidator;
 import com.wasacz.hfms.persistence.*;
@@ -18,7 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class ExpenseService implements IFinanceService {
+public class ExpenseService implements ITransactionService {
 
     private final ExpenseRepository expenseRepository;
     private final ExpenseCategoryRepository expenseCategoryRepository;
@@ -56,39 +55,41 @@ public class ExpenseService implements IFinanceService {
     }
 
     @Override
-    public ExpenseResponse add(AbstractFinance expenseObj, User user, MultipartFile file) {
+    public ExpenseResponse add(AbstractTransaction expenseObj, User user, MultipartFile file) {
         if(!(expenseObj instanceof ExpenseObj)) {
             throw new IllegalStateException("Incorrect abstractFinance implementation!");
         }
         ExpenseObj expense = (ExpenseObj) expenseObj;
         ExpenseValidator.validateFinance(expense);
         Expense savedExpense = expenseRepository.save(Expense.builder()
-                .expenseName(expense.getExpenseName())
+                .expenseName(expense.getName())
                 .category(obtainCategory(expense.getCategoryId(), user))
                 .cost(BigDecimal.valueOf(expense.getCost()))
                 .shop(obtainShop(expense, user))
                 .user(user)
                 .build());
-        ReceiptFile receiptFile = receiptFileService.saveFile(file, savedExpense, expense.getExpenseName(), user.getUsername());
+        ReceiptFile receiptFile = receiptFileService.saveFile(file, savedExpense, expense.getName(), user.getUsername());
         List<ExpensePosition> expensePositionList = expensePositionService.addExpensePositions(savedExpense, expense.getExpensePositions());
         return ExpenseMapper.mapExpenseToResponse(savedExpense, expensePositionList, receiptFile != null ? receiptFile.getId() : null);
     }
 
     @Override
-    public List<AbstractFinanceResponse> getAll(User user) {
+    public List<AbstractTransactionResponse> getAll(User user) {
         Optional<List<Expense>> expensesByUser = expenseRepository.findAllByUser(user);
         List<Expense> allExpenses = expensesByUser.orElseGet(Collections::emptyList);
-        return allExpenses.stream().map(expense -> {
-            Optional<List<ExpensePosition>> expensePositionList = expensePositionService.getExpensePositionList(expense.getId());
-            Optional<ReceiptFile> receiptFile = receiptFileService.getFileByExpense(expense.getId());
-            return ExpenseMapper.mapExpenseToResponse(expense,
-                    expensePositionList.orElse(Collections.emptyList()),
-                    receiptFile.map(ReceiptFile::getId).orElse(null));
-        }).collect(Collectors.toList());
+        return allExpenses.stream().map(this::getExpenseResponse).collect(Collectors.toList());
+    }
+
+    private ExpenseResponse getExpenseResponse(Expense expense) {
+        Optional<List<ExpensePosition>> expensePositionList = expensePositionService.getExpensePositionList(expense.getId());
+        Optional<ReceiptFile> receiptFile = receiptFileService.getFileByExpense(expense.getId());
+        return ExpenseMapper.mapExpenseToResponse(expense,
+                expensePositionList.orElse(Collections.emptyList()),
+                receiptFile.map(ReceiptFile::getId).orElse(null));
     }
 
     @Override
-    public FinanceType getService() {
-        return FinanceType.EXPENSE;
+    public TransactionType getService() {
+        return TransactionType.EXPENSE;
     }
 }

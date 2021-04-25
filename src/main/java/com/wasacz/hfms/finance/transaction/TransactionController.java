@@ -1,8 +1,5 @@
-package com.wasacz.hfms.finance.expense.Controller;
+package com.wasacz.hfms.finance.transaction;
 
-import com.wasacz.hfms.finance.AbstractFinance;
-import com.wasacz.hfms.finance.AbstractFinanceResponse;
-import com.wasacz.hfms.finance.FinanceType;
 import com.wasacz.hfms.security.CurrentUser;
 import com.wasacz.hfms.security.UserPrincipal;
 import lombok.extern.slf4j.Slf4j;
@@ -19,13 +16,13 @@ import java.util.List;
 
 @RestController
 @Slf4j
-@RequestMapping("/api/finance")
-public class FinanceController {
+@RequestMapping("/api/transaction")
+public class TransactionController {
 
-    private final FinanceServiceFactory financeServiceFactory;
+    private final TransactionServiceFactory transactionServiceFactory;
 
-    public FinanceController(FinanceServiceFactory financeServiceFactory) {
-        this.financeServiceFactory = financeServiceFactory;
+    public TransactionController(TransactionServiceFactory transactionServiceFactory) {
+        this.transactionServiceFactory = transactionServiceFactory;
     }
 
     @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
@@ -34,21 +31,21 @@ public class FinanceController {
         response.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     }
 
-    @PostMapping(value = "/{type}/", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_MIXED_VALUE})
+    @PostMapping(value = "/{type}/")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> add(@CurrentUser UserPrincipal user,
-                                @RequestBody AbstractFinance abstractFinanceObj,
-                                @RequestPart(value = "file", required = false) MultipartFile receiptFile,
-                                @PathVariable("type") FinanceType financeType) {
-        AbstractFinanceResponse response = financeServiceFactory.getService(financeType).add(abstractFinanceObj, user.getUser(), receiptFile);
+                                 @RequestParam(value = "file", required = false) MultipartFile receiptFile,
+                                 @RequestPart AbstractTransaction transaction,
+                                 @PathVariable("type") TransactionType transactionType) {
+        AbstractTransactionResponse response = transactionServiceFactory.getService(transactionType).add(transaction, user.getUser(), receiptFile);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping(value = "/{type}/")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> getAll(@CurrentUser UserPrincipal user,
-                                            @PathVariable("type") FinanceType financeType) {
-        List<AbstractFinanceResponse> response = financeServiceFactory.getService(financeType).getAll(user.getUser());
+                                            @PathVariable("type") TransactionType transactionType) {
+        List<AbstractTransactionResponse> response = transactionServiceFactory.getService(transactionType).getAll(user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
