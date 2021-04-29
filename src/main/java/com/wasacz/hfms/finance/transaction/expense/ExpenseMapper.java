@@ -2,7 +2,6 @@ package com.wasacz.hfms.finance.transaction.expense;
 
 import com.wasacz.hfms.persistence.Expense;
 import com.wasacz.hfms.persistence.ExpensePosition;
-import com.wasacz.hfms.utils.date.DateTime;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,9 +13,19 @@ public class ExpenseMapper {
                 .expenseName(expense.getExpenseName())
                 .shopName(expense.getShop() != null ? expense.getShop().getShopName() : null)
                 .cost(expense.getCost().doubleValue())
-                .createdDate(new DateTime(expense.getCreatedDate()))
+                .createdDate(expense.getExpenseDate())
                 .expensePositionList(mapExpensePositionToResponse(expensePositionList))
                 .receiptId(receiptId)
+                .build();
+    }
+
+    static ExpenseResponse mapExpenseToResponse(Expense expense) {
+        return ExpenseResponse.builder()
+                .id(expense.getId())
+                .expenseName(expense.getExpenseName())
+                .shopName(expense.getShop() != null ? expense.getShop().getShopName() : null)
+                .cost(expense.getCost().doubleValue())
+                .createdDate(expense.getExpenseDate())
                 .build();
     }
 

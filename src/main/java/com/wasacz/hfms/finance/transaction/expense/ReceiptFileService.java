@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Optional;
@@ -50,5 +51,19 @@ public class ReceiptFileService {
 
     public Optional<ReceiptFile> getFileByExpense(Long expenseId) {
         return repository.findByExpenseId(expenseId);
+    }
+
+    public void deleteFile(Long expenseId) {
+        Optional<ReceiptFile> file = getFileByExpense(expenseId);
+        if(file.isEmpty()) {
+            return;
+        }
+
+        try {
+            Files.delete(Path.of(file.get().getReceiptFilePath() + "\\" + file.get().getFileName()));
+        } catch (IOException e) {
+            log.error("Error while delete the file: {} - {}", e.getClass(), e.getMessage());
+            throw new IllegalStateException("Something goes wrong while delete the file. %s - %s".formatted(e.getClass(), e.getMessage()));
+        }
     }
 }

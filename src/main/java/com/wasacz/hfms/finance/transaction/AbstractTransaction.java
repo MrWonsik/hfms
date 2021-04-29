@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDate;
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "transactionType")
 @JsonSubTypes(
         {
@@ -21,4 +23,5 @@ public abstract class AbstractTransaction {
     private final String name;
     private final Double cost;
     private final String transactionType;
+    private final LocalDate transactionDate;
 }

@@ -5,9 +5,9 @@ import com.wasacz.hfms.utils.ValidatorUtils;
 
 public class ExpenseValidator {
 
-    public static void validateFinance(AbstractTransaction expenseObj) {
-        ValidatorUtils.handleFieldBlank(expenseObj.getName(), "expenseName");
-        isNotNullAndBiggerThanZero(expenseObj.getCost(), "Cost must be bigger than 0.");
+    public static void validateFinance(AbstractTransaction transaction) {
+        ValidatorUtils.handleFieldBlank(transaction.getName(), "name");
+        isNotNullAndBiggerThanZero(transaction.getCost(), "Cost must be bigger than 0.");
     }
 
     public static void validateExpensePosition(ExpensePositionObj expensePositionObj) {

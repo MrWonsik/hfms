@@ -10,7 +10,9 @@ import com.wasacz.hfms.persistence.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.time.Month;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -61,16 +63,29 @@ public class ExpenseService implements ITransactionService {
         }
         ExpenseObj expense = (ExpenseObj) expenseObj;
         ExpenseValidator.validateFinance(expense);
-        Expense savedExpense = expenseRepository.save(Expense.builder()
+        Expense savedExpense = expenseRepository.save(buildExpense(expenseObj, user, expense));
+
+        ReceiptFile receiptFile = receiptFileService.saveFile(file, savedExpense, expense.getName(), user.getUsername());
+        List<ExpensePosition> expensePositionList = expensePositionService.addExpensePositions(savedExpense, expense.getExpensePositions());
+        return ExpenseMapper.mapExpenseToResponse(savedExpense, expensePositionList, receiptFile != null ? receiptFile.getId() : null);
+    }
+
+    private Expense buildExpense(AbstractTransaction expenseObj, User user, ExpenseObj expense) {
+        Expense.ExpenseBuilder expenseBuilder = Expense.builder()
                 .expenseName(expense.getName())
                 .category(obtainCategory(expense.getCategoryId(), user))
                 .cost(BigDecimal.valueOf(expense.getCost()))
                 .shop(obtainShop(expense, user))
-                .user(user)
-                .build());
-        ReceiptFile receiptFile = receiptFileService.saveFile(file, savedExpense, expense.getName(), user.getUsername());
-        List<ExpensePosition> expensePositionList = expensePositionService.addExpensePositions(savedExpense, expense.getExpensePositions());
-        return ExpenseMapper.mapExpenseToResponse(savedExpense, expensePositionList, receiptFile != null ? receiptFile.getId() : null);
+                .user(user);
+        if(expenseObj.getTransactionDate() != null) {
+            expenseBuilder.expenseDate(expenseObj.getTransactionDate());
+        }
+        return expenseBuilder.build();
+    }
+
+    @Override
+    public AbstractTransactionResponse getTransaction(long transactionId, User user) {
+        return null;
     }
 
     @Override
@@ -78,6 +93,25 @@ public class ExpenseService implements ITransactionService {
         Optional<List<Expense>> expensesByUser = expenseRepository.findAllByUser(user);
         List<Expense> allExpenses = expensesByUser.orElseGet(Collections::emptyList);
         return allExpenses.stream().map(this::getExpenseResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AbstractTransactionResponse> getAllForMonth(User user, Month month) {
+        return null;
+    }
+
+    @Override
+    @Transactional
+    public AbstractTransactionResponse delete(long transactionId, User user) {
+        Expense expenseToDelete = expenseRepository.findByIdAndUser(transactionId, user).orElseThrow(() -> new IllegalArgumentException("Transaction %s not found.".formatted(transactionId)));
+        receiptFileService.deleteFile(expenseToDelete.getId());
+        expenseRepository.delete(expenseToDelete);
+        return ExpenseMapper.mapExpenseToResponse(expenseToDelete);
+    }
+
+    @Override
+    public AbstractTransactionResponse addFile(MultipartFile file, User user) {
+        return null;
     }
 
     private ExpenseResponse getExpenseResponse(Expense expense) {

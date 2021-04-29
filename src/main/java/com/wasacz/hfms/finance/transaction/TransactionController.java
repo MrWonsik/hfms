@@ -4,7 +4,6 @@ import com.wasacz.hfms.security.CurrentUser;
 import com.wasacz.hfms.security.UserPrincipal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 @RestController
@@ -46,6 +46,15 @@ public class TransactionController {
     public ResponseEntity<?> getAll(@CurrentUser UserPrincipal user,
                                             @PathVariable("type") TransactionType transactionType) {
         List<AbstractTransactionResponse> response = transactionServiceFactory.getService(transactionType).getAll(user.getUser());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping(value = "/{type}/{id}")
+    @Secured({"ROLE_USER"})
+    public ResponseEntity<?> delete(@CurrentUser UserPrincipal user,
+                                    @PathVariable("type") TransactionType transactionType,
+                                    @PathVariable("id") Long transactionId) {
+        AbstractTransactionResponse response = transactionServiceFactory.getService(transactionType).delete(transactionId, user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

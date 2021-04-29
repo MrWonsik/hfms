@@ -8,6 +8,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -37,6 +38,10 @@ public class Expense {
 
     @NotNull
     private BigDecimal cost;
+
+    @NotNull
+    @Builder.Default
+    private LocalDate expenseDate = LocalDate.now();
 
     @CreatedDate
     @Builder.Default
