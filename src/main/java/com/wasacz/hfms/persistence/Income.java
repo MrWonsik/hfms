@@ -7,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -30,6 +31,10 @@ public class Income {
     @NotNull
     @ManyToOne
     private User user;
+
+    @NotNull
+    @Builder.Default
+    private LocalDate expenseDate = LocalDate.now();
 
     @CreatedDate
     @Builder.Default

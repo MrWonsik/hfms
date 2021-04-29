@@ -1,7 +1,6 @@
 package com.wasacz.hfms.finance.category.expense;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wasacz.hfms.finance.category.controller.CreateCategoryRequest;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryMaximumCostRequest;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryVersionResponse;
@@ -18,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.math.BigDecimal;
 import java.time.YearMonth;
 
 import static com.wasacz.hfms.helpers.ObjectMapperStatic.asJsonString;
@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ExpenseCategoryManagementControllerTest {
+class ExpenseCategoryControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,7 +46,7 @@ class ExpenseCategoryManagementControllerTest {
 
     @BeforeAll
     public void setup() {
-        currentUser = currentUserMock.getCurrentUser("User_category_versions", Role.ROLE_USER);
+        currentUser = currentUserMock.createMockUser("User_category_versions", Role.ROLE_USER);
     }
 
     @Test
@@ -79,14 +79,14 @@ class ExpenseCategoryManagementControllerTest {
     }
 
     private ExpenseCategoryResponse createCategoryAndReturn() throws Exception {
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
+        ExpenseCategoryObj categoryObj = ExpenseCategoryObj
                 .builder()
                 .categoryName("Car")
-                .maximumCost(10d)
+                .maximumCost(BigDecimal.valueOf(10d))
                 .build();
 
         MvcResult createdCategoryResult = this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
-                .content(asJsonString(createCategoryRequest))
+                .content(asJsonString(categoryObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

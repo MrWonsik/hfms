@@ -30,8 +30,8 @@ public class ShopManagementController {
 
     @PostMapping("/")
     @Secured({"ROLE_USER"})
-    public ResponseEntity<?> addShop(@CurrentUser UserPrincipal user, @RequestBody CreateShopRequest createShopRequest) {
-        ShopResponse shopResponse = shopManagementService.addNewShop(createShopRequest, user.getUser());
+    public ResponseEntity<?> addShop(@CurrentUser UserPrincipal user, @RequestBody ShopObj shopObj) {
+        ShopResponse shopResponse = shopManagementService.addNewShop(shopObj, user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(shopResponse);
     }
 

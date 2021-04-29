@@ -1,6 +1,5 @@
 package com.wasacz.hfms.finance.category.income;
 
-import com.wasacz.hfms.finance.category.controller.CreateCategoryRequest;
 import com.wasacz.hfms.persistence.IncomeCategory;
 import com.wasacz.hfms.persistence.IncomeCategoryRepository;
 import com.wasacz.hfms.persistence.User;
@@ -17,18 +16,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class IncomeCategoryManagementServiceTest {
+class IncomeCategoryServiceTest {
 
     @Mock
     private IncomeCategoryRepository incomeCategoryRepository;
 
     @InjectMocks
-    private IncomeCategoryManagementService incomeCategoryManagementService;
+    private IncomeCategoryService incomeCategoryService;
 
     @Test
     public void whenAddIncomeCategory_givenCreateCategoryResponse_thenSaveExpenseCategory() {
         //given
-        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest.builder()
+        IncomeCategoryObj categoryObj = IncomeCategoryObj.builder()
                 .categoryName("Work")
                 .colorHex("#F00")
                 .isFavourite(false)
@@ -48,13 +47,13 @@ class IncomeCategoryManagementServiceTest {
         when(incomeCategoryRepository.save(any(IncomeCategory.class))).thenReturn(incomeCategory);
 
         //when
-        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryManagementService.addCategory(createCategoryRequest, user);
+        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.addCategory(categoryObj, user);
 
         //then
-        assertEquals(incomeCategoryResponse.getCategoryName(), createCategoryRequest.getCategoryName());
+        assertEquals(incomeCategoryResponse.getCategoryName(), categoryObj.getCategoryName());
         assertFalse(incomeCategoryResponse.isDeleted());
-        assertEquals(incomeCategoryResponse.getColorHex(), createCategoryRequest.getColorHex());
-        assertEquals(incomeCategoryResponse.isFavourite(), createCategoryRequest.getIsFavourite());
+        assertEquals(incomeCategoryResponse.getColorHex(), categoryObj.getColorHex());
+        assertEquals(incomeCategoryResponse.isFavourite(), categoryObj.getIsFavourite());
     }
 
     @Test
@@ -75,7 +74,7 @@ class IncomeCategoryManagementServiceTest {
         when(incomeCategoryRepository.save(any(IncomeCategory.class))).thenReturn(incomeCategory);
 
         //when
-        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryManagementService.setAsFavourite(1L, true, user);
+        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.setAsFavourite(1L, true, user);
 
         //then
         assertTrue(incomeCategoryResponse.isFavourite());
@@ -100,7 +99,7 @@ class IncomeCategoryManagementServiceTest {
         when(incomeCategoryRepository.save(any(IncomeCategory.class))).thenReturn(incomeCategory);
 
         //when
-        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryManagementService.deleteCategory(1L, user);
+        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.deleteCategory(1L, user);
 
         //then
         assertTrue(incomeCategoryResponse.isDeleted());
@@ -116,7 +115,7 @@ class IncomeCategoryManagementServiceTest {
 
         //then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> incomeCategoryManagementService.setAsFavourite(1L, false, user));
+                () -> incomeCategoryService.setAsFavourite(1L, false, user));
         assertEquals(exception.getMessage(), "Income category not found.");
     }
 
@@ -129,7 +128,7 @@ class IncomeCategoryManagementServiceTest {
 
         //then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> incomeCategoryManagementService.deleteCategory(1L, user));
+                () -> incomeCategoryService.deleteCategory(1L, user));
         assertEquals(exception.getMessage(), "Income category not found.");
     }
 
@@ -159,7 +158,7 @@ class IncomeCategoryManagementServiceTest {
         when(incomeCategoryRepository.save(any(IncomeCategory.class))).thenReturn(incomeCategoryUpdated);
 
         //when
-        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryManagementService.editCategory(1L, "CategoryName", "#aaa", user);
+        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.editCategory(1L, "CategoryName", "#aaa", user);
 
         //then
         assertEquals(incomeCategoryUpdated.getCategoryName(), incomeCategoryResponse.getCategoryName());
@@ -183,7 +182,7 @@ class IncomeCategoryManagementServiceTest {
         when(incomeCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(incomeCategory));
 
         //when
-        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryManagementService.editCategory(1L, null, null, user);
+        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.editCategory(1L, null, null, user);
 
         //then
         verify(incomeCategoryRepository, times(0)).save(any(IncomeCategory.class));
@@ -216,7 +215,7 @@ class IncomeCategoryManagementServiceTest {
         when(incomeCategoryRepository.save(any(IncomeCategory.class))).thenReturn(incomeCategoryUpdated);
 
         //when
-        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryManagementService.editCategory(1L, null, "#aaa", user);
+        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.editCategory(1L, null, "#aaa", user);
 
         //then
         assertEquals(incomeCategory.getCategoryName(), incomeCategoryResponse.getCategoryName());
@@ -250,7 +249,7 @@ class IncomeCategoryManagementServiceTest {
         when(incomeCategoryRepository.save(any(IncomeCategory.class))).thenReturn(incomeCategoryUpdated);
 
         //when
-        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryManagementService.editCategory(1L, "CategoryName", null, user);
+        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.editCategory(1L, "CategoryName", null, user);
 
         //then
         assertEquals(incomeCategory.getColorHex(), incomeCategoryResponse.getColorHex());
@@ -265,7 +264,7 @@ class IncomeCategoryManagementServiceTest {
 
         //then
         IllegalStateException exception = assertThrows(IllegalStateException.class,
-                () -> incomeCategoryManagementService.editCategory(1L, "", null, user));
+                () -> incomeCategoryService.editCategory(1L, "", null, user));
         assertEquals(exception.getMessage(), "categoryName cannot be blank.");
     }
 
@@ -276,7 +275,7 @@ class IncomeCategoryManagementServiceTest {
 
         //then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> incomeCategoryManagementService.editCategory(1L, null, "#aaaaaa00", user));
+                () -> incomeCategoryService.editCategory(1L, null, "#aaaaaa00", user));
         assertEquals(exception.getMessage(), "Incorrect hex color provided.");
     }
 }

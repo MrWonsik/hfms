@@ -1,8 +1,5 @@
 package com.wasacz.hfms.finance.shop;
 
-import com.wasacz.hfms.finance.shop.CreateShopRequest;
-import com.wasacz.hfms.finance.shop.ShopManagementService;
-import com.wasacz.hfms.finance.shop.ShopResponse;
 import com.wasacz.hfms.persistence.Shop;
 import com.wasacz.hfms.persistence.ShopRepository;
 import com.wasacz.hfms.persistence.User;
@@ -33,15 +30,15 @@ class ShopManagementServiceTest {
     @Test
     public void whenAddNewShop_givenNewShopRequest_thenSaveShop() {
         //given
-        CreateShopRequest createShopRequest = new CreateShopRequest();
-        createShopRequest.setShopName(SHOP_NAME);
+        ShopObj shop = ShopObj.builder().shopName(SHOP_NAME).build();
+
         User user = User.builder().id(1L).username("Test").build();
 
         Shop ikeaShop = Shop.builder().shopName(SHOP_NAME).user(user).isDeleted(false).build();
         when(shopRepository.save(any(Shop.class))).thenReturn(ikeaShop);
 
         //when
-        ShopResponse shopResponse = shopManagementService.addNewShop(createShopRequest, user);
+        ShopResponse shopResponse = shopManagementService.addNewShop(shop, user);
 
         //then
         assertEquals(shopResponse.getShopName(), ikeaShop.getShopName());
@@ -52,13 +49,12 @@ class ShopManagementServiceTest {
     @NullAndEmptySource
     public void whenAddNewShop_givenNewShopRequestWithEmptyName_thenThrowException(String shopName) {
         //given
-        CreateShopRequest createShopRequest = new CreateShopRequest();
-        createShopRequest.setShopName(shopName);
+        ShopObj shop = ShopObj.builder().shopName(shopName).build();
         User user = User.builder().id(1L).username("Test").build();
 
         //then
         IllegalStateException exception = assertThrows(IllegalStateException.class,
-                () -> shopManagementService.addNewShop(createShopRequest, user));
+                () -> shopManagementService.addNewShop(shop, user));
         assertEquals(exception.getMessage(), "shopName cannot be blank.");
     }
 

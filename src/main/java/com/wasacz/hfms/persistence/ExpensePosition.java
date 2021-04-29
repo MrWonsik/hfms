@@ -2,6 +2,8 @@ package com.wasacz.hfms.persistence;
 
 import com.sun.istack.NotNull;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -23,8 +25,6 @@ public class ExpensePosition {
     @NotNull
     private String expensePositionName;
 
-    private String manufacturer;
-
     private BigDecimal size;
 
     @NotNull
@@ -32,6 +32,7 @@ public class ExpensePosition {
 
     @NotNull
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Expense expense;
 
     @CreatedDate

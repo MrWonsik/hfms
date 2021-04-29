@@ -36,7 +36,7 @@ class ChangePasswordControllerTest {
                 .oldPassword(PASSWORD)
                 .build();
 
-        this.mockMvc.perform(post("/api/user/password").with(user(currentUserMock.getCurrentUser("Test", Role.ROLE_ADMIN)))
+        this.mockMvc.perform(post("/api/user/password").with(user(currentUserMock.createMockUser("Test", Role.ROLE_ADMIN)))
                 .content(asJsonString(changePasswordRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -52,7 +52,7 @@ class ChangePasswordControllerTest {
                 .oldPassword(PASSWORD)
                 .build();
 
-        this.mockMvc.perform(post("/api/user/password").with(user(currentUserMock.getCurrentUser("Test2", Role.ROLE_ADMIN)))
+        this.mockMvc.perform(post("/api/user/password").with(user(currentUserMock.createMockUser("Test2", Role.ROLE_ADMIN)))
                 .content(asJsonString(changePasswordRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -67,7 +67,7 @@ class ChangePasswordControllerTest {
                 .oldPassword("incorrectOldPassword123!!")
                 .build();
 
-        this.mockMvc.perform(post("/api/user/password").with(user(currentUserMock.getCurrentUser("Test3", Role.ROLE_ADMIN)))
+        this.mockMvc.perform(post("/api/user/password").with(user(currentUserMock.createMockUser("Test3", Role.ROLE_ADMIN)))
                 .content(asJsonString(changePasswordRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))

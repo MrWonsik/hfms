@@ -2,13 +2,13 @@ package com.wasacz.hfms.persistence;
 
 import com.sun.istack.NotNull;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -16,32 +16,25 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Expense {
+public class ReceiptFile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    private String expenseName;
+    private String receiptFilePath;
 
     @NotNull
-    @ManyToOne
-    private ExpenseCategory category;
+    @Column(unique = true)
+    private String fileName;
 
     @NotNull
-    @ManyToOne
-    private Shop shop;
+    @OneToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Expense expense;
 
-    @NotNull
-    @ManyToOne
-    private User user;
-
-    @NotNull
-    private BigDecimal cost;
-
-    @NotNull
     @Builder.Default
-    private LocalDate expenseDate = LocalDate.now();
+    private Boolean isDeleted = false;
 
     @CreatedDate
     @Builder.Default

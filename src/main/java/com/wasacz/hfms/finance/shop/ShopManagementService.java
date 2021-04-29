@@ -33,9 +33,9 @@ public class ShopManagementService {
                 .build();
     }
 
-    public ShopResponse addNewShop(CreateShopRequest createShopRequest, User user) {
-        ShopValidator.validate(createShopRequest);
-        Shop savedShop = shopRepository.save(Shop.builder().shopName(createShopRequest.getShopName()).user(user).build());
+    public ShopResponse addNewShop(ShopObj shopObj, User user) {
+        ShopValidator.validate(shopObj);
+        Shop savedShop = shopRepository.save(Shop.builder().shopName(shopObj.getShopName()).user(user).build());
         return getShopResponse(savedShop);
     }
 

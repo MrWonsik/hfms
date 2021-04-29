@@ -1,6 +1,7 @@
 package com.wasacz.hfms.finance.category.controller;
 
-import com.wasacz.hfms.finance.category.CategoryManagementServiceProvider;
+import com.wasacz.hfms.finance.category.AbstractCategory;
+import com.wasacz.hfms.finance.category.CategoryServiceFactory;
 import com.wasacz.hfms.finance.category.CategoryType;
 import com.wasacz.hfms.security.CurrentUser;
 import com.wasacz.hfms.security.UserPrincipal;
@@ -19,10 +20,10 @@ import java.io.IOException;
 @RequestMapping("/api/category")
 public class CategoryManagementController {
 
-    private final CategoryManagementServiceProvider categoryManagementServiceProvider;
+    private final CategoryServiceFactory categoryServiceFactory;
 
-    public CategoryManagementController(CategoryManagementServiceProvider categoryManagementServiceProvider) {
-        this.categoryManagementServiceProvider = categoryManagementServiceProvider;
+    public CategoryManagementController(CategoryServiceFactory categoryServiceFactory) {
+        this.categoryServiceFactory = categoryServiceFactory;
     }
 
     @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
@@ -41,9 +42,9 @@ public class CategoryManagementController {
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> addCategory(@CurrentUser UserPrincipal user,
                                          @PathVariable("type") CategoryType categoryType,
-                                         @RequestBody CreateCategoryRequest createCategoryRequest) {
-        AbstractCategoryResponse abstractCategoryResponse = categoryManagementServiceProvider.addCategory(createCategoryRequest, user.getUser(), categoryType);
-        return ResponseEntity.status(HttpStatus.OK).body(abstractCategoryResponse);
+                                         @RequestBody AbstractCategory categoryObj) {
+        AbstractCategoryResponse response = categoryServiceFactory.getService(categoryType).addCategory(categoryObj, user.getUser());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PatchMapping("/{type}/favourite/{id}")
@@ -51,9 +52,9 @@ public class CategoryManagementController {
     public ResponseEntity<?> setCategoryAsFavourite(@CurrentUser UserPrincipal user,
                                                     @PathVariable("id") long categoryId,
                                                     @PathVariable("type") CategoryType categoryType,
-                                                    @RequestBody CategoryIsFavouriteRequest categoryIsFavouriteRequest) {
-        AbstractCategoryResponse abstractCategoryResponse = categoryManagementServiceProvider.setAsFavourite(categoryId, categoryIsFavouriteRequest, user.getUser(), categoryType);
-        return ResponseEntity.status(HttpStatus.OK).body(abstractCategoryResponse);
+                                                    @RequestBody CategoryIsFavouriteRequest request) {
+        AbstractCategoryResponse response = categoryServiceFactory.getService(categoryType).setAsFavourite(categoryId, request.getIsFavourite(), user.getUser());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{type}/{id}")
@@ -61,7 +62,7 @@ public class CategoryManagementController {
     public ResponseEntity<?> deleteCategory(@CurrentUser UserPrincipal user,
                                             @PathVariable("id") long categoryId,
                                             @PathVariable("type") CategoryType categoryType) {
-        AbstractCategoryResponse abstractCategoryResponse = categoryManagementServiceProvider.deleteCategory(categoryId, user.getUser(), categoryType);
+        AbstractCategoryResponse abstractCategoryResponse = categoryServiceFactory.getService(categoryType).deleteCategory(categoryId, user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(abstractCategoryResponse);
     }
 
@@ -69,7 +70,7 @@ public class CategoryManagementController {
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> getAllExpenseCategory(@CurrentUser UserPrincipal user,
                                                    @PathVariable("type") CategoryType categoryType) {
-        CategoriesResponse categoriesResponse = categoryManagementServiceProvider.getAllCategories(user.getUser(), categoryType);
+        CategoriesResponse categoriesResponse = categoryServiceFactory.getService(categoryType).getAllCategories(user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(categoriesResponse);
     }
 
@@ -79,7 +80,7 @@ public class CategoryManagementController {
                                                     @PathVariable("id") long categoryId,
                                                     @PathVariable("type") CategoryType categoryType,
                                                     @RequestBody EditCategoryRequest editCategoryRequest) {
-        AbstractCategoryResponse abstractCategoryResponse = categoryManagementServiceProvider.editCategory(categoryId, editCategoryRequest.getCategoryName(), editCategoryRequest.getColorHex(), user.getUser(), categoryType);
+        AbstractCategoryResponse abstractCategoryResponse = categoryServiceFactory.getService(categoryType).editCategory(categoryId, editCategoryRequest.getCategoryName(), editCategoryRequest.getColorHex(), user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(abstractCategoryResponse);
     }
 
