@@ -48,7 +48,7 @@ class ShopManagementControllerIntegrationTest {
     public void whenAddShop_givenNewShopRequest_thenReturnOkStatus() throws Exception {
         //given
         ShopObj ikea = ShopObj.builder().shopName("ikea").build();
-        this.mockMvc.perform(post("/api/shop/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/shop").with(user(currentUser))
                 .content(asJsonString(ikea))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -61,7 +61,7 @@ class ShopManagementControllerIntegrationTest {
         //given
         ShopObj ikea = ShopObj.builder().build();
 
-        this.mockMvc.perform(post("/api/shop/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/shop").with(user(currentUser))
                 .content(asJsonString(ikea))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -74,14 +74,14 @@ class ShopManagementControllerIntegrationTest {
         //given
         ShopObj ikea = ShopObj.builder().shopName("ikea3").build();
 
-        this.mockMvc.perform(post("/api/shop/").with(user(currentUser))
+        this.mockMvc.perform(post("/api/shop").with(user(currentUser))
                 .content(asJsonString(ikea))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         UserPrincipal user2 = currentUserMock.createMockUser("DifferentUser", Role.ROLE_USER);
-        this.mockMvc.perform(post("/api/shop/").with(user(user2))
+        this.mockMvc.perform(post("/api/shop").with(user(user2))
                 .content(asJsonString(ikea))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -113,7 +113,7 @@ class ShopManagementControllerIntegrationTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        MvcResult shops = this.mockMvc.perform(get("/api/shop/").with(user(currentUser))
+        MvcResult shops = this.mockMvc.perform(get("/api/shop").with(user(currentUser))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
@@ -125,7 +125,7 @@ class ShopManagementControllerIntegrationTest {
     @Test
     public void whenGetAllShopsForNewUSer_thenReturnOkStatusAndEmptyListResponse() throws Exception {
         //given
-        MvcResult shops = this.mockMvc.perform(get("/api/shop/").with(user(currentUserMock.createMockUser("New_user", Role.ROLE_USER)))
+        MvcResult shops = this.mockMvc.perform(get("/api/shop").with(user(currentUserMock.createMockUser("New_user", Role.ROLE_USER)))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
@@ -135,7 +135,7 @@ class ShopManagementControllerIntegrationTest {
     }
 
     private MvcResult createNewShop(ShopObj ikea) throws Exception {
-        return this.mockMvc.perform(post("/api/shop/").with(user(currentUser))
+        return this.mockMvc.perform(post("/api/shop").with(user(currentUser))
                 .content(asJsonString(ikea))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)).andReturn();

@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.time.Month;
+import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +50,7 @@ public class ExpenseService implements ITransactionService {
 
         if(expenseObj.getShop() != null && expenseObj.getShop().getShopName() != null) {
             ShopValidator.validate(expenseObj.getShop());
-            return shopRepository.save(Shop.builder().shopName(expenseObj.getShop().getShopName()).build());
+            return shopRepository.save(Shop.builder().shopName(expenseObj.getShop().getShopName()).user(user).build());
         }
         return null;
 
@@ -96,8 +96,10 @@ public class ExpenseService implements ITransactionService {
     }
 
     @Override
-    public List<AbstractTransactionResponse> getAllForMonth(User user, Month month) {
-        return null;
+    public List<AbstractTransactionResponse> getAllForMonthInYear(User user, YearMonth yearMonth) {
+        Optional<List<Expense>> expensesByUserFromMonth = expenseRepository.findAllByUserAndExpenseDateIsBetween(user, yearMonth.atDay(1), yearMonth.atEndOfMonth());
+        List<Expense> allExpenses = expensesByUserFromMonth.orElseGet(Collections::emptyList);
+        return allExpenses.stream().map(this::getExpenseResponse).collect(Collectors.toList());
     }
 
     @Override

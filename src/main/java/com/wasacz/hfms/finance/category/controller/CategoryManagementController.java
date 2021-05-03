@@ -38,7 +38,7 @@ public class CategoryManagementController {
         response.sendError(HttpStatus.BAD_REQUEST.value(), "Incorrect category type.");
     }
 
-    @PostMapping("/{type}/")
+    @PostMapping("/{type}")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> addCategory(@CurrentUser UserPrincipal user,
                                          @PathVariable("type") CategoryType categoryType,
@@ -66,7 +66,7 @@ public class CategoryManagementController {
         return ResponseEntity.status(HttpStatus.OK).body(abstractCategoryResponse);
     }
 
-    @GetMapping("/{type}/")
+    @GetMapping("/{type}")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> getAllExpenseCategory(@CurrentUser UserPrincipal user,
                                                    @PathVariable("type") CategoryType categoryType) {
