@@ -3,7 +3,7 @@ package com.wasacz.hfms.finance.transaction;
 import com.wasacz.hfms.persistence.User;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Month;
+import java.time.YearMonth;
 import java.util.List;
 
 public interface ITransactionService {
@@ -14,7 +14,7 @@ public interface ITransactionService {
 
     List<AbstractTransactionResponse> getAll(User user);
 
-    List<AbstractTransactionResponse> getAllForMonth(User user, Month month);
+    List<AbstractTransactionResponse> getAllForMonthInYear(User user, YearMonth yearMonth);
 
     AbstractTransactionResponse delete(long transactionId, User user);
 

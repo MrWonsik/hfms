@@ -85,7 +85,7 @@ class ExpenseCategoryControllerIntegrationTest {
                 .maximumCost(BigDecimal.valueOf(10d))
                 .build();
 
-        MvcResult createdCategoryResult = this.mockMvc.perform(post("/api/category/expense/").with(user(currentUser))
+        MvcResult createdCategoryResult = this.mockMvc.perform(post("/api/category/expense").with(user(currentUser))
                 .content(asJsonString(categoryObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))

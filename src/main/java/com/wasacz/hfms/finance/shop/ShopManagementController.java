@@ -28,7 +28,7 @@ public class ShopManagementController {
         response.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> addShop(@CurrentUser UserPrincipal user, @RequestBody ShopObj shopObj) {
         ShopResponse shopResponse = shopManagementService.addNewShop(shopObj, user.getUser());
@@ -42,7 +42,7 @@ public class ShopManagementController {
         return ResponseEntity.status(HttpStatus.OK).body(shopResponse);
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> getAllShopsByUser(@CurrentUser UserPrincipal user) {
         return ResponseEntity.status(HttpStatus.OK).body(shopManagementService.getAllNotDeletedShops(user.getUser()));

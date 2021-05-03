@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.time.YearMonth;
 import java.util.List;
 
 @RestController
@@ -31,7 +31,7 @@ public class TransactionController {
         response.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     }
 
-    @PostMapping(value = "/{type}/")
+    @PostMapping(value = "/{type}")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> add(@CurrentUser UserPrincipal user,
                                  @RequestParam(value = "file", required = false) MultipartFile receiptFile,
@@ -41,12 +41,21 @@ public class TransactionController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping(value = "/{type}/")
+    @GetMapping(value = "/{type}")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> getAll(@CurrentUser UserPrincipal user,
-                                            @PathVariable("type") TransactionType transactionType) {
-        List<AbstractTransactionResponse> response = transactionServiceFactory.getService(transactionType).getAll(user.getUser());
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+                                    @PathVariable("type") TransactionType transactionType,
+                                    @RequestParam(required = false) Integer month,
+                                    @RequestParam(required = false) Integer year) {
+        return ResponseEntity.status(HttpStatus.OK).body(obtainTransactionResponse(user, transactionType, month, year));
+    }
+
+    private List<AbstractTransactionResponse> obtainTransactionResponse(UserPrincipal user, TransactionType transactionType, Integer month, Integer year) {
+        if(year != null && month != null) {
+            return transactionServiceFactory.getService(transactionType).getAllForMonthInYear(user.getUser(), YearMonth.of(year, month));
+        } else {
+            return transactionServiceFactory.getService(transactionType).getAll(user.getUser());
+        }
     }
 
     @DeleteMapping(value = "/{type}/{id}")

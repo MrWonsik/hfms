@@ -27,6 +27,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -74,7 +75,7 @@ public class TransactionControllerIntegrationTest {
 
     @Test
     public void whenAddExpense_givenExpenseObjRequestWithShopName_thenReturnOkStatus() throws Exception {
-        MvcResult expense = createExpense("expense_2021_04_22", 129.99, "new_ikea", currentUser, expenseCategoryResponse.getId());
+        MvcResult expense = createExpense("expense_2021_04_22", 129.99, "new_ikea", currentUser, expenseCategoryResponse.getId(), LocalDate.now());
 
         ExpenseResponse expenseResponse = objectMapper.readValue(expense.getResponse().getContentAsString(), ExpenseResponse.class);
 
@@ -85,12 +86,13 @@ public class TransactionControllerIntegrationTest {
         assertNull(expenseResponse.getReceiptId());
     }
 
-    private MvcResult createExpense(String expenseName, Double cost, String shopName, UserPrincipal user, Long categoryId) throws Exception {
+    private MvcResult createExpense(String expenseName, Double cost, String shopName, UserPrincipal user, Long categoryId, LocalDate date) throws Exception {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName(expenseName)
-                .cost(129.99)
-                .shop(ShopObj.builder().shopName("new_ikea").build())
+                .cost(cost)
+                .shop(ShopObj.builder().shopName(shopName).build())
                 .categoryId(categoryId)
+                .transactionDate(date)
                 .build();
         return this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
@@ -106,11 +108,11 @@ public class TransactionControllerIntegrationTest {
         MvcResult category = CategoryCreatorStatic.callCreateExpenseCategoryEndpoint(mockMvc, "Shoping", user);
         ExpenseCategoryResponse categoryResponse = objectMapper.readValue(category.getResponse().getContentAsString(), ExpenseCategoryResponse.class);
 
-        createExpense("Icecream",12.99,"Biedronka", user, categoryResponse.getId());
-        createExpense("Milk",3.00,"Biedronka", user, categoryResponse.getId());
-        createExpense("Egg",8.99,"Biedronka", user, categoryResponse.getId());
+        createExpense("Icecream",12.99,"Biedronka", user, categoryResponse.getId(), LocalDate.now());
+        createExpense("Milk",3.00,"Biedronka", user, categoryResponse.getId(), LocalDate.now());
+        createExpense("Egg",8.99,"Biedronka", user, categoryResponse.getId(), LocalDate.now());
 
-        MvcResult expenseList = this.mockMvc.perform(get("/api/transaction/expense/").with(user(user))
+        MvcResult expenseList = this.mockMvc.perform(get("/api/transaction/expense").with(user(user))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -119,6 +121,31 @@ public class TransactionControllerIntegrationTest {
         List<ExpenseResponse> expenseResponse = Arrays.asList(objectMapper.readValue(expenseList.getResponse().getContentAsString(), ExpenseResponse[].class));
 
         assertEquals(3, expenseResponse.size());
+    }
+
+    @Test
+    public void whenGetAllExpenseFromCurrentMonth_givenExpenseObjRequestWithShopName_thenReturnOkStatusAndReturnExpenseOnlyFromCurrentMonth() throws Exception {
+        UserPrincipal user = currentUserMock.createMockUser("User_expense_for_get_all_month", Role.ROLE_USER);
+        MvcResult category = CategoryCreatorStatic.callCreateExpenseCategoryEndpoint(mockMvc, "Shoping", user);
+        ExpenseCategoryResponse categoryResponse = objectMapper.readValue(category.getResponse().getContentAsString(), ExpenseCategoryResponse.class);
+
+        createExpense("Icecream",12.99,"Biedronka", user, categoryResponse.getId(), LocalDate.now().minusMonths(1));
+        createExpense("Milk",3.00,"Biedronka", user, categoryResponse.getId(), LocalDate.now().minusMonths(1));
+        createExpense("Egg",8.99,"Biedronka", user, categoryResponse.getId(), LocalDate.now());
+
+        int year = Year.now().getValue();
+        int month = LocalDate.now().getMonth().getValue();
+
+
+        MvcResult expenseList = this.mockMvc.perform(get("/api/transaction/expense?year=" + year + "&month=" + month).with(user(user))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<ExpenseResponse> expenseResponse = Arrays.asList(objectMapper.readValue(expenseList.getResponse().getContentAsString(), ExpenseResponse[].class));
+
+        assertEquals(1, expenseResponse.size());
     }
 
     @Test
@@ -360,7 +387,7 @@ public class TransactionControllerIntegrationTest {
                 .with(user(currentUser))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("expenseName cannot be blank."));
+                .andExpect(status().reason("name cannot be blank."));
     }
 
     @Test
