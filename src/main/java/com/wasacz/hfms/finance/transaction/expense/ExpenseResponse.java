@@ -15,8 +15,8 @@ public class ExpenseResponse extends AbstractTransactionResponse {
     private final Long receiptId;
 
     @Builder
-    private ExpenseResponse(Long id, String expenseName, Double cost, LocalDate createdDate, String shopName, List<ExpensePositionResponse> expensePositionList, Long receiptId) {
-        super(id, expenseName, cost, createdDate);
+    private ExpenseResponse(Long id, String expenseName, Double cost, LocalDate createdDate, String shopName, List<ExpensePositionResponse> expensePositionList, Long receiptId, String categoryName) {
+        super(id, expenseName, cost, createdDate, categoryName);
         this.shopName = shopName;
         this.expensePositionList = expensePositionList;
         this.receiptId = receiptId;

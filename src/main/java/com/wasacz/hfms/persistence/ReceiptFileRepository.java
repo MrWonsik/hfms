@@ -8,5 +8,5 @@ import java.util.Optional;
 @Repository
 public interface ReceiptFileRepository extends JpaRepository<ReceiptFile, Long> {
 
-    Optional<ReceiptFile> findByExpenseId(Long expenseId);
+    Optional<ReceiptFile> findByExpenseIdAndIsDeletedIsFalse(Long expenseId);
 }

@@ -32,6 +32,9 @@ public class ReceiptFileService {
         if (file == null) {
             return null;
         }
+        if(getReceiptFileByExpense(expense.getId()).isPresent()) {
+            throw new IllegalStateException("File for this expense is already uploaded!");
+        }
         String dirPath = "%s/%s".formatted(destinationPath, username);
         String filePathname = "%s/%s_%s.jpg".formatted(dirPath, expenseName, Instant.now().getEpochSecond());
         try {
@@ -49,12 +52,29 @@ public class ReceiptFileService {
         }
     }
 
-    public Optional<ReceiptFile> getFileByExpense(Long expenseId) {
-        return repository.findByExpenseId(expenseId);
+    public Optional<ReceiptFile> getReceiptFileByExpense(Long expenseId) {
+        return repository.findByExpenseIdAndIsDeletedIsFalse(expenseId);
+    }
+
+    public File getFile(Long expenseId, Long receiptFileId) {
+        Optional<ReceiptFile> receiptFileByExpense = getReceiptFileByExpense(expenseId);
+        if(receiptFileByExpense.isEmpty()) {
+            return null;
+        }
+        if(!receiptFileByExpense.get().getId().equals(receiptFileId)) {
+            throw new IllegalStateException("Incorrect receipt file id!");
+        }
+        ReceiptFile receiptFile = repository.findById(receiptFileId).orElse(null);
+        if(receiptFile == null) {
+            return null;
+        }
+
+        String filePath = receiptFile.getReceiptFilePath() + "/" + receiptFile.getFileName();
+        return new File(filePath);
     }
 
     public void deleteFile(Long expenseId) {
-        Optional<ReceiptFile> file = getFileByExpense(expenseId);
+        Optional<ReceiptFile> file = getReceiptFileByExpense(expenseId);
         if(file.isEmpty()) {
             return;
         }

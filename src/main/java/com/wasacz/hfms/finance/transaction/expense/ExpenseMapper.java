@@ -16,6 +16,7 @@ public class ExpenseMapper {
                 .createdDate(expense.getExpenseDate())
                 .expensePositionList(mapExpensePositionToResponse(expensePositionList))
                 .receiptId(receiptId)
+                .categoryName(expense.getCategory().getCategoryName())
                 .build();
     }
 
