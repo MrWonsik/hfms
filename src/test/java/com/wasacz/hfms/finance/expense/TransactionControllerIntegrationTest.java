@@ -80,7 +80,7 @@ public class TransactionControllerIntegrationTest {
         ExpenseResponse expenseResponse = objectMapper.readValue(expense.getResponse().getContentAsString(), ExpenseResponse.class);
 
         assertEquals("expense_2021_04_22", expenseResponse.getName());
-        assertEquals("new_ikea", expenseResponse.getShopName());
+        assertEquals("new_ikea", expenseResponse.getShop().getName());
         assertEquals(129.99, expenseResponse.getCost());
         assertTrue(expenseResponse.getExpensePositionList().isEmpty());
         assertNull(expenseResponse.getReceiptId());
@@ -90,7 +90,7 @@ public class TransactionControllerIntegrationTest {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName(expenseName)
                 .cost(cost)
-                .shop(ShopObj.builder().shopName(shopName).build())
+                .shop(ShopObj.builder().name(shopName).build())
                 .categoryId(categoryId)
                 .transactionDate(date)
                 .build();
@@ -168,7 +168,8 @@ public class TransactionControllerIntegrationTest {
 
 
         assertEquals("expense_2021_04_22", expenseResponse.getName());
-        assertEquals("existing_shop", expenseResponse.getShopName());
+        assertEquals(shopResponse.getName(), expenseResponse.getShop().getName());
+        assertEquals(shopResponse.getId(), expenseResponse.getShop().getId());
         assertEquals(129.99, expenseResponse.getCost());
         assertTrue(expenseResponse.getExpensePositionList().isEmpty());
         assertNotNull(expenseResponse.getReceiptId());
@@ -193,7 +194,7 @@ public class TransactionControllerIntegrationTest {
 
 
         assertEquals("expense_2021_04_22", expenseResponse.getName());
-        assertNull(expenseResponse.getShopName());
+        assertNull(expenseResponse.getShop());
         assertEquals(129.99, expenseResponse.getCost());
         assertTrue(expenseResponse.getExpensePositionList().isEmpty());
     }
@@ -221,7 +222,7 @@ public class TransactionControllerIntegrationTest {
 
 
         assertEquals("expense_2021_04_22", expenseResponse.getName());
-        assertNull(expenseResponse.getShopName());
+        assertNull(expenseResponse.getShop());
         assertEquals(129.99, expenseResponse.getCost());
         assertEquals(2, expenseResponse.getExpensePositionList().size());
     }

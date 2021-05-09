@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ShopResponse {
     private final Long id;
-    private final String shopName;
+    private final String name;
     private final boolean isDeleted;
     private final DateTime createDate;
 }

@@ -27,7 +27,7 @@ public class ShopManagementService {
     private ShopResponse getShopResponse(Shop shop) {
         return ShopResponse.builder()
                 .id(shop.getId())
-                .shopName(shop.getShopName())
+                .name(shop.getName())
                 .isDeleted(shop.isDeleted())
                 .createDate(new DateTime(shop.getCreatedDate()))
                 .build();
@@ -35,7 +35,7 @@ public class ShopManagementService {
 
     public ShopResponse addNewShop(ShopObj shopObj, User user) {
         ShopValidator.validate(shopObj);
-        Shop savedShop = shopRepository.save(Shop.builder().shopName(shopObj.getShopName()).user(user).build());
+        Shop savedShop = shopRepository.save(Shop.builder().name(shopObj.getName()).user(user).build());
         return getShopResponse(savedShop);
     }
 

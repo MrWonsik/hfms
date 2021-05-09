@@ -17,4 +17,6 @@ public interface ITransactionService {
     AbstractTransactionResponse delete(long transactionId, User user);
 
     TransactionType getService();
+
+    AbstractTransactionResponse updateTransaction(Long transactionId, AbstractTransaction transaction, User user);
 }

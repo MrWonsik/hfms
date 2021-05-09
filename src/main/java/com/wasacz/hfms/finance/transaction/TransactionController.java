@@ -67,4 +67,15 @@ public class TransactionController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+
+    @PutMapping(value = "/{type}/{id}")
+    @Secured({"ROLE_USER"})
+    public ResponseEntity<?> updateTransaction(@CurrentUser UserPrincipal user,
+                                    @PathVariable("type") TransactionType transactionType,
+                                    @PathVariable("id") Long transactionId,
+                                    @RequestBody AbstractTransaction transaction) {
+        AbstractTransactionResponse response = transactionServiceFactory.getService(transactionType).updateTransaction(transactionId, transaction, user.getUser());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 }

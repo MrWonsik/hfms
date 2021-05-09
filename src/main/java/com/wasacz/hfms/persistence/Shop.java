@@ -17,12 +17,13 @@ import java.time.Instant;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Shop {
     @Id
+    @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
     @Column(updatable = false)
-    private String shopName;
+    private String name;
 
     @NotNull
     @ManyToOne

@@ -13,5 +13,5 @@ public abstract class AbstractTransactionResponse {
     private final String name;
     private final Double cost;
     private final LocalDate createdDate;
-    private final String categoryName;
+    private final CategoryResponse category;
 }

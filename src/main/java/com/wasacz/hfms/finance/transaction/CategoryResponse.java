@@ -1,4 +1,4 @@
-package com.wasacz.hfms.finance.transaction.expense;
+package com.wasacz.hfms.finance.transaction;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -8,9 +8,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class ExpensePositionResponse {
+public class CategoryResponse {
     private final Long id;
-    private final String positionName;
-    private final Double size;
-    private final Double cost;
+    private final String name;
 }

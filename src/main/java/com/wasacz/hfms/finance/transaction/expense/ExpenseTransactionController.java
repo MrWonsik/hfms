@@ -7,10 +7,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
@@ -23,16 +21,29 @@ public class ExpenseTransactionController {
         this.expenseService = expenseService;
     }
 
-    @GetMapping(value = "/{id}/file/{receiptId}")
+    @GetMapping(value = "/{id}/file")
     @Secured({"ROLE_USER"})
-    public ResponseEntity<?> getReceipt(@CurrentUser UserPrincipal user,
-                                    @PathVariable("id") Long transactionId,
-                                    @PathVariable("receiptId") Long receiptId) {
-        FileReceiptResponse file = expenseService.getReceiptFile(transactionId, receiptId, user.getUser());
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .contentLength(file.getLength())
-                .body(file.getBase64Resource());
+    public ResponseEntity<?> getReceiptFile(@CurrentUser UserPrincipal user,
+                                            @PathVariable("id") Long transactionId) {
+        FileReceiptResponse file = expenseService.getReceiptFileByExpense(transactionId, user.getUser());
+        return ResponseEntity.ok().body(file);
+    }
+
+    @DeleteMapping(value = "/{id}/file")
+    @Secured({"ROLE_USER"})
+    public ResponseEntity<?> deleteReceiptFile(@CurrentUser UserPrincipal user,
+                                            @PathVariable("id") Long transactionId) {
+        expenseService.deleteReceiptFile(transactionId, user.getUser());
+        return ResponseEntity.ok().body("File has been deleted.");
+    }
+
+    @PostMapping(value = "/{id}/file")
+    @Secured({"ROLE_USER"})
+    public ResponseEntity<?> uploadReceiptFile(@CurrentUser UserPrincipal user,
+                                               @RequestParam(value = "file", required = false) MultipartFile receiptFile,
+                                               @PathVariable("id") Long expenseId) {
+        FileReceiptResponse file = expenseService.uploadReceiptFile(expenseId, receiptFile, user.getUser());
+        return ResponseEntity.ok().body(file);
+
     }
 }

@@ -21,6 +21,6 @@ public class ShopCreatorStatic {
     }
 
     public static ShopObj getCreateShopRequest(String categoryName) {
-        return ShopObj.builder().shopName(categoryName).build();
+        return ShopObj.builder().name(categoryName).build();
     }
 }

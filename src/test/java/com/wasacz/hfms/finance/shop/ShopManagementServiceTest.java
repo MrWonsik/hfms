@@ -30,18 +30,18 @@ class ShopManagementServiceTest {
     @Test
     public void whenAddNewShop_givenNewShopRequest_thenSaveShop() {
         //given
-        ShopObj shop = ShopObj.builder().shopName(SHOP_NAME).build();
+        ShopObj shop = ShopObj.builder().name(SHOP_NAME).build();
 
         User user = User.builder().id(1L).username("Test").build();
 
-        Shop ikeaShop = Shop.builder().shopName(SHOP_NAME).user(user).isDeleted(false).build();
+        Shop ikeaShop = Shop.builder().name(SHOP_NAME).user(user).isDeleted(false).build();
         when(shopRepository.save(any(Shop.class))).thenReturn(ikeaShop);
 
         //when
         ShopResponse shopResponse = shopManagementService.addNewShop(shop, user);
 
         //then
-        assertEquals(shopResponse.getShopName(), ikeaShop.getShopName());
+        assertEquals(shopResponse.getName(), ikeaShop.getName());
         assertFalse(shopResponse.isDeleted());
     }
 
@@ -49,7 +49,7 @@ class ShopManagementServiceTest {
     @NullAndEmptySource
     public void whenAddNewShop_givenNewShopRequestWithEmptyName_thenThrowException(String shopName) {
         //given
-        ShopObj shop = ShopObj.builder().shopName(shopName).build();
+        ShopObj shop = ShopObj.builder().name(shopName).build();
         User user = User.builder().id(1L).username("Test").build();
 
         //then
@@ -64,8 +64,8 @@ class ShopManagementServiceTest {
         //given
         User user = User.builder().id(1L).username("Test").build();
 
-        Shop ikeaShopBeforeDeleted = Shop.builder().id(1L).shopName(SHOP_NAME).user(user).isDeleted(false).build();
-        Shop ikeaShopDeleted = Shop.builder().id(1L).shopName(SHOP_NAME).user(user).isDeleted(true).build();
+        Shop ikeaShopBeforeDeleted = Shop.builder().id(1L).name(SHOP_NAME).user(user).isDeleted(false).build();
+        Shop ikeaShopDeleted = Shop.builder().id(1L).name(SHOP_NAME).user(user).isDeleted(true).build();
         when(shopRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(ikeaShopBeforeDeleted));
         when(shopRepository.save(any(Shop.class))).thenReturn(ikeaShopDeleted);
 

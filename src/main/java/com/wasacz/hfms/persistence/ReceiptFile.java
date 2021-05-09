@@ -33,9 +33,6 @@ public class ReceiptFile {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Expense expense;
 
-    @Builder.Default
-    private Boolean isDeleted = false;
-
     @CreatedDate
     @Builder.Default
     @Column(nullable = false, updatable = false)
