@@ -49,6 +49,9 @@ public class ExpensePositionService {
     }
 
     public List<ExpensePosition> updateExpensePositions(Expense updatedExpense, List<ExpensePositionObj> newExpensePositions) {
+        if(newExpensePositions == null) {
+            return Collections.emptyList();
+        }
         if(updatedExpense == null) {
             throw new IllegalStateException("Incorrect expense.");
         }

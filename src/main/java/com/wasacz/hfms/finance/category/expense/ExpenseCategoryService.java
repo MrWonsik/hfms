@@ -101,10 +101,10 @@ public class ExpenseCategoryService implements ICategoryService {
                 .isFavourite(expenseCategory.getIsFavourite())
                 .currentVersion(expenseCategoryVersionMapper.mapExpenseCategoryVersionToResponse(
                         expenseCategoryVersionService.getCurrentCategoryVersion(expenseCategory.getId()))
-                ) //TODO: improve it
+                )
                 .expenseCategoryVersions(expenseCategoryVersionMapper.mapExpenseCategoryVersionsListToResponse(
                         expenseCategoryVersionService.getCategoryVersions(expenseCategory.getId()))
-                ) //TODO: improve it
+                )
                 .createDate(new DateTime(expenseCategory.getCreatedDate()))
                 .build();
     }

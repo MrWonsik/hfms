@@ -3,12 +3,14 @@ package com.wasacz.hfms.finance.transaction.expense;
 import com.wasacz.hfms.security.CurrentUser;
 import com.wasacz.hfms.security.UserPrincipal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @RestController
 @Slf4j
@@ -20,6 +22,13 @@ public class ExpenseTransactionController {
     public ExpenseTransactionController(ExpenseService expenseService) {
         this.expenseService = expenseService;
     }
+
+    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
+    public void handleValidationExceptions(RuntimeException ex, HttpServletResponse response) throws IOException {
+        log.debug("API layer validation errors: {}", ex.getMessage());
+        response.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+    }
+
 
     @GetMapping(value = "/{id}/file")
     @Secured({"ROLE_USER"})
