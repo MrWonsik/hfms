@@ -23,7 +23,7 @@ public class ExpensePositionService {
 
     public List<ExpensePosition> addExpensePositions(Expense expense, List<ExpensePositionObj> expensePositions) {
         if(expense == null) {
-            throw new IllegalStateException("Incorrect expense.");
+            throw new IllegalStateException("Expense cannot be null!");
         }
         if(expensePositions == null || expensePositions.isEmpty()) {
             return Collections.emptyList();
@@ -53,7 +53,7 @@ public class ExpensePositionService {
             return Collections.emptyList();
         }
         if(updatedExpense == null) {
-            throw new IllegalStateException("Incorrect expense.");
+            throw new IllegalStateException("Expense cannot be null!");
         }
         List<ExpensePosition> oldExpensePositionList = getExpensePositionList(updatedExpense.getId()).orElse(Collections.emptyList());
         deleteOldPositionsLists(newExpensePositions, oldExpensePositionList);
@@ -79,7 +79,7 @@ public class ExpensePositionService {
         ExpensePosition expensePositionToUpdate = expensePositionRepository
                 .findById(expensePositionObj.getId())
                 .orElseThrow(() -> new IllegalStateException(
-                        MessageFormat.format("Provide incorrect position id: {0} for expense! {1}, position with this id not exists.",
+                        MessageFormat.format("Provide incorrect position id: {0} for expense: {1}, position with this id not exists.",
                                 expensePositionObj.getId(), expense.getExpenseName())));
 
         expensePositionToUpdate.setExpensePositionName(expensePositionObj.getPositionName());
