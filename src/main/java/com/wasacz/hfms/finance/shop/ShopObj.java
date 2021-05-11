@@ -8,5 +8,5 @@ import lombok.Setter;
 @Builder
 public class ShopObj {
     private final Long id;
-    private final String shopName;
+    private final String name;
 }

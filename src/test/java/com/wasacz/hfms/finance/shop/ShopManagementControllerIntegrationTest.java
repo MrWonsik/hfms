@@ -47,7 +47,7 @@ class ShopManagementControllerIntegrationTest {
     @Test
     public void whenAddShop_givenNewShopRequest_thenReturnOkStatus() throws Exception {
         //given
-        ShopObj ikea = ShopObj.builder().shopName("ikea").build();
+        ShopObj ikea = ShopObj.builder().name("ikea").build();
         this.mockMvc.perform(post("/api/shop").with(user(currentUser))
                 .content(asJsonString(ikea))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -72,7 +72,7 @@ class ShopManagementControllerIntegrationTest {
     @Test
     public void whenAddShopsWithTheSameNameAsDifferentUser_thenReturnOkStatus() throws Exception {
         //given
-        ShopObj ikea = ShopObj.builder().shopName("ikea3").build();
+        ShopObj ikea = ShopObj.builder().name("ikea3").build();
 
         this.mockMvc.perform(post("/api/shop").with(user(currentUser))
                 .content(asJsonString(ikea))
@@ -91,7 +91,7 @@ class ShopManagementControllerIntegrationTest {
     @Test
     public void whenDeleteShop_thenReturnOkStatus() throws Exception {
         //given
-        ShopObj ikea = ShopObj.builder().shopName("ikea4").build();
+        ShopObj ikea = ShopObj.builder().name("ikea4").build();
 
         ShopResponse shopResponse = objectMapper.readValue(createNewShop(ikea).getResponse().getContentAsString(), ShopResponse.class);
         this.mockMvc.perform(delete("/api/shop/" + shopResponse.getId()).with(user(currentUser))
@@ -102,8 +102,8 @@ class ShopManagementControllerIntegrationTest {
     @Test
     public void whenGetAllShops_thenReturnOkStatusAndOnlyNotDeletedShop() throws Exception {
         //given
-        ShopObj ikea = ShopObj.builder().shopName("ikea5").build();
-        ShopObj ikea2 = ShopObj.builder().shopName("ikea5").build();
+        ShopObj ikea = ShopObj.builder().name("ikea5").build();
+        ShopObj ikea2 = ShopObj.builder().name("ikea5").build();
 
 
         MvcResult newShop = createNewShop(ikea);

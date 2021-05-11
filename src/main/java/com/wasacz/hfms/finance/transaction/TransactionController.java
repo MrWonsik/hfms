@@ -60,10 +60,21 @@ public class TransactionController {
 
     @DeleteMapping(value = "/{type}/{id}")
     @Secured({"ROLE_USER"})
-    public ResponseEntity<?> delete(@CurrentUser UserPrincipal user,
-                                    @PathVariable("type") TransactionType transactionType,
-                                    @PathVariable("id") Long transactionId) {
+    public ResponseEntity<?> deleteTransaction(@CurrentUser UserPrincipal user,
+                                               @PathVariable("type") TransactionType transactionType,
+                                               @PathVariable("id") Long transactionId) {
         AbstractTransactionResponse response = transactionServiceFactory.getService(transactionType).delete(transactionId, user.getUser());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+
+    @PutMapping(value = "/{type}/{id}")
+    @Secured({"ROLE_USER"})
+    public ResponseEntity<?> updateTransaction(@CurrentUser UserPrincipal user,
+                                    @PathVariable("type") TransactionType transactionType,
+                                    @PathVariable("id") Long transactionId,
+                                    @RequestBody AbstractTransaction transaction) {
+        AbstractTransactionResponse response = transactionServiceFactory.getService(transactionType).updateTransaction(transactionId, transaction, user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

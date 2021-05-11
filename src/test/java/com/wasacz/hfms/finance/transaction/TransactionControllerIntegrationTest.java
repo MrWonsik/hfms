@@ -1,4 +1,4 @@
-package com.wasacz.hfms.finance.expense;
+package com.wasacz.hfms.finance.transaction;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
@@ -36,8 +36,7 @@ import java.util.List;
 import static com.wasacz.hfms.helpers.ObjectMapperStatic.asJsonString;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -80,7 +79,7 @@ public class TransactionControllerIntegrationTest {
         ExpenseResponse expenseResponse = objectMapper.readValue(expense.getResponse().getContentAsString(), ExpenseResponse.class);
 
         assertEquals("expense_2021_04_22", expenseResponse.getName());
-        assertEquals("new_ikea", expenseResponse.getShopName());
+        assertEquals("new_ikea", expenseResponse.getShop().getName());
         assertEquals(129.99, expenseResponse.getCost());
         assertTrue(expenseResponse.getExpensePositionList().isEmpty());
         assertNull(expenseResponse.getReceiptId());
@@ -90,9 +89,10 @@ public class TransactionControllerIntegrationTest {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName(expenseName)
                 .cost(cost)
-                .shop(ShopObj.builder().shopName(shopName).build())
+                .shop(ShopObj.builder().name(shopName).build())
                 .categoryId(categoryId)
                 .transactionDate(date)
+                .transactionType("Expense")
                 .build();
         return this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
@@ -168,7 +168,8 @@ public class TransactionControllerIntegrationTest {
 
 
         assertEquals("expense_2021_04_22", expenseResponse.getName());
-        assertEquals("existing_shop", expenseResponse.getShopName());
+        assertEquals(shopResponse.getName(), expenseResponse.getShop().getName());
+        assertEquals(shopResponse.getId(), expenseResponse.getShop().getId());
         assertEquals(129.99, expenseResponse.getCost());
         assertTrue(expenseResponse.getExpensePositionList().isEmpty());
         assertNotNull(expenseResponse.getReceiptId());
@@ -193,7 +194,7 @@ public class TransactionControllerIntegrationTest {
 
 
         assertEquals("expense_2021_04_22", expenseResponse.getName());
-        assertNull(expenseResponse.getShopName());
+        assertNull(expenseResponse.getShop());
         assertEquals(129.99, expenseResponse.getCost());
         assertTrue(expenseResponse.getExpensePositionList().isEmpty());
     }
@@ -221,13 +222,13 @@ public class TransactionControllerIntegrationTest {
 
 
         assertEquals("expense_2021_04_22", expenseResponse.getName());
-        assertNull(expenseResponse.getShopName());
+        assertNull(expenseResponse.getShop());
         assertEquals(129.99, expenseResponse.getCost());
         assertEquals(2, expenseResponse.getExpensePositionList().size());
     }
 
     @Test
-    public void whenAddExpense_givenExpenseObjRequestWithExpensePositionsWithNNullPositionName_thenReturnOkStatus() throws Exception {
+    public void whenAddExpense_givenExpenseObjRequestWithExpensePositionsWithNNullPositionName_thenReturnBadRequest() throws Exception {
         List<ExpensePositionObj> expensePositions = new ArrayList<>();
         expensePositions.add(createExpensePositionObj(null, 1d, 12.01));
         expensePositions.add(createExpensePositionObj("position_el2", 0.98, 5.89));
@@ -247,7 +248,7 @@ public class TransactionControllerIntegrationTest {
     }
 
     @Test
-    public void whenAddExpense_givenExpenseObjRequestWithExpensePositionsWithIncorrectSize_thenReturnOkStatus() throws Exception {
+    public void whenAddExpense_givenExpenseObjRequestWithExpensePositionsWithIncorrectSize_thenReturnBadRequest() throws Exception {
         List<ExpensePositionObj> expensePositions = new ArrayList<>();
         expensePositions.add(createExpensePositionObj("position_el2", -0.98, 5.89));
         ExpenseObj expenseObj = ExpenseObj.builder()
@@ -423,4 +424,47 @@ public class TransactionControllerIntegrationTest {
                 .andExpect(status().reason("Cost must be bigger than 0."));
     }
 
+    @Test
+    public void whenDeleteExpense_givenExpenseId_thenReturnOkStatus() throws Exception {
+        MvcResult expense = createExpense("expense_2021_05_09", 129.99, "new_ikea", currentUser, expenseCategoryResponse.getId(), LocalDate.now());
+
+        ExpenseResponse expenseResponse = objectMapper.readValue(expense.getResponse().getContentAsString(), ExpenseResponse.class);
+
+        this.mockMvc.perform(delete("/api/transaction/expense/" + expenseResponse.getId()).with(user(currentUser)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void whenDeleteExpense_givenIncorrectExpenseId_thenReturnBadRequest() throws Exception {
+        this.mockMvc.perform(delete("/api/transaction/expense/" + 9999999L).with(user(currentUser)))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Transaction 9999999 not found."));
+    }
+
+    @Test
+    public void whenUpdateExpense_givenExpenseRequest_thenReturnOkStatus() throws Exception {
+        MvcResult expense = createExpense("expense_2021_05_09", 129.99, "new_ikea", currentUser, expenseCategoryResponse.getId(), LocalDate.now());
+
+        ExpenseResponse expenseResponse = objectMapper.readValue(expense.getResponse().getContentAsString(), ExpenseResponse.class);
+
+        ExpenseObj expenseObjectBody = ExpenseObj.builder()
+                .expenseName("Updated_name")
+                .cost(2000d)
+                .shop(ShopObj.builder().name("updated_shop").build())
+                .categoryId(expenseCategoryResponse.getId())
+                .build();
+        MvcResult updatedExpenseResult = this.mockMvc.perform(put("/api/transaction/expense/" + expenseResponse.getId())
+                .with(user(currentUser))
+                .content(asJsonString(expenseObjectBody))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ExpenseResponse updatedExpenseResponse = objectMapper.readValue(updatedExpenseResult.getResponse().getContentAsString(), ExpenseResponse.class);
+        assertEquals("Updated_name", updatedExpenseResponse.getName());
+        assertEquals(expenseObjectBody.getShop().getName(), updatedExpenseResponse.getShop().getName());
+        assertEquals(2000d, updatedExpenseResponse.getCost());
+        assertTrue(updatedExpenseResponse.getExpensePositionList().isEmpty());
+    }
 }

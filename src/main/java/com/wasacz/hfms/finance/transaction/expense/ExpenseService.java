@@ -1,5 +1,6 @@
 package com.wasacz.hfms.finance.transaction.expense;
 
+import com.wasacz.hfms.finance.shop.ShopObj;
 import com.wasacz.hfms.finance.transaction.AbstractTransaction;
 import com.wasacz.hfms.finance.transaction.AbstractTransactionResponse;
 import com.wasacz.hfms.finance.transaction.TransactionType;
@@ -35,37 +36,14 @@ public class ExpenseService implements ITransactionService {
         this.receiptFileService = receiptFileService;
     }
 
-    private ExpenseCategory obtainCategory(Long categoryId, User user) {
-        if(categoryId == null) {
-            throw new IllegalStateException("CategoryId cannot be null!");
-        }
-        return expenseCategoryRepository.findByIdAndUserAndIsDeletedFalse(categoryId, user)
-                .orElseThrow(() -> new IllegalArgumentException("Category with id " + categoryId + " not found."));
-    }
-
-    private Shop obtainShop(ExpenseObj expenseObj, User user) {
-        if(expenseObj.getShop() != null && expenseObj.getShop().getId() != null) {
-            return shopRepository.findByIdAndUserAndIsDeletedFalse(expenseObj.getShop().getId(), user).orElseThrow(() -> new IllegalArgumentException("Shop with id " + expenseObj.getShop().getId() + " not found."));
-        }
-
-        if(expenseObj.getShop() != null && expenseObj.getShop().getShopName() != null) {
-            ShopValidator.validate(expenseObj.getShop());
-            return shopRepository.save(Shop.builder().shopName(expenseObj.getShop().getShopName()).user(user).build());
-        }
-        return null;
-
-    }
-
     @Override
+    @Transactional
     public ExpenseResponse add(AbstractTransaction expenseObj, User user, MultipartFile file) {
-        if(!(expenseObj instanceof ExpenseObj)) {
-            throw new IllegalStateException("Incorrect abstractFinance implementation!");
-        }
-        ExpenseObj expense = (ExpenseObj) expenseObj;
+        ExpenseObj expense = obtainExpenseObj(expenseObj);
         ExpenseValidator.validateFinance(expense);
         Expense savedExpense = expenseRepository.save(buildExpense(expenseObj, user, expense));
 
-        ReceiptFile receiptFile = receiptFileService.saveFile(file, savedExpense, expense.getName(), user.getUsername());
+        ReceiptFile receiptFile = receiptFileService.saveFile(file, savedExpense, user.getUsername());
         List<ExpensePosition> expensePositionList = expensePositionService.addExpensePositions(savedExpense, expense.getExpensePositions());
         return ExpenseMapper.mapExpenseToResponse(savedExpense, expensePositionList, receiptFile != null ? receiptFile.getId() : null);
     }
@@ -75,7 +53,7 @@ public class ExpenseService implements ITransactionService {
                 .expenseName(expense.getName())
                 .category(obtainCategory(expense.getCategoryId(), user))
                 .cost(BigDecimal.valueOf(expense.getCost()))
-                .shop(obtainShop(expense, user))
+                .shop(obtainShop(expense.getShop(), user))
                 .user(user);
         if(expenseObj.getTransactionDate() != null) {
             expenseBuilder.expenseDate(expenseObj.getTransactionDate());
@@ -83,9 +61,25 @@ public class ExpenseService implements ITransactionService {
         return expenseBuilder.build();
     }
 
-    @Override
-    public AbstractTransactionResponse getTransaction(long transactionId, User user) {
+    private ExpenseCategory obtainCategory(Long categoryId, User user) {
+        if(categoryId == null) {
+            throw new IllegalStateException("CategoryId cannot be null!");
+        }
+        return expenseCategoryRepository.findByIdAndUserAndIsDeletedFalse(categoryId, user)
+                .orElseThrow(() -> new IllegalArgumentException("Category with id " + categoryId + " not found."));
+    }
+
+    private Shop obtainShop(ShopObj shopObj, User user) {
+        if(shopObj != null && shopObj.getId() != null) {
+            return shopRepository.findByIdAndUserAndIsDeletedFalse(shopObj.getId(), user).orElseThrow(() -> new IllegalArgumentException("Shop with id " + shopObj.getId() + " not found."));
+        }
+
+        if(shopObj != null && shopObj.getName() != null) {
+            ShopValidator.validate(shopObj);
+            return shopRepository.save(Shop.builder().name(shopObj.getName()).user(user).build());
+        }
         return null;
+
     }
 
     @Override
@@ -104,21 +98,16 @@ public class ExpenseService implements ITransactionService {
 
     @Override
     @Transactional
-    public AbstractTransactionResponse delete(long transactionId, User user) {
-        Expense expenseToDelete = expenseRepository.findByIdAndUser(transactionId, user).orElseThrow(() -> new IllegalArgumentException("Transaction %s not found.".formatted(transactionId)));
-        receiptFileService.deleteFile(expenseToDelete.getId());
+    public AbstractTransactionResponse delete(long expenseId, User user) {
+        Expense expenseToDelete = expenseRepository.findByIdAndUser(expenseId, user).orElseThrow(() -> new IllegalArgumentException("Transaction %s not found.".formatted(expenseId)));
+        receiptFileService.deleteFileByExpense(expenseToDelete.getId());
         expenseRepository.delete(expenseToDelete);
         return ExpenseMapper.mapExpenseToResponse(expenseToDelete);
     }
 
-    @Override
-    public AbstractTransactionResponse addFile(MultipartFile file, User user) {
-        return null;
-    }
-
     private ExpenseResponse getExpenseResponse(Expense expense) {
         Optional<List<ExpensePosition>> expensePositionList = expensePositionService.getExpensePositionList(expense.getId());
-        Optional<ReceiptFile> receiptFile = receiptFileService.getFileByExpense(expense.getId());
+        Optional<ReceiptFile> receiptFile = receiptFileService.getReceiptFileByExpense(expense.getId());
         return ExpenseMapper.mapExpenseToResponse(expense,
                 expensePositionList.orElse(Collections.emptyList()),
                 receiptFile.map(ReceiptFile::getId).orElse(null));
@@ -127,5 +116,57 @@ public class ExpenseService implements ITransactionService {
     @Override
     public TransactionType getService() {
         return TransactionType.EXPENSE;
+    }
+
+    @Override
+    @Transactional
+    public AbstractTransactionResponse updateTransaction(Long expenseId, AbstractTransaction expenseObj, User user) {
+        ExpenseObj expense = obtainExpenseObj(expenseObj);
+        Expense expenseToUpdate = expenseRepository.findByIdAndUser(expenseId, user).orElseThrow(() -> new IllegalArgumentException("Transaction %s not found.".formatted(expenseId)));
+
+        ExpenseValidator.validateFinance(expense);
+        expenseToUpdate.setExpenseName(expense.getName());
+        expenseToUpdate.setExpenseDate(expense.getTransactionDate());
+        expenseToUpdate.setCost(BigDecimal.valueOf(expense.getCost()));
+        expenseToUpdate.setCategory(obtainCategory(expense.getCategoryId(), user));
+        expenseToUpdate.setShop(obtainShop(expense.getShop(), user));
+        Expense savedUpdatedExpense = expenseRepository.save(expenseToUpdate);
+
+        List<ExpensePosition> expensePositionList = expensePositionService.updateExpensePositions(savedUpdatedExpense, expense.getExpensePositions());
+        return ExpenseMapper.mapExpenseToResponse(savedUpdatedExpense, expensePositionList, getReceiptId(savedUpdatedExpense));
+    }
+
+    private Long getReceiptId(Expense savedUpdatedExpense) {
+        Optional<ReceiptFile> receiptFileByExpense = receiptFileService.getReceiptFileByExpense(savedUpdatedExpense.getId());
+        return receiptFileByExpense.map(ReceiptFile::getId).orElse(null);
+    }
+
+    private ExpenseObj obtainExpenseObj(AbstractTransaction expenseObj) {
+        if (!(expenseObj instanceof ExpenseObj)) {
+            throw new IllegalStateException("Incorrect abstractFinance implementation!");
+        }
+        return (ExpenseObj) expenseObj;
+    }
+
+    public FileReceiptResponse getReceiptFileByExpense(Long expenseId, User user) {
+        expenseRepository.findByIdAndUser(expenseId, user)
+                .orElseThrow(() -> new IllegalArgumentException("Transaction %s not found.".formatted(expenseId)));
+
+        ReceiptFile receiptFile = receiptFileService.getFile(expenseId);
+
+        return receiptFileService.mapFileReceiptToResponse(receiptFile);
+    }
+
+    public void deleteReceiptFile(Long expenseId, User user) {
+        expenseRepository.findByIdAndUser(expenseId, user).orElseThrow(() -> new IllegalArgumentException("Transaction %s not found.".formatted(expenseId)));
+        receiptFileService.deleteFileByExpense(expenseId);
+    }
+
+    public FileReceiptResponse uploadReceiptFile(Long expenseId, MultipartFile file, User user) {
+        Expense expenseToUploadFile = expenseRepository.findByIdAndUser(expenseId, user)
+                .orElseThrow(() -> new IllegalArgumentException("Transaction %s not found.".formatted(expenseId)));
+
+        ReceiptFile receiptFile = receiptFileService.saveFile(file, expenseToUploadFile, user.getUsername());
+        return receiptFileService.mapFileReceiptToResponse(receiptFile);
     }
 }
