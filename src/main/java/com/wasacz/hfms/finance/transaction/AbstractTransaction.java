@@ -3,6 +3,7 @@ package com.wasacz.hfms.finance.transaction;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.wasacz.hfms.finance.transaction.expense.ExpenseObj;
+import com.wasacz.hfms.finance.transaction.income.IncomeObj;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 @JsonSubTypes(
         {
                 @JsonSubTypes.Type(value = ExpenseObj.class, name = "EXPENSE"),
+                @JsonSubTypes.Type(value = IncomeObj.class, name = "INCOME")
         }
     )
 @Getter
@@ -21,7 +23,7 @@ public abstract class AbstractTransaction {
     private final Long id;
     private final Long categoryId;
     private final String name;
-    private final Double cost;
+    private final Double amount;
     private final String transactionType;
     private final LocalDate transactionDate;
 }

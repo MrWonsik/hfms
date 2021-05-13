@@ -1,12 +1,12 @@
 package com.wasacz.hfms.finance.transaction.expense;
 
 import com.wasacz.hfms.finance.shop.ShopObj;
-import com.wasacz.hfms.finance.transaction.AbstractTransaction;
-import com.wasacz.hfms.finance.transaction.AbstractTransactionResponse;
-import com.wasacz.hfms.finance.transaction.TransactionType;
-import com.wasacz.hfms.finance.transaction.ITransactionService;
+import com.wasacz.hfms.finance.transaction.*;
 import com.wasacz.hfms.finance.shop.ShopManagementService;
 import com.wasacz.hfms.finance.shop.ShopValidator;
+import com.wasacz.hfms.finance.transaction.expense.expensePositions.ExpensePositionService;
+import com.wasacz.hfms.finance.transaction.expense.receiptFile.FileReceiptResponse;
+import com.wasacz.hfms.finance.transaction.expense.receiptFile.ReceiptFileService;
 import com.wasacz.hfms.persistence.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,7 +40,7 @@ public class ExpenseService implements ITransactionService {
     @Transactional
     public ExpenseResponse add(AbstractTransaction expenseObj, User user, MultipartFile file) {
         ExpenseObj expense = obtainExpenseObj(expenseObj);
-        ExpenseValidator.validateFinance(expense);
+        TransactionValidator.validateFinance(expense);
         Expense savedExpense = expenseRepository.save(buildExpense(expenseObj, user, expense));
 
         ReceiptFile receiptFile = receiptFileService.saveFile(file, savedExpense, user.getUsername());
@@ -52,7 +52,7 @@ public class ExpenseService implements ITransactionService {
         Expense.ExpenseBuilder expenseBuilder = Expense.builder()
                 .expenseName(expense.getName())
                 .category(obtainCategory(expense.getCategoryId(), user))
-                .cost(BigDecimal.valueOf(expense.getCost()))
+                .amount(BigDecimal.valueOf(expense.getAmount()))
                 .shop(obtainShop(expense.getShop(), user))
                 .user(user);
         if(expenseObj.getTransactionDate() != null) {
@@ -124,10 +124,10 @@ public class ExpenseService implements ITransactionService {
         ExpenseObj expense = obtainExpenseObj(expenseObj);
         Expense expenseToUpdate = expenseRepository.findByIdAndUser(expenseId, user).orElseThrow(() -> new IllegalArgumentException("Transaction %s not found.".formatted(expenseId)));
 
-        ExpenseValidator.validateFinance(expense);
+        TransactionValidator.validateFinance(expense);
         expenseToUpdate.setExpenseName(expense.getName());
         expenseToUpdate.setExpenseDate(expense.getTransactionDate());
-        expenseToUpdate.setCost(BigDecimal.valueOf(expense.getCost()));
+        expenseToUpdate.setAmount(BigDecimal.valueOf(expense.getAmount()));
         expenseToUpdate.setCategory(obtainCategory(expense.getCategoryId(), user));
         expenseToUpdate.setShop(obtainShop(expense.getShop(), user));
         Expense savedUpdatedExpense = expenseRepository.save(expenseToUpdate);

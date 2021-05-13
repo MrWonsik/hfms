@@ -1,5 +1,6 @@
 package com.wasacz.hfms.finance.transaction.expense;
 
+import com.wasacz.hfms.finance.transaction.expense.receiptFile.FileReceiptResponse;
 import com.wasacz.hfms.security.CurrentUser;
 import com.wasacz.hfms.security.UserPrincipal;
 import lombok.extern.slf4j.Slf4j;

@@ -10,11 +10,11 @@ import java.math.BigDecimal;
 @JsonTypeName("EXPENSE")
 @Getter
 public class ExpenseCategoryObj extends AbstractCategory {
-    private final BigDecimal maximumCost;
+    private final BigDecimal maximumAmount;
 
     @Builder
-    protected ExpenseCategoryObj(String categoryName, String colorHex, Boolean isFavourite, String type, BigDecimal maximumCost) {
+    protected ExpenseCategoryObj(String categoryName, String colorHex, Boolean isFavourite, String type, BigDecimal maximumAmount) {
         super(categoryName, colorHex, isFavourite, type);
-        this.maximumCost = maximumCost;
+        this.maximumAmount = maximumAmount;
     }
 }

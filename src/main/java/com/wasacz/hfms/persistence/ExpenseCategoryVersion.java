@@ -26,7 +26,7 @@ public class ExpenseCategoryVersion {
     @ManyToOne(fetch = FetchType.LAZY)
     private ExpenseCategory expenseCategory;
 
-    private BigDecimal maximumCost;
+    private BigDecimal maximumAmount;
 
     @NotNull
     @Builder.Default

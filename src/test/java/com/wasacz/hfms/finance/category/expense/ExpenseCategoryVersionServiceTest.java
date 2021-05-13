@@ -49,7 +49,7 @@ class ExpenseCategoryVersionServiceTest {
                 .builder()
                 .id(1L)
                 .expenseCategory(expenseCategory)
-                .maximumCost(BigDecimal.TEN)
+                .maximumAmount(BigDecimal.TEN)
                 .validMonth(YearMonth.now())
                 .build();
 
@@ -57,7 +57,7 @@ class ExpenseCategoryVersionServiceTest {
                 .builder()
                 .id(2L)
                 .expenseCategory(expenseCategory)
-                .maximumCost(BigDecimal.TEN)
+                .maximumAmount(BigDecimal.TEN)
                 .validMonth(YearMonth.now().plusMonths(1))
                 .build();
 
@@ -65,7 +65,7 @@ class ExpenseCategoryVersionServiceTest {
                 .builder()
                 .id(3L)
                 .expenseCategory(expenseCategory)
-                .maximumCost(BigDecimal.TEN)
+                .maximumAmount(BigDecimal.TEN)
                 .validMonth(YearMonth.now().minusMonths(1))
                 .build();
 
@@ -99,7 +99,7 @@ class ExpenseCategoryVersionServiceTest {
                 .builder()
                 .id(2L)
                 .expenseCategory(expenseCategory)
-                .maximumCost(BigDecimal.TEN)
+                .maximumAmount(BigDecimal.TEN)
                 .validMonth(YearMonth.now().plusMonths(1))
                 .build();
 
@@ -107,7 +107,7 @@ class ExpenseCategoryVersionServiceTest {
                 .builder()
                 .id(3L)
                 .expenseCategory(expenseCategory)
-                .maximumCost(BigDecimal.TEN)
+                .maximumAmount(BigDecimal.TEN)
                 .validMonth(YearMonth.now().minusMonths(3))
                 .build();
 
@@ -153,7 +153,7 @@ class ExpenseCategoryVersionServiceTest {
                 .builder()
                 .id(2L)
                 .expenseCategory(expenseCategory)
-                .maximumCost(BigDecimal.TEN)
+                .maximumAmount(BigDecimal.TEN)
                 .validMonth(YearMonth.now().plusMonths(1))
                 .build();
 

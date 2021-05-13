@@ -13,7 +13,7 @@ public class CategoryValidator {
     public static void validate(ExpenseCategoryObj expenseCategory) {
         validateName(expenseCategory.getCategoryName());
         validateHexColor(expenseCategory.getColorHex());
-        validateMaximumCost(expenseCategory.getMaximumCost());
+        validateMaximumAmount(expenseCategory.getMaximumAmount());
     }
 
     public static void validate(IncomeCategoryObj incomeCategory) {
@@ -28,12 +28,12 @@ public class CategoryValidator {
         validateHexColor(hexColor);
     }
 
-    public static void validateMaximumCost(BigDecimal maximumCost) {
-        if(maximumCost == null) {
+    public static void validateMaximumAmount(BigDecimal maximumAmount) {
+        if(maximumAmount == null) {
             return;
         }
-        if(maximumCost.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Maximum cost should be grater than 0.");
+        if(maximumAmount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Maximum amount should be grater than 0.");
         }
     }
 

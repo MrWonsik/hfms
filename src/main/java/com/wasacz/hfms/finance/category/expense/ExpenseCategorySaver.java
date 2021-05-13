@@ -22,7 +22,7 @@ public class ExpenseCategorySaver {
     public ExpenseCategoryVersion saveExpenseCategory(ExpenseCategoryObj expenseCategoryObj, User user) {
         ExpenseCategory expenseCategoryPersistence = buildExpenseCategory(expenseCategoryObj, user);
         ExpenseCategory savedExpenseCategory = expenseCategoryRepository.save(expenseCategoryPersistence);
-        return saveExpenseCategoryVersion(expenseCategoryObj.getMaximumCost(), savedExpenseCategory);
+        return saveExpenseCategoryVersion(expenseCategoryObj.getMaximumAmount(), savedExpenseCategory);
     }
 
     private ExpenseCategory buildExpenseCategory(ExpenseCategoryObj expenseCategoryObj, User user) {
@@ -34,27 +34,27 @@ public class ExpenseCategorySaver {
                 .build();
     }
 
-    private ExpenseCategoryVersion saveExpenseCategoryVersion(BigDecimal maximumCost, ExpenseCategory expenseCategoryPersistence) {
-        ExpenseCategoryVersion expenseCategoryVersion = buildExpenseCategoryVersionPersistence(maximumCost, expenseCategoryPersistence);
+    private ExpenseCategoryVersion saveExpenseCategoryVersion(BigDecimal maximumAmount, ExpenseCategory expenseCategoryPersistence) {
+        ExpenseCategoryVersion expenseCategoryVersion = buildExpenseCategoryVersionPersistence(maximumAmount, expenseCategoryPersistence);
         return expenseCategoryVersionRepository.save(expenseCategoryVersion);
     }
 
-    public ExpenseCategoryVersion saveExpenseCategoryVersion(BigDecimal maximumCost, ExpenseCategory expenseCategoryPersistence, YearMonth validMonth) {
-        ExpenseCategoryVersion expenseCategoryVersion = buildExpenseCategoryVersionPersistence(maximumCost, expenseCategoryPersistence, validMonth);
+    public ExpenseCategoryVersion saveExpenseCategoryVersion(BigDecimal maximumAmount, ExpenseCategory expenseCategoryPersistence, YearMonth validMonth) {
+        ExpenseCategoryVersion expenseCategoryVersion = buildExpenseCategoryVersionPersistence(maximumAmount, expenseCategoryPersistence, validMonth);
         return expenseCategoryVersionRepository.save(expenseCategoryVersion);
     }
 
-    private ExpenseCategoryVersion buildExpenseCategoryVersionPersistence(BigDecimal maximumCost, ExpenseCategory expenseCategoryPersistence) {
+    private ExpenseCategoryVersion buildExpenseCategoryVersionPersistence(BigDecimal maximumAmount, ExpenseCategory expenseCategoryPersistence) {
         return ExpenseCategoryVersion.builder()
                 .expenseCategory(expenseCategoryPersistence)
-                .maximumCost(maximumCost != null ? maximumCost : BigDecimal.ZERO)
+                .maximumAmount(maximumAmount != null ? maximumAmount : BigDecimal.ZERO)
                 .build();
     }
 
-    private ExpenseCategoryVersion buildExpenseCategoryVersionPersistence(BigDecimal maximumCost, ExpenseCategory expenseCategoryPersistence, YearMonth validMonth) {
+    private ExpenseCategoryVersion buildExpenseCategoryVersionPersistence(BigDecimal maximumAmount, ExpenseCategory expenseCategoryPersistence, YearMonth validMonth) {
         return ExpenseCategoryVersion.builder()
                 .expenseCategory(expenseCategoryPersistence)
-                .maximumCost(maximumCost != null ? maximumCost : BigDecimal.ZERO)
+                .maximumAmount(maximumAmount != null ? maximumAmount : BigDecimal.ZERO)
                 .validMonth(validMonth)
                 .build();
     }

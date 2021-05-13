@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public abstract class AbstractTransactionResponse {
     private final Long id;
     private final String name;
-    private final Double cost;
+    private final Double amount;
     private final LocalDate createdDate;
     private final CategoryResponse category;
 }

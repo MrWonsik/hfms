@@ -1,4 +1,4 @@
-package com.wasacz.hfms.finance.transaction.expense;
+package com.wasacz.hfms.finance.transaction.expense.receiptFile;
 
 import lombok.Builder;
 import lombok.Getter;

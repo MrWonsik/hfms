@@ -1,5 +1,6 @@
-package com.wasacz.hfms.finance.transaction.expense;
+package com.wasacz.hfms.finance.transaction.expense.expensePositions;
 
+import com.wasacz.hfms.finance.transaction.TransactionValidator;
 import com.wasacz.hfms.persistence.Expense;
 import com.wasacz.hfms.persistence.ExpensePosition;
 import com.wasacz.hfms.persistence.ExpensePositionRepository;
@@ -39,11 +40,11 @@ public class ExpensePositionService {
     }
 
     private ExpensePosition saveExpensePosition(Expense expense, ExpensePositionObj expensePositionObj) {
-        ExpenseValidator.validateExpensePosition(expensePositionObj);
+        TransactionValidator.validateExpensePosition(expensePositionObj);
         return expensePositionRepository.save(ExpensePosition.builder()
                 .expense(expense)
                 .expensePositionName(expensePositionObj.getPositionName())
-                .cost(BigDecimal.valueOf(expensePositionObj.getCost()))
+                .amount(BigDecimal.valueOf(expensePositionObj.getAmount()))
                 .size(BigDecimal.valueOf(expensePositionObj.getSize()))
                 .build());
     }
@@ -75,7 +76,7 @@ public class ExpensePositionService {
         if(expensePositionObj.getId() == null) {
             return saveExpensePosition(expense, expensePositionObj);
         }
-        ExpenseValidator.validateExpensePosition(expensePositionObj);
+        TransactionValidator.validateExpensePosition(expensePositionObj);
         ExpensePosition expensePositionToUpdate = expensePositionRepository
                 .findById(expensePositionObj.getId())
                 .orElseThrow(() -> new IllegalStateException(
@@ -83,7 +84,7 @@ public class ExpensePositionService {
                                 expensePositionObj.getId(), expense.getExpenseName())));
 
         expensePositionToUpdate.setExpensePositionName(expensePositionObj.getPositionName());
-        expensePositionToUpdate.setCost(BigDecimal.valueOf(expensePositionObj.getCost()));
+        expensePositionToUpdate.setAmount(BigDecimal.valueOf(expensePositionObj.getAmount()));
         expensePositionToUpdate.setSize(BigDecimal.valueOf(expensePositionObj.getSize()));
         return expensePositionRepository.save(expensePositionToUpdate);
     }

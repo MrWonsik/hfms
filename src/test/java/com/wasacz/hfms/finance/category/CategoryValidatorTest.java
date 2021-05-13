@@ -65,16 +65,16 @@ class CategoryValidatorTest {
     }
 
     @Test
-    public void whenValidateExpenseCategoryRequest_givenNegativeMaximumCost_thenThrowException() {
+    public void whenValidateExpenseCategoryRequest_givenNegativeMaximumAmount_thenThrowException() {
         //given
         ExpenseCategoryObj expenseCategoryObj = ExpenseCategoryObj.builder()
-                .categoryName("Negative maximum cost")
-                .maximumCost(BigDecimal.valueOf(-5))
+                .categoryName("Negative maximum amount")
+                .maximumAmount(BigDecimal.valueOf(-5))
                 .build();
 
         //when and then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> CategoryValidator.validate(expenseCategoryObj));
-        assertEquals("Maximum cost should be grater than 0.", exception.getMessage());
+        assertEquals("Maximum amount should be grater than 0.", exception.getMessage());
     }
 
 }

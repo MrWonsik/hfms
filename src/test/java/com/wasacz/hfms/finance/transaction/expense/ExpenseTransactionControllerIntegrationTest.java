@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
 import com.wasacz.hfms.finance.shop.ShopObj;
 import com.wasacz.hfms.finance.shop.ShopResponse;
+import com.wasacz.hfms.finance.transaction.expense.receiptFile.FileReceiptResponse;
 import com.wasacz.hfms.helpers.CategoryCreatorStatic;
 import com.wasacz.hfms.helpers.CurrentUserMock;
 import com.wasacz.hfms.helpers.FileToMultipartFileConverter;
@@ -67,7 +68,7 @@ class ExpenseTransactionControllerIntegrationTest {
     public void whenGetReceiptFile_givenTransactionId_thenReturnOkStatus() throws Exception {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_05_09")
-                .cost(129.99)
+                .amount(129.99)
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
                 .build();
@@ -107,7 +108,7 @@ class ExpenseTransactionControllerIntegrationTest {
     public void whenDeleteReceiptFile_givenTransactionId_thenReturnOkStatus() throws Exception {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_05_09_2")
-                .cost(129.99)
+                .amount(129.99)
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
                 .build();
@@ -143,7 +144,7 @@ class ExpenseTransactionControllerIntegrationTest {
     public void whenUploadReceiptFile_givenExpenseIdAndFile_thenReturnOkStatus() throws Exception {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_05_09_3")
-                .cost(129.99)
+                .amount(129.99)
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
                 .build();
