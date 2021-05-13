@@ -48,25 +48,25 @@ public class ExpenseCategoryVersionService {
                 .findByExpenseCategoryId(expenseCategoryId).orElse(Collections.emptyList());
     }
 
-    public ExpenseCategoryVersion addNewVersionForNextMonth(User user, long categoryId, Double newMaximumCost) {
-        CategoryValidator.validateMaximumCost(BigDecimal.valueOf(newMaximumCost));
+    public ExpenseCategoryVersion addNewVersionForNextMonth(User user, long categoryId, Double newMaximumAmount) {
+        CategoryValidator.validateMaximumAmount(BigDecimal.valueOf(newMaximumAmount));
         ExpenseCategory category = findExpenseCategoryByIdAndUser(categoryId, user);
         YearMonth nextMonthFromNow = getNextMonthFromNow();
         Optional<ExpenseCategoryVersion> expenseCategoryVersionOptional = expenseCategoryVersionRepository.findByExpenseCategoryAndValidMonth(category, nextMonthFromNow);
         return expenseCategoryVersionOptional
-                .map(categoryVersion -> updateCategory(categoryVersion, newMaximumCost))
-                .orElseGet(() -> expenseCategorySaver.saveExpenseCategoryVersion(BigDecimal.valueOf(newMaximumCost), category, nextMonthFromNow));
+                .map(categoryVersion -> updateCategory(categoryVersion, newMaximumAmount))
+                .orElseGet(() -> expenseCategorySaver.saveExpenseCategoryVersion(BigDecimal.valueOf(newMaximumAmount), category, nextMonthFromNow));
     }
 
     private YearMonth getNextMonthFromNow() {
         return YearMonth.now().plusMonths(1);
     }
 
-    public ExpenseCategoryVersion editCategoryVersion(User user, long categoryId, Double newMaximumCost) {
-        CategoryValidator.validateMaximumCost(BigDecimal.valueOf(newMaximumCost));
+    public ExpenseCategoryVersion editCategoryVersion(User user, long categoryId, Double newMaximumAmount) {
+        CategoryValidator.validateMaximumAmount(BigDecimal.valueOf(newMaximumAmount));
         findExpenseCategoryByIdAndUser(categoryId, user);
         ExpenseCategoryVersion currentCategoryVersion = getCurrentCategoryVersion(categoryId);
-        return updateCategory(currentCategoryVersion, newMaximumCost);
+        return updateCategory(currentCategoryVersion, newMaximumAmount);
     }
 
     private ExpenseCategory findExpenseCategoryByIdAndUser(long categoryId, User user) {
@@ -75,8 +75,8 @@ public class ExpenseCategoryVersionService {
                 .orElseThrow(() -> new IllegalArgumentException("Expense category not found."));
     }
 
-    private ExpenseCategoryVersion updateCategory(ExpenseCategoryVersion expenseCategoryVersion, Double newMaximumCost) {
-        expenseCategoryVersion.setMaximumCost(BigDecimal.valueOf(newMaximumCost));
+    private ExpenseCategoryVersion updateCategory(ExpenseCategoryVersion expenseCategoryVersion, Double newMaximumAmount) {
+        expenseCategoryVersion.setMaximumAmount(BigDecimal.valueOf(newMaximumAmount));
         return expenseCategoryVersionRepository.save(expenseCategoryVersion);
     }
 }

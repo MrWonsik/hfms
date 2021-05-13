@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 
@@ -21,7 +22,6 @@ public class Income {
     private Long id;
 
     @NotNull
-    @Column(unique = true)
     private String incomeName;
 
     @NotNull
@@ -33,8 +33,11 @@ public class Income {
     private User user;
 
     @NotNull
+    private BigDecimal amount;
+
+    @NotNull
     @Builder.Default
-    private LocalDate expenseDate = LocalDate.now();
+    private LocalDate incomeDate = LocalDate.now();
 
     @CreatedDate
     @Builder.Default

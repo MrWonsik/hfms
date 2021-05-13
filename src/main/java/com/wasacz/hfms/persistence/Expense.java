@@ -37,7 +37,7 @@ public class Expense {
     private User user;
 
     @NotNull
-    private BigDecimal cost;
+    private BigDecimal amount;
 
     @NotNull
     @Builder.Default

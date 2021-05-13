@@ -33,20 +33,20 @@ public class ExpenseCategoryManagementController {
 
     @PutMapping("/expense/{id}/version")
     @Secured({"ROLE_USER"})
-    public ResponseEntity<?> editMaximumCostExpenseCategory(@CurrentUser UserPrincipal user,
+    public ResponseEntity<?> editMaximumAmountExpenseCategory(@CurrentUser UserPrincipal user,
                                                             @PathVariable("id") long categoryId,
-                                                            @RequestBody ExpenseCategoryMaximumCostRequest expenseCategoryMaximumCostRequest) {
+                                                            @RequestBody ExpenseCategoryMaximumAmountRequest expenseCategoryMaximumAmountRequest) {
         ExpenseCategoryVersionResponse expenseCategoryVersionResponse;
-        if(expenseCategoryMaximumCostRequest.getIsValidFromNextMonth()) {
+        if(expenseCategoryMaximumAmountRequest.getIsValidFromNextMonth()) {
             expenseCategoryVersionResponse = expenseCategoryVersionMapper.mapExpenseCategoryVersionToResponse(
                     expenseCategoryVersionService.addNewVersionForNextMonth(user.getUser(),
                                     categoryId,
-                                    expenseCategoryMaximumCostRequest.getNewMaximumCost()));
+                                    expenseCategoryMaximumAmountRequest.getNewMaximumAmount()));
         } else {
             expenseCategoryVersionResponse = expenseCategoryVersionMapper.mapExpenseCategoryVersionToResponse(
                     expenseCategoryVersionService.editCategoryVersion(user.getUser(),
                             categoryId,
-                            expenseCategoryMaximumCostRequest.getNewMaximumCost())
+                            expenseCategoryMaximumAmountRequest.getNewMaximumAmount())
             );
         }
         return ResponseEntity.status(HttpStatus.OK).body(expenseCategoryVersionResponse);

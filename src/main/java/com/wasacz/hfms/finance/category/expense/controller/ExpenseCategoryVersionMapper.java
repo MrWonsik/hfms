@@ -13,8 +13,8 @@ public class ExpenseCategoryVersionMapper {
     public ExpenseCategoryVersionResponse mapExpenseCategoryVersionToResponse(ExpenseCategoryVersion expenseCategoryVersion) {
         return ExpenseCategoryVersionResponse.builder()
                 .id(expenseCategoryVersion.getId())
-                .maximumCost(expenseCategoryVersion.getMaximumCost().doubleValue())
-                .isValid(expenseCategoryVersion.getMaximumCost().doubleValue() != 0)
+                .maximumAmount(expenseCategoryVersion.getMaximumAmount().doubleValue())
+                .isValid(expenseCategoryVersion.getMaximumAmount().doubleValue() != 0)
                 .createDate(new DateTime(expenseCategoryVersion.getCreatedDate()))
                 .validMonth(expenseCategoryVersion.getValidMonth())
                 .build();

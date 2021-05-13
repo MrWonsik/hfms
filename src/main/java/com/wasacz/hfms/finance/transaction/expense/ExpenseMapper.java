@@ -1,6 +1,7 @@
 package com.wasacz.hfms.finance.transaction.expense;
 
 import com.wasacz.hfms.finance.transaction.CategoryResponse;
+import com.wasacz.hfms.finance.transaction.expense.expensePositions.ExpensePositionResponse;
 import com.wasacz.hfms.persistence.Expense;
 import com.wasacz.hfms.persistence.ExpenseCategory;
 import com.wasacz.hfms.persistence.ExpensePosition;
@@ -21,7 +22,7 @@ public class ExpenseMapper {
                 .id(expense.getId())
                 .expenseName(expense.getExpenseName())
                 .shop(mapShopToResponse(expense.getShop()))
-                .cost(expense.getCost().doubleValue())
+                .amount(expense.getAmount().doubleValue())
                 .createdDate(expense.getExpenseDate())
                 .expensePositionList(mapExpensePositionToResponse(expensePositionList))
                 .receiptId(receiptId)
@@ -45,7 +46,7 @@ public class ExpenseMapper {
                 .builder()
                 .id(expensePosition.getId())
                 .positionName(expensePosition.getExpensePositionName())
-                .cost(expensePosition.getCost().doubleValue())
+                .amount(expensePosition.getAmount().doubleValue())
                 .size(expensePosition.getSize().doubleValue())
                 .build()).collect(Collectors.toList());
     }

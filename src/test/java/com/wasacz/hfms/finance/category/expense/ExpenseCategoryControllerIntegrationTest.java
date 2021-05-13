@@ -1,7 +1,7 @@
 package com.wasacz.hfms.finance.category.expense;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryMaximumCostRequest;
+import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryMaximumAmountRequest;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryVersionResponse;
 import com.wasacz.hfms.helpers.CurrentUserMock;
@@ -50,26 +50,26 @@ class ExpenseCategoryControllerIntegrationTest {
     }
 
     @Test
-    void whenEditMaximumCostExpenseCategory_givenExpenseCategoryMaximumCostRequest_thenReturnOkStatus() throws Exception {
+    void whenEditMaximumAmountExpenseCategory_givenExpenseCategoryMaximumAmountRequest_thenReturnOkStatus() throws Exception {
         ExpenseCategoryResponse categoryAndReturn = createCategoryAndReturn();
 
-        ExpenseCategoryMaximumCostRequest expenseCategoryMaximumCostRequest = ExpenseCategoryMaximumCostRequest
+        ExpenseCategoryMaximumAmountRequest expenseCategoryMaximumAmountRequest = ExpenseCategoryMaximumAmountRequest
                 .builder()
-                .newMaximumCost(100d)
+                .newMaximumAmount(100d)
                 .isValidFromNextMonth(false)
                 .build();
 
         YearMonth yearMonth = YearMonth.now();
 
-        ExpenseCategoryVersionResponse expenseCategoryVersionResponse = callEditMaximumCostExpenseCategory(categoryAndReturn, expenseCategoryMaximumCostRequest);
-        assertEquals(100d, expenseCategoryVersionResponse.getMaximumCost());
+        ExpenseCategoryVersionResponse expenseCategoryVersionResponse = callEditMaximumAmountExpenseCategory(categoryAndReturn, expenseCategoryMaximumAmountRequest);
+        assertEquals(100d, expenseCategoryVersionResponse.getMaximumAmount());
         assertEquals(yearMonth, expenseCategoryVersionResponse.getValidMonth());
         assertEquals(categoryAndReturn.getCurrentVersion().getId(), expenseCategoryVersionResponse.getId());
     }
 
-    private ExpenseCategoryVersionResponse callEditMaximumCostExpenseCategory(ExpenseCategoryResponse categoryAndReturn, ExpenseCategoryMaximumCostRequest expenseCategoryMaximumCostRequest) throws Exception {
+    private ExpenseCategoryVersionResponse callEditMaximumAmountExpenseCategory(ExpenseCategoryResponse categoryAndReturn, ExpenseCategoryMaximumAmountRequest expenseCategoryMaximumAmountRequest) throws Exception {
         MvcResult versionResponse = this.mockMvc.perform(put("/api/category/expense/" + categoryAndReturn.getId() + "/version").with(user(currentUser))
-                .content(asJsonString(expenseCategoryMaximumCostRequest))
+                .content(asJsonString(expenseCategoryMaximumAmountRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -82,7 +82,7 @@ class ExpenseCategoryControllerIntegrationTest {
         ExpenseCategoryObj categoryObj = ExpenseCategoryObj
                 .builder()
                 .categoryName("Car")
-                .maximumCost(BigDecimal.valueOf(10d))
+                .maximumAmount(BigDecimal.valueOf(10d))
                 .build();
 
         MvcResult createdCategoryResult = this.mockMvc.perform(post("/api/category/expense").with(user(currentUser))
@@ -96,38 +96,38 @@ class ExpenseCategoryControllerIntegrationTest {
     }
 
     @Test
-    void whenEditMaximumCostExpenseCategory_givenExpenseCategoryMaximumCostRequestForNextMonth_thenReturnOkStatus() throws Exception {
+    void whenEditMaximumAmountExpenseCategory_givenExpenseCategoryMaximumAmountRequestForNextMonth_thenReturnOkStatus() throws Exception {
         ExpenseCategoryResponse categoryAndReturn = createCategoryAndReturn();
 
-        ExpenseCategoryMaximumCostRequest expenseCategoryMaximumCostRequest = ExpenseCategoryMaximumCostRequest
+        ExpenseCategoryMaximumAmountRequest expenseCategoryMaximumAmountRequest = ExpenseCategoryMaximumAmountRequest
                 .builder()
-                .newMaximumCost(100d)
+                .newMaximumAmount(100d)
                 .isValidFromNextMonth(true)
                 .build();
 
         YearMonth yearMonth = YearMonth.now();
 
-        ExpenseCategoryVersionResponse expenseCategoryVersionResponse = callEditMaximumCostExpenseCategory(categoryAndReturn, expenseCategoryMaximumCostRequest);
-        assertEquals(100d, expenseCategoryVersionResponse.getMaximumCost());
+        ExpenseCategoryVersionResponse expenseCategoryVersionResponse = callEditMaximumAmountExpenseCategory(categoryAndReturn, expenseCategoryMaximumAmountRequest);
+        assertEquals(100d, expenseCategoryVersionResponse.getMaximumAmount());
         assertEquals(yearMonth.plusMonths(1), expenseCategoryVersionResponse.getValidMonth());
         assertNotEquals(categoryAndReturn.getCurrentVersion().getId(), expenseCategoryVersionResponse.getId());
     }
 
     @Test
-    void whenEditMaximumCostExpenseCategory_givenExpenseCategoryMaximumCostRequestWithMinusNewMaximumCost_thenReturnOkStatus() throws Exception {
+    void whenEditMaximumAmountExpenseCategory_givenExpenseCategoryMaximumAmountRequestWithMinusNewMaximumAmount_thenReturnOkStatus() throws Exception {
         ExpenseCategoryResponse categoryAndReturn = createCategoryAndReturn();
 
-        ExpenseCategoryMaximumCostRequest expenseCategoryMaximumCostRequest = ExpenseCategoryMaximumCostRequest
+        ExpenseCategoryMaximumAmountRequest expenseCategoryMaximumAmountRequest = ExpenseCategoryMaximumAmountRequest
                 .builder()
-                .newMaximumCost(-100d)
+                .newMaximumAmount(-100d)
                 .isValidFromNextMonth(true)
                 .build();
 
         this.mockMvc.perform(put("/api/category/expense/" + categoryAndReturn.getId() + "/version").with(user(currentUser))
-                .content(asJsonString(expenseCategoryMaximumCostRequest))
+                .content(asJsonString(expenseCategoryMaximumAmountRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("Maximum cost should be grater than 0."));
+                .andExpect(status().reason("Maximum amount should be grater than 0."));
     }
 }

@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ExpenseCategoryMaximumCostRequest {
+public class ExpenseCategoryMaximumAmountRequest {
     private final Boolean isValidFromNextMonth;
-    private final Double newMaximumCost;
+    private final Double newMaximumAmount;
 }

@@ -2,11 +2,14 @@ package com.wasacz.hfms.finance.transaction;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
+import com.wasacz.hfms.finance.category.income.IncomeCategoryResponse;
 import com.wasacz.hfms.finance.transaction.expense.ExpenseResponse;
 import com.wasacz.hfms.finance.shop.ShopObj;
 import com.wasacz.hfms.finance.shop.ShopResponse;
 import com.wasacz.hfms.finance.transaction.expense.ExpenseObj;
-import com.wasacz.hfms.finance.transaction.expense.ExpensePositionObj;
+import com.wasacz.hfms.finance.transaction.expense.expensePositions.ExpensePositionObj;
+import com.wasacz.hfms.finance.transaction.income.IncomeObj;
+import com.wasacz.hfms.finance.transaction.income.IncomeResponse;
 import com.wasacz.hfms.helpers.CategoryCreatorStatic;
 import com.wasacz.hfms.helpers.CurrentUserMock;
 import com.wasacz.hfms.helpers.FileToMultipartFileConverter;
@@ -61,6 +64,8 @@ public class TransactionControllerIntegrationTest {
     private ShopResponse shopResponse;
 
     private ExpenseCategoryResponse expenseCategoryResponse;
+    
+    private IncomeCategoryResponse incomeCategoryResponse;
 
     @BeforeAll
     public void setup() throws Exception {
@@ -68,8 +73,10 @@ public class TransactionControllerIntegrationTest {
         currentUser = currentUserMock.createMockUser("User_expense", Role.ROLE_USER);
         MvcResult shop = ShopCreatorStatic.callCreateShopEndpoint(mockMvc, "existing_shop", currentUser);
         shopResponse = objectMapper.readValue(shop.getResponse().getContentAsString(), ShopResponse.class);
-        MvcResult category = CategoryCreatorStatic.callCreateExpenseCategoryEndpoint(mockMvc, "categoryName", currentUser);
-        expenseCategoryResponse = objectMapper.readValue(category.getResponse().getContentAsString(), ExpenseCategoryResponse.class);
+        MvcResult expenseCategory = CategoryCreatorStatic.callCreateExpenseCategoryEndpoint(mockMvc, "categoryName_expense", currentUser);
+        expenseCategoryResponse = objectMapper.readValue(expenseCategory.getResponse().getContentAsString(), ExpenseCategoryResponse.class);
+        MvcResult incomeCategory = CategoryCreatorStatic.callCreateIncomeCategoryEndpoint(mockMvc, "categoryName_income", currentUser);
+        incomeCategoryResponse = objectMapper.readValue(incomeCategory.getResponse().getContentAsString(), IncomeCategoryResponse.class);
     }
 
     @Test
@@ -80,22 +87,48 @@ public class TransactionControllerIntegrationTest {
 
         assertEquals("expense_2021_04_22", expenseResponse.getName());
         assertEquals("new_ikea", expenseResponse.getShop().getName());
-        assertEquals(129.99, expenseResponse.getCost());
+        assertEquals(129.99, expenseResponse.getAmount());
         assertTrue(expenseResponse.getExpensePositionList().isEmpty());
         assertNull(expenseResponse.getReceiptId());
     }
 
-    private MvcResult createExpense(String expenseName, Double cost, String shopName, UserPrincipal user, Long categoryId, LocalDate date) throws Exception {
+    @Test
+    public void whenAddIncome_givenIncomeObjRequestWithShopName_thenReturnOkStatus() throws Exception {
+        MvcResult income = createIncome("income_2021_04_22", 129.99, currentUser, incomeCategoryResponse.getId(), LocalDate.now());
+
+        IncomeResponse incomeResponse = objectMapper.readValue(income.getResponse().getContentAsString(), IncomeResponse.class);
+
+        assertEquals("income_2021_04_22", incomeResponse.getName());
+        assertEquals(129.99, incomeResponse.getAmount());
+    }
+
+    private MvcResult createExpense(String expenseName, Double amount, String shopName, UserPrincipal user, Long categoryId, LocalDate date) throws Exception {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName(expenseName)
-                .cost(cost)
+                .amount(amount)
                 .shop(ShopObj.builder().name(shopName).build())
                 .categoryId(categoryId)
                 .transactionDate(date)
-                .transactionType("Expense")
+                .transactionType("EXPENSE")
                 .build();
         return this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
+                .with(user(user))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    private MvcResult createIncome(String incomeName, Double amount, UserPrincipal user, Long categoryId, LocalDate date) throws Exception {
+        IncomeObj incomeObj = IncomeObj.builder()
+                .name(incomeName)
+                .amount(amount)
+                .categoryId(categoryId)
+                .transactionDate(date)
+                .transactionType("INCOME")
+                .build();
+        return this.mockMvc.perform(multipart("/api/transaction/income/")
+                .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(incomeObj).getBytes()))
                 .with(user(user))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -124,6 +157,27 @@ public class TransactionControllerIntegrationTest {
     }
 
     @Test
+    public void whenGetAllIncome_givenIncomeObjRequest_thenReturnOkStatus() throws Exception {
+        UserPrincipal user = currentUserMock.createMockUser("User_income_for_get_all", Role.ROLE_USER);
+        MvcResult category = CategoryCreatorStatic.callCreateIncomeCategoryEndpoint(mockMvc, "Salary", user);
+        IncomeCategoryResponse categoryResponse = objectMapper.readValue(category.getResponse().getContentAsString(), IncomeCategoryResponse.class);
+
+        createIncome("Icecream",12.99, user, categoryResponse.getId(), LocalDate.now());
+        createIncome("Milk",3.00, user, categoryResponse.getId(), LocalDate.now());
+        createIncome("Egg",8.99, user, categoryResponse.getId(), LocalDate.now());
+
+        MvcResult incomeList = this.mockMvc.perform(get("/api/transaction/income").with(user(user))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<IncomeResponse> incomeResponse = Arrays.asList(objectMapper.readValue(incomeList.getResponse().getContentAsString(), IncomeResponse[].class));
+
+        assertEquals(3, incomeResponse.size());
+    }
+
+    @Test
     public void whenGetAllExpenseFromCurrentMonth_givenExpenseObjRequestWithShopName_thenReturnOkStatusAndReturnExpenseOnlyFromCurrentMonth() throws Exception {
         UserPrincipal user = currentUserMock.createMockUser("User_expense_for_get_all_month", Role.ROLE_USER);
         MvcResult category = CategoryCreatorStatic.callCreateExpenseCategoryEndpoint(mockMvc, "Shoping", user);
@@ -149,10 +203,35 @@ public class TransactionControllerIntegrationTest {
     }
 
     @Test
+    public void whenGetAllIncomeFromCurrentMonth_givenIncomeObjRequest_thenReturnOkStatusAndReturnIncomeOnlyFromCurrentMonth() throws Exception {
+        UserPrincipal user = currentUserMock.createMockUser("User_income_for_get_all_month", Role.ROLE_USER);
+        MvcResult category = CategoryCreatorStatic.callCreateIncomeCategoryEndpoint(mockMvc, "Shoping", user);
+        IncomeCategoryResponse categoryResponse = objectMapper.readValue(category.getResponse().getContentAsString(), IncomeCategoryResponse.class);
+
+        createIncome("Icecream",12.99, user, categoryResponse.getId(), LocalDate.now().minusMonths(1));
+        createIncome("Milk",3.00, user, categoryResponse.getId(), LocalDate.now().minusMonths(1));
+        createIncome("Egg",8.99, user, categoryResponse.getId(), LocalDate.now());
+
+        int year = Year.now().getValue();
+        int month = LocalDate.now().getMonth().getValue();
+
+
+        MvcResult incomeList = this.mockMvc.perform(get("/api/transaction/income?year=" + year + "&month=" + month).with(user(user))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<IncomeResponse> incomeResponse = Arrays.asList(objectMapper.readValue(incomeList.getResponse().getContentAsString(), IncomeResponse[].class));
+
+        assertEquals(1, incomeResponse.size());
+    }
+
+    @Test
     public void whenAddExpense_givenExpenseObjRequestWithShopIdAndReceiptFile_thenReturnOkStatus() throws Exception {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
-                .cost(129.99)
+                .amount(129.99)
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
                 .build();
@@ -170,7 +249,7 @@ public class TransactionControllerIntegrationTest {
         assertEquals("expense_2021_04_22", expenseResponse.getName());
         assertEquals(shopResponse.getName(), expenseResponse.getShop().getName());
         assertEquals(shopResponse.getId(), expenseResponse.getShop().getId());
-        assertEquals(129.99, expenseResponse.getCost());
+        assertEquals(129.99, expenseResponse.getAmount());
         assertTrue(expenseResponse.getExpensePositionList().isEmpty());
         assertNotNull(expenseResponse.getReceiptId());
     }
@@ -179,7 +258,7 @@ public class TransactionControllerIntegrationTest {
     public void whenAddExpense_givenExpenseObjRequestWithoutShopObj_thenReturnOkStatus() throws Exception {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
-                .cost(129.99)
+                .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
                 .transactionType("Expense")
                 .build();
@@ -195,7 +274,7 @@ public class TransactionControllerIntegrationTest {
 
         assertEquals("expense_2021_04_22", expenseResponse.getName());
         assertNull(expenseResponse.getShop());
-        assertEquals(129.99, expenseResponse.getCost());
+        assertEquals(129.99, expenseResponse.getAmount());
         assertTrue(expenseResponse.getExpensePositionList().isEmpty());
     }
 
@@ -206,7 +285,7 @@ public class TransactionControllerIntegrationTest {
         expensePositions.add(createExpensePositionObj("position_el2", 0.98, 5.89));
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
-                .cost(129.99)
+                .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions)
                 .transactionType("Expense")
@@ -223,18 +302,18 @@ public class TransactionControllerIntegrationTest {
 
         assertEquals("expense_2021_04_22", expenseResponse.getName());
         assertNull(expenseResponse.getShop());
-        assertEquals(129.99, expenseResponse.getCost());
+        assertEquals(129.99, expenseResponse.getAmount());
         assertEquals(2, expenseResponse.getExpensePositionList().size());
     }
 
     @Test
-    public void whenAddExpense_givenExpenseObjRequestWithExpensePositionsWithNNullPositionName_thenReturnBadRequest() throws Exception {
+    public void whenAddExpense_givenExpenseObjRequestWithExpensePositionsWithNullPositionName_thenReturnBadRequest() throws Exception {
         List<ExpensePositionObj> expensePositions = new ArrayList<>();
         expensePositions.add(createExpensePositionObj(null, 1d, 12.01));
         expensePositions.add(createExpensePositionObj("position_el2", 0.98, 5.89));
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
-                .cost(129.99)
+                .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions)
                 .transactionType("Expense")
@@ -253,7 +332,7 @@ public class TransactionControllerIntegrationTest {
         expensePositions.add(createExpensePositionObj("position_el2", -0.98, 5.89));
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
-                .cost(129.99)
+                .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions)
                 .transactionType("Expense")
@@ -269,7 +348,7 @@ public class TransactionControllerIntegrationTest {
         expensePositions2.add(createExpensePositionObj("position_el2", null, 5.89));
         ExpenseObj expenseObj2 = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
-                .cost(129.99)
+                .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions2)
                 .transactionType("Expense")
@@ -283,12 +362,12 @@ public class TransactionControllerIntegrationTest {
     }
 
     @Test
-    public void whenAddExpense_givenExpenseObjRequestWithExpensePositionsWithIncorrectCost_thenReturnBadRequest() throws Exception {
+    public void whenAddExpense_givenExpenseObjRequestWithExpensePositionsWithIncorrectAmount_thenReturnBadRequest() throws Exception {
         List<ExpensePositionObj> expensePositions = new ArrayList<>();
         expensePositions.add(createExpensePositionObj("position_el2", 0.98, -5.89));
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
-                .cost(129.99)
+                .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions)
                 .transactionType("Expense")
@@ -298,13 +377,13 @@ public class TransactionControllerIntegrationTest {
                 .with(user(currentUser))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("Cost must be bigger than 0."));
+                .andExpect(status().reason("Amount must be bigger than 0."));
 
         List<ExpensePositionObj> expensePositions2 = new ArrayList<>();
         expensePositions2.add(createExpensePositionObj("position_el2", 1d, null));
         ExpenseObj expenseObj2 = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
-                .cost(129.99)
+                .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions2)
                 .transactionType("Expense")
@@ -316,14 +395,14 @@ public class TransactionControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("Cost must be bigger than 0."));
+                .andExpect(status().reason("Amount must be bigger than 0."));
     }
 
-    private ExpensePositionObj createExpensePositionObj(String name, Double size, Double cost) {
+    private ExpensePositionObj createExpensePositionObj(String name, Double size, Double amount) {
         return ExpensePositionObj.builder()
                 .positionName(name)
                 .size(size)
-                .cost(cost)
+                .amount(amount)
                 .build();
     }
 
@@ -332,7 +411,7 @@ public class TransactionControllerIntegrationTest {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
                 .shop(ShopObj.builder().id(99999999L).build())
-                .cost(129.99)
+                .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
                 .transactionType("Expense")
                 .build();
@@ -348,7 +427,7 @@ public class TransactionControllerIntegrationTest {
     public void whenAddExpense_givenExpenseObjRequestWithCategoryIdThatNotExists_thenReturnBadRequest() throws Exception {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
-                .cost(129.99)
+                .amount(129.99)
                 .categoryId(99999L)
                 .transactionType("EXPENSE")
                 .build();
@@ -361,10 +440,26 @@ public class TransactionControllerIntegrationTest {
     }
 
     @Test
+    public void whenAddIncome_givenIncomeObjRequestWithCategoryIdThatNotExists_thenReturnBadRequest() throws Exception {
+        IncomeObj incomeObj = IncomeObj.builder()
+                .name("income_2021_04_22")
+                .amount(129.99)
+                .categoryId(99999L)
+                .transactionType("INCOME")
+                .build();
+        this.mockMvc.perform(multipart("/api/transaction/income/")
+                .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(incomeObj).getBytes()))
+                .with(user(currentUser))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Category with id 99999 not found."));
+    }
+
+    @Test
     public void whenAddExpense_givenExpenseObjRequestWithoutCategoryId_thenReturnBadRequest() throws Exception {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
-                .cost(129.99)
+                .amount(129.99)
                 .transactionType("Expense")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
@@ -376,9 +471,24 @@ public class TransactionControllerIntegrationTest {
     }
 
     @Test
+    public void whenAddIncome_givenIncomeObjRequestWithoutCategoryId_thenReturnBadRequest() throws Exception {
+        IncomeObj incomeObj = IncomeObj.builder()
+                .name("income_2021_04_22")
+                .amount(129.99)
+                .transactionType("Income")
+                .build();
+        this.mockMvc.perform(multipart("/api/transaction/income/")
+                .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(incomeObj).getBytes()))
+                .with(user(currentUser))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("CategoryId cannot be null!"));
+    }
+
+    @Test
     public void whenAddExpense_givenExpenseObjRequestWithoutShopName_thenReturnBadRequest() throws Exception {
         ExpenseObj expenseObj = ExpenseObj.builder()
-                .cost(129.99)
+                .amount(129.99)
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
                 .transactionType("Expense")
@@ -392,10 +502,10 @@ public class TransactionControllerIntegrationTest {
     }
 
     @Test
-    public void whenAddExpense_givenExpenseObjRequestWithIncorrectCost_thenReturnBadRequest() throws Exception {
+    public void whenAddExpense_givenExpenseObjRequestWithIncorrectAmount_thenReturnBadRequest() throws Exception {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
-                .cost(-129.99)
+                .amount(-129.99)
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
                 .transactionType("Expense")
@@ -405,11 +515,11 @@ public class TransactionControllerIntegrationTest {
                 .with(user(currentUser))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("Cost must be bigger than 0."));
+                .andExpect(status().reason("Amount must be bigger than 0."));
 
         ExpenseObj expenseObj2 = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
-                .cost(null)
+                .amount(null)
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
                 .transactionType("Expense")
@@ -421,9 +531,40 @@ public class TransactionControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("Cost must be bigger than 0."));
+                .andExpect(status().reason("Amount must be bigger than 0."));
     }
 
+    @Test
+    public void whenAddIncome_givenIncomeObjRequestWithIncorrectAmount_thenReturnBadRequest() throws Exception {
+        IncomeObj incomeObj = IncomeObj.builder()
+                .name("income_2021_04_22")
+                .amount(-129.99)
+                .categoryId(incomeCategoryResponse.getId())
+                .transactionType("Income")
+                .build();
+        this.mockMvc.perform(multipart("/api/transaction/income/")
+                .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(incomeObj).getBytes()))
+                .with(user(currentUser))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Amount must be bigger than 0."));
+
+        IncomeObj incomeObj2 = IncomeObj.builder()
+                .name("income_2021_04_22")
+                .amount(null)
+                .categoryId(incomeCategoryResponse.getId())
+                .transactionType("Income")
+                .build();
+        this.mockMvc.perform(multipart("/api/transaction/income/")
+                .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(incomeObj).getBytes()))
+                .with(user(currentUser))
+                .content(asJsonString(incomeObj2))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Amount must be bigger than 0."));
+    }
+    
     @Test
     public void whenDeleteExpense_givenExpenseId_thenReturnOkStatus() throws Exception {
         MvcResult expense = createExpense("expense_2021_05_09", 129.99, "new_ikea", currentUser, expenseCategoryResponse.getId(), LocalDate.now());
@@ -442,6 +583,23 @@ public class TransactionControllerIntegrationTest {
     }
 
     @Test
+    public void whenDeleteIncome_givenIncomeId_thenReturnOkStatus() throws Exception {
+        MvcResult income = createIncome("income_2021_05_09", 129.99, currentUser, incomeCategoryResponse.getId(), LocalDate.now());
+
+        IncomeResponse incomeResponse = objectMapper.readValue(income.getResponse().getContentAsString(), IncomeResponse.class);
+
+        this.mockMvc.perform(delete("/api/transaction/income/" + incomeResponse.getId()).with(user(currentUser)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void whenDeleteIncome_givenIncorrectIncomeId_thenReturnBadRequest() throws Exception {
+        this.mockMvc.perform(delete("/api/transaction/income/" + 9999999L).with(user(currentUser)))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Transaction 9999999 not found."));
+    }
+
+    @Test
     public void whenUpdateExpense_givenExpenseRequest_thenReturnOkStatus() throws Exception {
         MvcResult expense = createExpense("expense_2021_05_09", 129.99, "new_ikea", currentUser, expenseCategoryResponse.getId(), LocalDate.now());
 
@@ -449,7 +607,7 @@ public class TransactionControllerIntegrationTest {
 
         ExpenseObj expenseObjectBody = ExpenseObj.builder()
                 .expenseName("Updated_name")
-                .cost(2000d)
+                .amount(2000d)
                 .shop(ShopObj.builder().name("updated_shop").build())
                 .categoryId(expenseCategoryResponse.getId())
                 .build();
@@ -464,7 +622,31 @@ public class TransactionControllerIntegrationTest {
         ExpenseResponse updatedExpenseResponse = objectMapper.readValue(updatedExpenseResult.getResponse().getContentAsString(), ExpenseResponse.class);
         assertEquals("Updated_name", updatedExpenseResponse.getName());
         assertEquals(expenseObjectBody.getShop().getName(), updatedExpenseResponse.getShop().getName());
-        assertEquals(2000d, updatedExpenseResponse.getCost());
+        assertEquals(2000d, updatedExpenseResponse.getAmount());
         assertTrue(updatedExpenseResponse.getExpensePositionList().isEmpty());
+    }
+
+    @Test
+    public void whenUpdateIncome_givenIncomeRequest_thenReturnOkStatus() throws Exception {
+        MvcResult income = createIncome("income_2021_05_09", 129.99, currentUser, incomeCategoryResponse.getId(), LocalDate.now());
+
+        IncomeResponse incomeResponse = objectMapper.readValue(income.getResponse().getContentAsString(), IncomeResponse.class);
+
+        IncomeObj incomeObjectBody = IncomeObj.builder()
+                .name("Updated_name")
+                .amount(2000d)
+                .categoryId(incomeCategoryResponse.getId())
+                .build();
+        MvcResult updatedIncomeResult = this.mockMvc.perform(put("/api/transaction/income/" + incomeResponse.getId())
+                .with(user(currentUser))
+                .content(asJsonString(incomeObjectBody))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        IncomeResponse updatedIncomeResponse = objectMapper.readValue(updatedIncomeResult.getResponse().getContentAsString(), IncomeResponse.class);
+        assertEquals("Updated_name", updatedIncomeResponse.getName());
+        assertEquals(2000d, updatedIncomeResponse.getAmount());
     }
 }

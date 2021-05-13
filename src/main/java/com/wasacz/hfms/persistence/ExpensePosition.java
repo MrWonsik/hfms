@@ -28,7 +28,7 @@ public class ExpensePosition {
     private BigDecimal size;
 
     @NotNull
-    private BigDecimal cost;
+    private BigDecimal amount;
 
     @NotNull
     @ManyToOne

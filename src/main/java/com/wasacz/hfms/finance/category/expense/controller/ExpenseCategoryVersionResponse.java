@@ -11,7 +11,7 @@ import java.time.YearMonth;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExpenseCategoryVersionResponse {
     private final long id;
-    private final Double maximumCost;
+    private final Double maximumAmount;
     private final YearMonth validMonth;
     private final boolean isValid;
     private final DateTime createDate;

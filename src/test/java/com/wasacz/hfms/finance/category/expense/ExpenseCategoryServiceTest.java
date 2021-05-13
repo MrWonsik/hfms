@@ -63,13 +63,13 @@ class ExpenseCategoryServiceTest {
                 .builder()
                 .id(1L)
                 .expenseCategory(expenseCategory)
-                .maximumCost(BigDecimal.TEN)
+                .maximumAmount(BigDecimal.TEN)
                 .validMonth(now)
                 .build();
         ExpenseCategoryVersionResponse expenseCategoryVersionResponse = ExpenseCategoryVersionResponse
                 .builder()
                 .id(1L)
-                .maximumCost(BigDecimal.TEN.doubleValue())
+                .maximumAmount(BigDecimal.TEN.doubleValue())
                 .validMonth(now)
                 .isValid(true)
                 .build();
@@ -90,7 +90,7 @@ class ExpenseCategoryServiceTest {
         assertEquals(expenseCategoryResponse.isFavourite(), expenseCategoryObj.getIsFavourite());
         ExpenseCategoryVersionResponse currentVersion = expenseCategoryResponse.getCurrentVersion();
         assertEquals(currentVersion.getId(), expenseCategoryVersion.getId());
-        assertEquals(currentVersion.getMaximumCost(), expenseCategoryVersion.getMaximumCost().doubleValue());
+        assertEquals(currentVersion.getMaximumAmount(), expenseCategoryVersion.getMaximumAmount().doubleValue());
         assertEquals(currentVersion.getValidMonth(), expenseCategoryVersion.getValidMonth());
         assertTrue(currentVersion.isValid());
     }

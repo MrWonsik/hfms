@@ -1,19 +1,19 @@
-package com.wasacz.hfms.finance.transaction.expense;
+package com.wasacz.hfms.finance.transaction;
 
-import com.wasacz.hfms.finance.transaction.AbstractTransaction;
+import com.wasacz.hfms.finance.transaction.expense.expensePositions.ExpensePositionObj;
 import com.wasacz.hfms.utils.ValidatorUtils;
 
-public class ExpenseValidator {
+public class TransactionValidator {
 
     public static void validateFinance(AbstractTransaction transaction) {
         ValidatorUtils.handleFieldBlank(transaction.getName(), "name");
-        isNotNullAndBiggerThanZero(transaction.getCost(), "Cost must be bigger than 0.");
+        isNotNullAndBiggerThanZero(transaction.getAmount(), "Amount must be bigger than 0.");
     }
 
     public static void validateExpensePosition(ExpensePositionObj expensePositionObj) {
         ValidatorUtils.handleFieldBlank(expensePositionObj.getPositionName(), "positionName");
         isNotNullAndBiggerThanZero(expensePositionObj.getSize(), "Size must be bigger than 0.");
-        isNotNullAndBiggerThanZero(expensePositionObj.getCost(), "Cost must be bigger than 0.");
+        isNotNullAndBiggerThanZero(expensePositionObj.getAmount(), "Amount must be bigger than 0.");
     }
 
     private static void isNotNullAndBiggerThanZero(Double val, String message) {

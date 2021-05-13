@@ -1,5 +1,7 @@
 package com.wasacz.hfms.finance.transaction.expense;
 
+import com.wasacz.hfms.finance.transaction.expense.expensePositions.ExpensePositionObj;
+import com.wasacz.hfms.finance.transaction.expense.expensePositions.ExpensePositionService;
 import com.wasacz.hfms.persistence.Expense;
 import com.wasacz.hfms.persistence.ExpensePosition;
 import com.wasacz.hfms.persistence.ExpensePositionRepository;
@@ -36,9 +38,9 @@ class ExpensePositionServiceTest {
         Expense expense = mock(Expense.class);
 
         List<ExpensePosition> oldExpenses = new ArrayList<>();
-        oldExpenses.add(ExpensePosition.builder().id(1L).expensePositionName("Position1").expense(expense).size(BigDecimal.valueOf(1)).cost(BigDecimal.valueOf(123)).build());
-        oldExpenses.add(ExpensePosition.builder().id(2L).expensePositionName("Position2").expense(expense).size(BigDecimal.valueOf(1)).cost(BigDecimal.valueOf(123)).build());
-        oldExpenses.add(ExpensePosition.builder().id(3L).expensePositionName("Position3").expense(expense).size(BigDecimal.valueOf(1)).cost(BigDecimal.valueOf(123)).build());
+        oldExpenses.add(ExpensePosition.builder().id(1L).expensePositionName("Position1").expense(expense).size(BigDecimal.valueOf(1)).amount(BigDecimal.valueOf(123)).build());
+        oldExpenses.add(ExpensePosition.builder().id(2L).expensePositionName("Position2").expense(expense).size(BigDecimal.valueOf(1)).amount(BigDecimal.valueOf(123)).build());
+        oldExpenses.add(ExpensePosition.builder().id(3L).expensePositionName("Position3").expense(expense).size(BigDecimal.valueOf(1)).amount(BigDecimal.valueOf(123)).build());
 
         when(expense.getId()).thenReturn(1L);
         when(repository.findAllByExpenseId(1L)).thenReturn(Optional.of(oldExpenses));
@@ -72,14 +74,14 @@ class ExpensePositionServiceTest {
         Expense expense = mock(Expense.class);
 
         List<ExpensePosition> oldExpenses = new ArrayList<>();
-        oldExpenses.add(ExpensePosition.builder().id(1L).expensePositionName("Position1").expense(expense).size(BigDecimal.valueOf(1)).cost(BigDecimal.valueOf(123)).build());
-        oldExpenses.add(ExpensePosition.builder().id(2L).expensePositionName("Position2").expense(expense).size(BigDecimal.valueOf(1)).cost(BigDecimal.valueOf(123)).build());
+        oldExpenses.add(ExpensePosition.builder().id(1L).expensePositionName("Position1").expense(expense).size(BigDecimal.valueOf(1)).amount(BigDecimal.valueOf(123)).build());
+        oldExpenses.add(ExpensePosition.builder().id(2L).expensePositionName("Position2").expense(expense).size(BigDecimal.valueOf(1)).amount(BigDecimal.valueOf(123)).build());
 
         List<ExpensePositionObj> newExpenses = new ArrayList<>();
-        newExpenses.add(ExpensePositionObj.builder().id(1L).positionName("Position1_edit").size(1d).cost(123d).build());
-        newExpenses.add(ExpensePositionObj.builder().id(null).positionName("Position2").size(1d).cost(123d).build());
+        newExpenses.add(ExpensePositionObj.builder().id(1L).positionName("Position1_edit").size(1d).amount(123d).build());
+        newExpenses.add(ExpensePositionObj.builder().id(null).positionName("Position2").size(1d).amount(123d).build());
 
-        ExpensePosition newExpensePosition = ExpensePosition.builder().id(1L).expensePositionName("Position1").size(BigDecimal.valueOf(1)).cost(BigDecimal.valueOf(122d)).build();
+        ExpensePosition newExpensePosition = ExpensePosition.builder().id(1L).expensePositionName("Position1").size(BigDecimal.valueOf(1)).amount(BigDecimal.valueOf(122d)).build();
 
         when(expense.getId()).thenReturn(1L);
         when(repository.findAllByExpenseId(1L)).thenReturn(Optional.of(oldExpenses));
@@ -93,10 +95,10 @@ class ExpensePositionServiceTest {
         verify(repository, times(1)).delete(any());
         verify(repository, times(2)).save(any());
         assertEquals(2, expensePositionList.size());
-        assertEquals(BigDecimal.valueOf(123.0), expensePositionList.get(0).getCost());
+        assertEquals(BigDecimal.valueOf(123.0), expensePositionList.get(0).getAmount());
         assertEquals(BigDecimal.valueOf(1.0), expensePositionList.get(0).getSize());
         assertEquals("Position1_edit", expensePositionList.get(0).getExpensePositionName());
-        assertEquals(BigDecimal.valueOf(123.0), expensePositionList.get(1).getCost());
+        assertEquals(BigDecimal.valueOf(123.0), expensePositionList.get(1).getAmount());
         assertEquals(BigDecimal.valueOf(1.0), expensePositionList.get(1).getSize());
         assertEquals("Position2", expensePositionList.get(1).getExpensePositionName());
     }
@@ -107,12 +109,12 @@ class ExpensePositionServiceTest {
         Expense expense = mock(Expense.class);
 
         List<ExpensePosition> oldExpenses = new ArrayList<>();
-        oldExpenses.add(ExpensePosition.builder().id(1L).expensePositionName("Position1").expense(expense).size(BigDecimal.valueOf(1)).cost(BigDecimal.valueOf(123)).build());
-        oldExpenses.add(ExpensePosition.builder().id(2L).expensePositionName("Position2").expense(expense).size(BigDecimal.valueOf(1)).cost(BigDecimal.valueOf(123)).build());
+        oldExpenses.add(ExpensePosition.builder().id(1L).expensePositionName("Position1").expense(expense).size(BigDecimal.valueOf(1)).amount(BigDecimal.valueOf(123)).build());
+        oldExpenses.add(ExpensePosition.builder().id(2L).expensePositionName("Position2").expense(expense).size(BigDecimal.valueOf(1)).amount(BigDecimal.valueOf(123)).build());
 
         List<ExpensePositionObj> newExpenses = new ArrayList<>();
-        newExpenses.add(ExpensePositionObj.builder().id(1L).positionName("Position1_edit").size(1d).cost(123d).build());
-        newExpenses.add(ExpensePositionObj.builder().id(null).positionName("Position2").size(1d).cost(123d).build());
+        newExpenses.add(ExpensePositionObj.builder().id(1L).positionName("Position1_edit").size(1d).amount(123d).build());
+        newExpenses.add(ExpensePositionObj.builder().id(null).positionName("Position2").size(1d).amount(123d).build());
 
         when(expense.getId()).thenReturn(1L);
         when(expense.getExpenseName()).thenReturn("test_expense_name");

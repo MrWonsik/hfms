@@ -1,4 +1,4 @@
-package com.wasacz.hfms.finance.transaction.expense;
+package com.wasacz.hfms.finance.transaction.expense.expensePositions;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,5 +12,5 @@ public class ExpensePositionResponse {
     private final Long id;
     private final String positionName;
     private final Double size;
-    private final Double cost;
+    private final Double amount;
 }
