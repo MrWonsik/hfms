@@ -15,4 +15,8 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     Optional<List<Expense>> findAllByUser(User userId);
 
     Optional<Expense> findByIdAndUser(long transactionId, User user);
+
+    Optional<List<Expense>> findAllByExpenseDateIsBetweenAndCategoryId(LocalDate fromDate, LocalDate toDate, long categoryId);
+
+    Optional<Expense> findFirstByCategoryIdOrderByExpenseDateAsc(long categoryId);
 }

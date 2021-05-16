@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
@@ -28,11 +29,13 @@ public class UserManagementService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserValidator userValidator;
+    private final CategoryStarterFactory categoryStarterFactory;
 
-    public UserManagementService(PasswordEncoder passwordEncoder, UserRepository userRepository, UserValidator userValidator) {
+    public UserManagementService(PasswordEncoder passwordEncoder, UserRepository userRepository, UserValidator userValidator, CategoryStarterFactory categoryStarterFactory) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.userValidator = userValidator;
+        this.categoryStarterFactory = categoryStarterFactory;
     }
 
     public UsersResponse getAllUsers() {
@@ -41,9 +44,11 @@ public class UserManagementService {
         return UsersResponse.builder().users(userLists).build();
     }
 
+    @Transactional
     public UserResponse createUser(CreateUserRequest createUserRequest) {
         userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository));
         User createdUser = userRepository.save(buildUser(createUserRequest));
+        categoryStarterFactory.addStarterCategoriesForUser(createdUser);
         log.debug("User {} has been created with role: {}.", createUserRequest.getUsername(), createUserRequest.getRole());
         return buildUserResponse(createdUser);
     }

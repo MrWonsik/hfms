@@ -2,6 +2,8 @@ package com.wasacz.hfms.persistence;
 
 import com.sun.istack.NotNull;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -24,6 +26,7 @@ public class ExpenseCategoryVersion {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ExpenseCategory expenseCategory;
 
     private BigDecimal maximumAmount;

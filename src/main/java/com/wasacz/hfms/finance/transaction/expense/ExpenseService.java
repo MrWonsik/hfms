@@ -136,6 +136,18 @@ public class ExpenseService implements ITransactionService {
         return ExpenseMapper.mapExpenseToResponse(savedUpdatedExpense, expensePositionList, getReceiptId(savedUpdatedExpense));
     }
 
+    @Override
+    public BigDecimal getSummaryAmountOfCategoryForMonth(long categoryId, YearMonth yearMonth) {
+        List<Expense> expenses = expenseRepository.findAllByExpenseDateIsBetweenAndCategoryId(yearMonth.atDay(1), yearMonth.atEndOfMonth(), categoryId).orElse(Collections.emptyList());
+        return expenses.stream().map(Expense::getAmount).reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
+    }
+
+    @Override
+    public AbstractTransactionResponse getTheOldestTransactionForCategory(long categoryId) {
+        Optional<Expense> oldestExpense = expenseRepository.findFirstByCategoryIdOrderByExpenseDateAsc(categoryId);
+        return oldestExpense.map(ExpenseMapper::mapExpenseToResponse).orElse(null);
+    }
+
     private Long getReceiptId(Expense savedUpdatedExpense) {
         Optional<ReceiptFile> receiptFileByExpense = receiptFileService.getReceiptFileByExpense(savedUpdatedExpense.getId());
         return receiptFileByExpense.map(ReceiptFile::getId).orElse(null);

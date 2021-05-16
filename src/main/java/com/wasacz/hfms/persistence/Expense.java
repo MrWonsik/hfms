@@ -2,6 +2,8 @@ package com.wasacz.hfms.persistence;
 
 import com.sun.istack.NotNull;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -26,14 +28,17 @@ public class Expense {
 
     @NotNull
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ExpenseCategory category;
 
     @NotNull
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Shop shop;
 
     @NotNull
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @NotNull

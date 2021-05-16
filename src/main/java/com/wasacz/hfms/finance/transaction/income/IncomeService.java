@@ -45,14 +45,14 @@ public class IncomeService implements ITransactionService {
                 .category(obtainCategory(income.getCategoryId(), user))
                 .amount(BigDecimal.valueOf(income.getAmount()))
                 .user(user);
-        if(incomeObj.getTransactionDate() != null) {
+        if (incomeObj.getTransactionDate() != null) {
             incomeBuilder.incomeDate(incomeObj.getTransactionDate());
         }
         return incomeBuilder.build();
     }
 
     private IncomeCategory obtainCategory(Long categoryId, User user) {
-        if(categoryId == null) {
+        if (categoryId == null) {
             throw new IllegalStateException("CategoryId cannot be null!");
         }
         return incomeCategoryRepository.findByIdAndUserAndIsDeletedFalse(categoryId, user)
@@ -98,5 +98,17 @@ public class IncomeService implements ITransactionService {
         Income savedUpdatedIncome = incomeRepository.save(incomeToUpdate);
 
         return IncomeMapper.mapIncomeToResponse(savedUpdatedIncome);
+    }
+
+    @Override
+    public BigDecimal getSummaryAmountOfCategoryForMonth(long categoryId, YearMonth yearMonth) {
+        List<Income> incomes = incomeRepository.findAllByIncomeDateIsBetweenAndCategoryId(yearMonth.atDay(1), yearMonth.atEndOfMonth(), categoryId).orElse(Collections.emptyList());
+        return incomes.stream().map(Income::getAmount).reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
+    }
+
+    @Override
+    public AbstractTransactionResponse getTheOldestTransactionForCategory(long categoryId) {
+        Optional<Income> oldestIncome = incomeRepository.findFirstByCategoryIdOrderByIncomeDateAsc(categoryId);
+        return oldestIncome.map(IncomeMapper::mapIncomeToResponse).orElse(null);
     }
 }

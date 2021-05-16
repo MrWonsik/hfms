@@ -7,7 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -23,8 +25,9 @@ public class ExpenseCategoryResponse extends AbstractCategoryResponse {
                                       boolean isDeleted,
                                       DateTime createDate,
                                       ExpenseCategoryVersionResponse currentVersion,
-                                      List<ExpenseCategoryVersionResponse> expenseCategoryVersions) {
-        super(id, categoryName, colorHex, isFavourite, isDeleted, createDate);
+                                      List<ExpenseCategoryVersionResponse> expenseCategoryVersions,
+                                      Map<YearMonth, Double> summaryTransactionMap) {
+        super(id, categoryName, colorHex, isFavourite, isDeleted, createDate, summaryTransactionMap);
         this.currentVersion = currentVersion;
         this.expenseCategoryVersions = expenseCategoryVersions;
     }

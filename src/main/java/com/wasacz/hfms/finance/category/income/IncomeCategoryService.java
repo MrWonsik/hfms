@@ -5,6 +5,8 @@ import com.wasacz.hfms.finance.category.CategoryType;
 import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
 import com.wasacz.hfms.finance.category.CategoryValidator;
 import com.wasacz.hfms.finance.category.ICategoryService;
+import com.wasacz.hfms.finance.category.TransactionSummaryProvider;
+import com.wasacz.hfms.finance.transaction.TransactionType;
 import com.wasacz.hfms.persistence.*;
 import com.wasacz.hfms.utils.date.DateTime;
 import org.springframework.stereotype.Service;
@@ -19,9 +21,11 @@ import static com.wasacz.hfms.utils.HexColorUtils.getRandomHexColor;
 public class IncomeCategoryService implements ICategoryService {
 
     private final IncomeCategoryRepository incomeCategoryRepository;
+    private final TransactionSummaryProvider transactionSummaryProvider;
 
-    public IncomeCategoryService(IncomeCategoryRepository incomeCategoryRepository) {
+    public IncomeCategoryService(IncomeCategoryRepository incomeCategoryRepository, TransactionSummaryProvider transactionSummaryProvider) {
         this.incomeCategoryRepository = incomeCategoryRepository;
+        this.transactionSummaryProvider = transactionSummaryProvider;
     }
 
     @Override
@@ -104,6 +108,7 @@ public class IncomeCategoryService implements ICategoryService {
                 .isDeleted(incomeCategory.getIsDeleted())
                 .isFavourite(incomeCategory.getIsFavourite())
                 .createDate(new DateTime(incomeCategory.getCreatedDate()))
+                .summaryTransactionMap(transactionSummaryProvider.getTransactionMapProvider(incomeCategory.getId(), TransactionType.INCOME))
                 .build();
     }
 }

@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.YearMonth;
+import java.util.Map;
+
 @Getter
 @Setter
 public class IncomeCategoryResponse extends AbstractCategoryResponse {
@@ -17,7 +20,8 @@ public class IncomeCategoryResponse extends AbstractCategoryResponse {
                                      String colorHex,
                                      boolean isFavourite,
                                      boolean isDeleted,
-                                     DateTime createDate) {
-        super(id, categoryName, colorHex, isFavourite, isDeleted, createDate);
+                                     DateTime createDate,
+                                     Map<YearMonth, Double> summaryTransactionMap) {
+        super(id, categoryName, colorHex, isFavourite, isDeleted, createDate, summaryTransactionMap);
     }
 }
