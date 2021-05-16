@@ -5,6 +5,9 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.YearMonth;
+import java.util.Map;
+
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractCategoryResponse {
@@ -14,4 +17,5 @@ public abstract class AbstractCategoryResponse {
     private final boolean isFavourite;
     private final boolean isDeleted;
     private final DateTime createDate;
+    private final Map<YearMonth, Double> summaryTransactionMap;
 }

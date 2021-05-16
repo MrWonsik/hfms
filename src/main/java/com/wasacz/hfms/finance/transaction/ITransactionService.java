@@ -3,6 +3,7 @@ package com.wasacz.hfms.finance.transaction;
 import com.wasacz.hfms.persistence.User;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.List;
 
@@ -19,4 +20,9 @@ public interface ITransactionService {
     TransactionType getService();
 
     AbstractTransactionResponse updateTransaction(Long transactionId, AbstractTransaction transaction, User user);
+
+    BigDecimal getSummaryAmountOfCategoryForMonth(long categoryId, YearMonth yearMonth);
+
+    AbstractTransactionResponse getTheOldestTransactionForCategory(long categoryId);
+
 }

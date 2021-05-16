@@ -1,16 +1,15 @@
 package com.wasacz.hfms.finance.category.expense;
 
-import com.wasacz.hfms.finance.category.AbstractCategory;
-import com.wasacz.hfms.finance.category.CategoryType;
+import com.wasacz.hfms.finance.category.*;
 import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
-import com.wasacz.hfms.finance.category.CategoryValidator;
-import com.wasacz.hfms.finance.category.ICategoryService;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryVersionMapper;
+import com.wasacz.hfms.finance.transaction.TransactionType;
 import com.wasacz.hfms.persistence.*;
 import com.wasacz.hfms.utils.date.DateTime;
 import org.springframework.stereotype.Service;
 
+import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,12 +21,14 @@ public class ExpenseCategoryService implements ICategoryService {
     private final ExpenseCategorySaver expenseCategorySaver;
     private final ExpenseCategoryVersionService expenseCategoryVersionService;
     private final ExpenseCategoryVersionMapper expenseCategoryVersionMapper;
+    private final TransactionSummaryProvider transactionSummaryProvider;
 
-    public ExpenseCategoryService(ExpenseCategoryRepository expenseCategoryRepository, ExpenseCategorySaver expenseCategorySaver, ExpenseCategoryVersionService expenseCategoryVersionService, ExpenseCategoryVersionMapper expenseCategoryVersionMapper) {
+    public ExpenseCategoryService(ExpenseCategoryRepository expenseCategoryRepository, ExpenseCategorySaver expenseCategorySaver, ExpenseCategoryVersionService expenseCategoryVersionService, ExpenseCategoryVersionMapper expenseCategoryVersionMapper, TransactionSummaryProvider transactionSummaryProvider) {
         this.expenseCategoryRepository = expenseCategoryRepository;
         this.expenseCategorySaver = expenseCategorySaver;
         this.expenseCategoryVersionService = expenseCategoryVersionService;
         this.expenseCategoryVersionMapper = expenseCategoryVersionMapper;
+        this.transactionSummaryProvider = transactionSummaryProvider;
     }
 
     @Override
@@ -106,6 +107,7 @@ public class ExpenseCategoryService implements ICategoryService {
                         expenseCategoryVersionService.getCategoryVersions(expenseCategory.getId()))
                 )
                 .createDate(new DateTime(expenseCategory.getCreatedDate()))
+                .summaryTransactionMap(transactionSummaryProvider.getTransactionMapProvider(expenseCategory.getId(), TransactionType.EXPENSE))
                 .build();
     }
 }

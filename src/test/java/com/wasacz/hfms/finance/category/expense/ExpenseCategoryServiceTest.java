@@ -1,8 +1,10 @@
 package com.wasacz.hfms.finance.category.expense;
 
+import com.wasacz.hfms.finance.category.TransactionSummaryProvider;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryVersionMapper;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryVersionResponse;
+import com.wasacz.hfms.finance.transaction.TransactionType;
 import com.wasacz.hfms.persistence.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.YearMonth;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +37,9 @@ class ExpenseCategoryServiceTest {
 
     @Mock
     private ExpenseCategoryVersionMapper expenseCategoryVersionMapper;
+
+    @Mock
+    private TransactionSummaryProvider transactionSummaryProvider;
 
     @InjectMocks
     private ExpenseCategoryService expenseCategoryService;
@@ -79,6 +85,7 @@ class ExpenseCategoryServiceTest {
         when(expenseCategoryVersionService.getCategoryVersions(any(Long.class))).thenReturn(List.of(expenseCategoryVersion));
         when(expenseCategoryVersionMapper.mapExpenseCategoryVersionToResponse(any(ExpenseCategoryVersion.class))).thenReturn(expenseCategoryVersionResponse);
         when(expenseCategoryVersionMapper.mapExpenseCategoryVersionsListToResponse(anyList())).thenReturn(List.of(expenseCategoryVersionResponse));
+        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(TransactionType.class))).thenReturn(Collections.emptyMap());
 
         //when
         ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryService.addCategory(expenseCategoryObj, user);
@@ -111,6 +118,7 @@ class ExpenseCategoryServiceTest {
                 .build();
         when(expenseCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(expenseCategory));
         when(expenseCategoryRepository.save(any(ExpenseCategory.class))).thenReturn(expenseCategory);
+        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(TransactionType.class))).thenReturn(Collections.emptyMap());
 
         //when
         ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryService.setAsFavourite(1L, true, user);
@@ -136,6 +144,7 @@ class ExpenseCategoryServiceTest {
                 .build();
         when(expenseCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(expenseCategory));
         when(expenseCategoryRepository.save(any(ExpenseCategory.class))).thenReturn(expenseCategory);
+        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(TransactionType.class))).thenReturn(Collections.emptyMap());
 
         //when
         ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryService.deleteCategory(1L, user);
@@ -194,6 +203,7 @@ class ExpenseCategoryServiceTest {
                 .build();
         when(expenseCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(expenseCategory));
         when(expenseCategoryRepository.save(any(ExpenseCategory.class))).thenReturn(expenseCategoryUpdated);
+        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(TransactionType.class))).thenReturn(Collections.emptyMap());
 
         //when
         ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryService.editCategory(1L, "CategoryName", "#aaa", user);
@@ -218,6 +228,7 @@ class ExpenseCategoryServiceTest {
                 .build();
 
         when(expenseCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(expenseCategory));
+        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(TransactionType.class))).thenReturn(Collections.emptyMap());
 
         //when
         ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryService.editCategory(1L, null, null, user);
@@ -251,6 +262,7 @@ class ExpenseCategoryServiceTest {
                 .build();
         when(expenseCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(expenseCategory));
         when(expenseCategoryRepository.save(any(ExpenseCategory.class))).thenReturn(expenseCategoryUpdated);
+        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(TransactionType.class))).thenReturn(Collections.emptyMap());
 
         //when
         ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryService.editCategory(1L, null, "#aaa", user);
