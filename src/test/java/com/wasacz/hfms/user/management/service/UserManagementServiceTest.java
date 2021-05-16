@@ -34,6 +34,9 @@ class UserManagementServiceTest {
     @Mock
     private UserValidator userValidator;
 
+    @Mock
+    private CategoryStarterFactory categoryStarterFactory;
+
     @InjectMocks
     private UserManagementService userManagementService;
 
