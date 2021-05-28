@@ -1,7 +1,6 @@
 package com.wasacz.hfms;
 
-import com.wasacz.hfms.user.management.controller.CreateUserRequest;
-import com.wasacz.hfms.user.management.service.UserManagementService;
+import com.wasacz.hfms.utils.ExampleUserFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -14,18 +13,25 @@ public class AppInitializer implements CommandLineRunner {
     @Value("${spring.jpa.hibernate.ddl-auto:\"\"}")
     private String ddlAuto;
 
-    private final UserManagementService userManagementService;
+    @Value("${recreateExampleUser:false}")
+    private boolean recreateExampleUser;
 
-    public AppInitializer(UserManagementService userManagementService) {
-        this.userManagementService = userManagementService;
+    private final ExampleUserFactory exampleUserFactory;
+
+    public AppInitializer(ExampleUserFactory exampleUserFactory) {
+        this.exampleUserFactory = exampleUserFactory;
     }
 
 
     @Override
     public void run(String... args) {
         if (ddlAuto.equals("create")) {
-            userManagementService.createUser(CreateUserRequest.builder().username("admin").password("Admin123!@").role("ROLE_ADMIN").build());
-            userManagementService.createUser(CreateUserRequest.builder().username("user").password("User123!@").role("ROLE_USER").build());
+            exampleUserFactory.produceBasicUsers();
+        }
+
+        if (recreateExampleUser) {
+            exampleUserFactory.produceExampleUser();
         }
     }
+
 }

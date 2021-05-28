@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
@@ -139,7 +140,7 @@ public class ExpenseService implements ITransactionService {
     @Override
     public BigDecimal getSummaryAmountOfCategoryForMonth(long categoryId, YearMonth yearMonth) {
         List<Expense> expenses = expenseRepository.findAllByExpenseDateIsBetweenAndCategoryId(yearMonth.atDay(1), yearMonth.atEndOfMonth(), categoryId).orElse(Collections.emptyList());
-        return expenses.stream().map(Expense::getAmount).reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
+        return expenses.stream().map(Expense::getAmount).reduce(BigDecimal::add).orElse(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override
