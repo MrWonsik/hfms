@@ -50,12 +50,7 @@ public class ExpenseCategoryVersionService {
 
     public ExpenseCategoryVersion addNewVersionForNextMonth(User user, long categoryId, Double newMaximumAmount) {
         CategoryValidator.validateMaximumAmount(BigDecimal.valueOf(newMaximumAmount));
-        ExpenseCategory category = findExpenseCategoryByIdAndUser(categoryId, user);
-        YearMonth nextMonthFromNow = getNextMonthFromNow();
-        Optional<ExpenseCategoryVersion> expenseCategoryVersionOptional = expenseCategoryVersionRepository.findByExpenseCategoryAndValidMonth(category, nextMonthFromNow);
-        return expenseCategoryVersionOptional
-                .map(categoryVersion -> updateCategory(categoryVersion, newMaximumAmount))
-                .orElseGet(() -> expenseCategorySaver.saveExpenseCategoryVersion(BigDecimal.valueOf(newMaximumAmount), category, nextMonthFromNow));
+        return addNewVersion(user, categoryId, newMaximumAmount, getNextMonthFromNow());
     }
 
     private YearMonth getNextMonthFromNow() {
@@ -66,7 +61,19 @@ public class ExpenseCategoryVersionService {
         CategoryValidator.validateMaximumAmount(BigDecimal.valueOf(newMaximumAmount));
         findExpenseCategoryByIdAndUser(categoryId, user);
         ExpenseCategoryVersion currentCategoryVersion = getCurrentCategoryVersion(categoryId);
+
+        if(currentCategoryVersion.getValidMonth().isBefore(YearMonth.now())) {
+            return addNewVersion(user, categoryId, newMaximumAmount, YearMonth.now());
+        }
         return updateCategory(currentCategoryVersion, newMaximumAmount);
+    }
+
+    private ExpenseCategoryVersion addNewVersion(User user, long categoryId, Double newMaximumAmount, YearMonth validMonth) {
+        ExpenseCategory category = findExpenseCategoryByIdAndUser(categoryId, user);
+        Optional<ExpenseCategoryVersion> expenseCategoryVersionOptional = expenseCategoryVersionRepository.findByExpenseCategoryAndValidMonth(category, validMonth);
+        return expenseCategoryVersionOptional
+                .map(categoryVersion -> updateCategory(categoryVersion, newMaximumAmount))
+                .orElseGet(() -> expenseCategorySaver.saveExpenseCategoryVersion(BigDecimal.valueOf(newMaximumAmount), category, validMonth));
     }
 
     private ExpenseCategory findExpenseCategoryByIdAndUser(long categoryId, User user) {
