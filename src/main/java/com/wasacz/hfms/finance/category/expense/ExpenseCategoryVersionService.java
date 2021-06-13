@@ -2,6 +2,7 @@ package com.wasacz.hfms.finance.category.expense;
 
 import com.wasacz.hfms.finance.category.CategoryValidator;
 import com.wasacz.hfms.persistence.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class ExpenseCategoryVersionService {
 
     private final ExpenseCategoryVersionRepository expenseCategoryVersionRepository;
@@ -27,6 +29,7 @@ public class ExpenseCategoryVersionService {
     public ExpenseCategoryVersion getCurrentCategoryVersion(Long expenseCategoryId) {
         List<ExpenseCategoryVersion> expenseCategoryVersions = expenseCategoryVersionRepository
                 .findByExpenseCategoryId(expenseCategoryId).orElseThrow(() -> {
+                    log.warn("Expense category " + expenseCategoryId + " versions is empty!");
                     throw new IllegalStateException("Expense category versions is empty!");
                 });
         return obtainCurrentCategoryVersion(expenseCategoryVersions);
@@ -38,6 +41,7 @@ public class ExpenseCategoryVersionService {
                 .filter(expenseCategoryVersion -> expenseCategoryVersion.getValidMonth().isBefore(YearMonth.now().plusMonths(1)))
                 .max(Comparator.comparing(ExpenseCategoryVersion::getValidMonth));
         if(newestVersionOptional.isEmpty()) {
+            log.error("Not found current version!");
             throw new IllegalStateException("Not found current version!");
         }
         return newestVersionOptional.get();
@@ -65,25 +69,30 @@ public class ExpenseCategoryVersionService {
         if(currentCategoryVersion.getValidMonth().isBefore(YearMonth.now())) {
             return addNewVersion(user, categoryId, newMaximumAmount, YearMonth.now());
         }
-        return updateCategory(currentCategoryVersion, newMaximumAmount);
+        return updateCategoryVersion(currentCategoryVersion, newMaximumAmount);
     }
 
     private ExpenseCategoryVersion addNewVersion(User user, long categoryId, Double newMaximumAmount, YearMonth validMonth) {
         ExpenseCategory category = findExpenseCategoryByIdAndUser(categoryId, user);
         Optional<ExpenseCategoryVersion> expenseCategoryVersionOptional = expenseCategoryVersionRepository.findByExpenseCategoryAndValidMonth(category, validMonth);
         return expenseCategoryVersionOptional
-                .map(categoryVersion -> updateCategory(categoryVersion, newMaximumAmount))
+                .map(categoryVersion -> updateCategoryVersion(categoryVersion, newMaximumAmount))
                 .orElseGet(() -> expenseCategorySaver.saveExpenseCategoryVersion(BigDecimal.valueOf(newMaximumAmount), category, validMonth));
     }
 
     private ExpenseCategory findExpenseCategoryByIdAndUser(long categoryId, User user) {
         return expenseCategoryRepository
                 .findByIdAndUserAndIsDeletedFalse(categoryId, user)
-                .orElseThrow(() -> new IllegalArgumentException("Expense category not found."));
+                .orElseThrow(() -> {
+                    log.warn("Expense category " + categoryId + " not found");
+                    throw new IllegalArgumentException("Expense category not found.");
+                });
     }
 
-    private ExpenseCategoryVersion updateCategory(ExpenseCategoryVersion expenseCategoryVersion, Double newMaximumAmount) {
+    private ExpenseCategoryVersion updateCategoryVersion(ExpenseCategoryVersion expenseCategoryVersion, Double newMaximumAmount) {
         expenseCategoryVersion.setMaximumAmount(BigDecimal.valueOf(newMaximumAmount));
-        return expenseCategoryVersionRepository.save(expenseCategoryVersion);
+        ExpenseCategoryVersion saved = expenseCategoryVersionRepository.save(expenseCategoryVersion);
+        log.debug("Expense category version: " + saved.getExpenseCategory().getCategoryName() + " for month: " + expenseCategoryVersion.getValidMonth() + " has been updated");
+        return saved;
     }
 }

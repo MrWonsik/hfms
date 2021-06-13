@@ -121,7 +121,7 @@ class ExpenseCategoryServiceTest {
         when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(TransactionType.class))).thenReturn(Collections.emptyMap());
 
         //when
-        ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryService.setAsFavourite(1L, true, user);
+        ExpenseCategoryResponse expenseCategoryResponse = expenseCategoryService.toggleFavourite(1L, true, user);
 
         //then
         assertTrue(expenseCategoryResponse.isFavourite());
@@ -163,7 +163,7 @@ class ExpenseCategoryServiceTest {
 
         //then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> expenseCategoryService.setAsFavourite(1L, false, user));
+                () -> expenseCategoryService.toggleFavourite(1L, false, user));
         assertEquals(exception.getMessage(), "Expense category not found.");
     }
 

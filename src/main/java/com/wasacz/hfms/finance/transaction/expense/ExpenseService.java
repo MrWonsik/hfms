@@ -8,6 +8,7 @@ import com.wasacz.hfms.finance.transaction.expense.expensePositions.ExpensePosit
 import com.wasacz.hfms.finance.transaction.expense.receiptFile.FileReceiptResponse;
 import com.wasacz.hfms.finance.transaction.expense.receiptFile.ReceiptFileService;
 import com.wasacz.hfms.persistence.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ExpenseService implements ITransactionService {
 
     private final ExpenseRepository expenseRepository;
@@ -43,9 +45,10 @@ public class ExpenseService implements ITransactionService {
         ExpenseObj expense = obtainExpenseObj(expenseObj);
         TransactionValidator.validateFinance(expense);
         Expense savedExpense = expenseRepository.save(buildExpense(expenseObj, user, expense));
-
+        log.debug("Expense has been saved: " + savedExpense.getExpenseName());
         ReceiptFile receiptFile = receiptFileService.saveFile(file, savedExpense, user.getUsername());
         List<ExpensePosition> expensePositionList = expensePositionService.addExpensePositions(savedExpense, expense.getExpensePositions());
+        log.debug("Expense positions has been added for: " + savedExpense.getExpenseName());
         return ExpenseMapper.mapExpenseToResponse(savedExpense, expensePositionList, receiptFile != null ? receiptFile.getId() : null);
     }
 
@@ -64,10 +67,15 @@ public class ExpenseService implements ITransactionService {
 
     private ExpenseCategory obtainCategory(Long categoryId, User user) {
         if(categoryId == null) {
+            log.debug("Category cannot be null");
             throw new IllegalStateException("CategoryId cannot be null!");
         }
         return expenseCategoryRepository.findByIdAndUserAndIsDeletedFalse(categoryId, user)
-                .orElseThrow(() -> new IllegalArgumentException("Category with id " + categoryId + " not found."));
+                .orElseThrow(() -> {
+                    String msg = "Category with id " + categoryId + " not found.";
+                    log.warn(msg);
+                    throw new IllegalArgumentException(msg);
+                });
     }
 
     private Shop obtainShop(ShopObj shopObj, User user) {
@@ -77,7 +85,9 @@ public class ExpenseService implements ITransactionService {
 
         if(shopObj != null && shopObj.getName() != null) {
             ShopValidator.validate(shopObj);
-            return shopRepository.save(Shop.builder().name(shopObj.getName()).user(user).build());
+            Shop saved = shopRepository.save(Shop.builder().name(shopObj.getName()).user(user).build());
+            log.debug("Shop has been saved: " + saved.getName());
+            return saved;
         }
         return null;
 
@@ -103,6 +113,7 @@ public class ExpenseService implements ITransactionService {
         Expense expenseToDelete = expenseRepository.findByIdAndUser(expenseId, user).orElseThrow(() -> new IllegalArgumentException("Transaction %s not found.".formatted(expenseId)));
         receiptFileService.deleteFileByExpense(expenseToDelete.getId());
         expenseRepository.delete(expenseToDelete);
+        log.debug("Expense has been deleted: " + expenseToDelete.getExpenseName());
         return ExpenseMapper.mapExpenseToResponse(expenseToDelete);
     }
 
@@ -132,6 +143,7 @@ public class ExpenseService implements ITransactionService {
         expenseToUpdate.setCategory(obtainCategory(expense.getCategoryId(), user));
         expenseToUpdate.setShop(obtainShop(expense.getShop(), user));
         Expense savedUpdatedExpense = expenseRepository.save(expenseToUpdate);
+        log.debug("Expense has been updated: " + savedUpdatedExpense.getExpenseName());
 
         List<ExpensePosition> expensePositionList = expensePositionService.updateExpensePositions(savedUpdatedExpense, expense.getExpensePositions());
         return ExpenseMapper.mapExpenseToResponse(savedUpdatedExpense, expensePositionList, getReceiptId(savedUpdatedExpense));
@@ -156,14 +168,14 @@ public class ExpenseService implements ITransactionService {
 
     private ExpenseObj obtainExpenseObj(AbstractTransaction expenseObj) {
         if (!(expenseObj instanceof ExpenseObj)) {
+            log.error("Incorrect abstractFinance implementation!");
             throw new IllegalStateException("Incorrect abstractFinance implementation!");
         }
         return (ExpenseObj) expenseObj;
     }
 
     public FileReceiptResponse getReceiptFileByExpense(Long expenseId, User user) {
-        expenseRepository.findByIdAndUser(expenseId, user)
-                .orElseThrow(() -> new IllegalArgumentException("Transaction %s not found.".formatted(expenseId)));
+        getExpenseToUploadFile(expenseId, user);
 
         ReceiptFile receiptFile = receiptFileService.getFile(expenseId);
 
@@ -176,10 +188,19 @@ public class ExpenseService implements ITransactionService {
     }
 
     public FileReceiptResponse uploadReceiptFile(Long expenseId, MultipartFile file, User user) {
-        Expense expenseToUploadFile = expenseRepository.findByIdAndUser(expenseId, user)
-                .orElseThrow(() -> new IllegalArgumentException("Transaction %s not found.".formatted(expenseId)));
+        Expense expenseToUploadFile = getExpenseToUploadFile(expenseId, user);
 
         ReceiptFile receiptFile = receiptFileService.saveFile(file, expenseToUploadFile, user.getUsername());
+        log.debug("File has been uploaded: " + receiptFile.getFileName());
         return receiptFileService.mapFileReceiptToResponse(receiptFile);
+    }
+
+    private Expense getExpenseToUploadFile(Long expenseId, User user) {
+        return expenseRepository.findByIdAndUser(expenseId, user)
+                .orElseThrow(() -> {
+                    String msg = "Transaction %s not found.".formatted(expenseId);
+                    log.warn(msg);
+                    throw new IllegalArgumentException("Transaction %s not found.".formatted(expenseId));
+                });
     }
 }

@@ -37,7 +37,9 @@ public class ReceiptFileService {
             return null;
         }
         if(getReceiptFileByExpense(expense.getId()).isPresent()) {
-            throw new IllegalStateException("File for this expense is already uploaded!");
+            String msg = "File for this expense is already uploaded!";
+            log.warn(msg);
+            throw new IllegalStateException(msg);
         }
         String dirPath = "%s/%s".formatted(destinationPath, username);
         String filePathname = "%s/%s_%s.jpg".formatted(dirPath, expense.getExpenseName(), Instant.now().getEpochSecond());
@@ -45,11 +47,13 @@ public class ReceiptFileService {
             Files.createDirectories(Paths.get(dirPath));
             File newFile = new File(filePathname);
             file.transferTo(newFile);
-            return repository.save(ReceiptFile.builder()
+            ReceiptFile saved = repository.save(ReceiptFile.builder()
                     .fileName(newFile.getName())
                     .receiptFilePath(newFile.getParent())
                     .expense(expense)
                     .build());
+            log.debug("File has been saved: " + saved.getFileName() + ", for expense: " + expense.getExpenseName());
+            return saved;
         } catch (IOException e) {
             log.error("Error while save the file: {} - {}", e.getClass(), e.getMessage());
             throw new IllegalStateException("Something goes wrong while save the file. %s - %s".formatted(e.getClass(), e.getMessage()));
@@ -95,6 +99,7 @@ public class ReceiptFileService {
                 return Base64.getEncoder().encodeToString(inputstream.readAllBytes());
             }
         } catch (IOException e) {
+            log.error("File not found " + file.getName());
             throw new IllegalStateException("File not found.");
         }
     }

@@ -41,7 +41,7 @@ public class IncomeCategoryService implements ICategoryService {
     }
 
     @Override
-    public IncomeCategoryResponse setAsFavourite(long categoryId, boolean isFavourite, User user) {
+    public IncomeCategoryResponse toggleFavourite(long categoryId, boolean isFavourite, User user) {
         IncomeCategory incomeCategoryToUpdate = findByIdAndUser(categoryId, user);
         incomeCategoryToUpdate.setIsFavourite(isFavourite);
         IncomeCategory updatedExpenseCategory = incomeCategoryRepository.save(incomeCategoryToUpdate);

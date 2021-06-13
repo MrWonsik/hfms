@@ -4,6 +4,7 @@ import com.wasacz.hfms.finance.transaction.TransactionValidator;
 import com.wasacz.hfms.persistence.Expense;
 import com.wasacz.hfms.persistence.ExpensePosition;
 import com.wasacz.hfms.persistence.ExpensePositionRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ExpensePositionService {
 
     private final ExpensePositionRepository expensePositionRepository;
@@ -24,6 +26,7 @@ public class ExpensePositionService {
 
     public List<ExpensePosition> addExpensePositions(Expense expense, List<ExpensePositionObj> expensePositions) {
         if(expense == null) {
+            log.debug("Expense cannot be null");
             throw new IllegalStateException("Expense cannot be null!");
         }
         if(expensePositions == null || expensePositions.isEmpty()) {
@@ -41,12 +44,14 @@ public class ExpensePositionService {
 
     private ExpensePosition saveExpensePosition(Expense expense, ExpensePositionObj expensePositionObj) {
         TransactionValidator.validateExpensePosition(expensePositionObj);
-        return expensePositionRepository.save(ExpensePosition.builder()
+        ExpensePosition saved = expensePositionRepository.save(ExpensePosition.builder()
                 .expense(expense)
                 .expensePositionName(expensePositionObj.getPositionName())
                 .amount(BigDecimal.valueOf(expensePositionObj.getAmount()))
                 .size(BigDecimal.valueOf(expensePositionObj.getSize()))
                 .build());
+        log.debug("Expense position has been saved: " + saved.getExpensePositionName() + " for expense: " + saved.getExpense().getExpenseName());
+        return saved;
     }
 
     public List<ExpensePosition> updateExpensePositions(Expense updatedExpense, List<ExpensePositionObj> newExpensePositions) {
@@ -54,6 +59,7 @@ public class ExpensePositionService {
             return Collections.emptyList();
         }
         if(updatedExpense == null) {
+            log.debug("Expense cannot be null");
             throw new IllegalStateException("Expense cannot be null!");
         }
         List<ExpensePosition> oldExpensePositionList = getExpensePositionList(updatedExpense.getId()).orElse(Collections.emptyList());
@@ -79,13 +85,18 @@ public class ExpensePositionService {
         TransactionValidator.validateExpensePosition(expensePositionObj);
         ExpensePosition expensePositionToUpdate = expensePositionRepository
                 .findById(expensePositionObj.getId())
-                .orElseThrow(() -> new IllegalStateException(
-                        MessageFormat.format("Provide incorrect position id: {0} for expense: {1}, position with this id not exists.",
-                                expensePositionObj.getId(), expense.getExpenseName())));
+                .orElseThrow(() -> {
+                    String msg = MessageFormat.format("Provide incorrect position id: {0} for expense: {1}, position with this id not exists.",
+                            expensePositionObj.getId(), expense.getExpenseName());
+                    log.warn(msg);
+                    throw new IllegalStateException(msg);
+                });
 
         expensePositionToUpdate.setExpensePositionName(expensePositionObj.getPositionName());
         expensePositionToUpdate.setAmount(BigDecimal.valueOf(expensePositionObj.getAmount()));
         expensePositionToUpdate.setSize(BigDecimal.valueOf(expensePositionObj.getSize()));
-        return expensePositionRepository.save(expensePositionToUpdate);
+        ExpensePosition saved = expensePositionRepository.save(expensePositionToUpdate);
+        log.debug("Expense position has been updated: " + saved.getExpensePositionName() + " for expense: " + saved.getExpense().getExpenseName());
+        return saved;
     }
 }

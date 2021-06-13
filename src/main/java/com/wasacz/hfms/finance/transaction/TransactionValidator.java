@@ -6,6 +6,7 @@ import com.wasacz.hfms.utils.ValidatorUtils;
 public class TransactionValidator {
 
     public static void validateFinance(AbstractTransaction transaction) {
+        ValidatorUtils.handleFieldIsNull(transaction.getTransactionDate(), "transaction date");
         ValidatorUtils.handleFieldBlank(transaction.getName(), "name");
         isNotNullAndBiggerThanZero(transaction.getAmount(), "Amount must be bigger than 0.");
     }
