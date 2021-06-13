@@ -27,7 +27,7 @@ public class TransactionSummaryProvider {
         }
 
         LocalDate now = LocalDate.now();
-        LocalDate createdDate = theOldestTransactionForCategory.getCreatedDate();
+        LocalDate createdDate = theOldestTransactionForCategory.getCreatedDate().withDayOfMonth(1);
         Map<YearMonth, Double> summaryMap = new HashMap<>();
 
         while(!createdDate.isAfter(now)) {
