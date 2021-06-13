@@ -1,6 +1,7 @@
 package com.wasacz.hfms.finance.category.expense;
 
 import com.wasacz.hfms.persistence.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -9,6 +10,7 @@ import java.time.YearMonth;
 import static com.wasacz.hfms.utils.HexColorUtils.getRandomHexColor;
 
 @Component
+@Slf4j
 public class ExpenseCategorySaver {
 
     private final ExpenseCategoryVersionRepository expenseCategoryVersionRepository;
@@ -41,7 +43,9 @@ public class ExpenseCategorySaver {
 
     public ExpenseCategoryVersion saveExpenseCategoryVersion(BigDecimal maximumAmount, ExpenseCategory expenseCategoryPersistence, YearMonth validMonth) {
         ExpenseCategoryVersion expenseCategoryVersion = buildExpenseCategoryVersionPersistence(maximumAmount, expenseCategoryPersistence, validMonth);
-        return expenseCategoryVersionRepository.save(expenseCategoryVersion);
+        ExpenseCategoryVersion saved = expenseCategoryVersionRepository.save(expenseCategoryVersion);
+        log.debug("Expense category version: " + expenseCategoryPersistence.getCategoryName() + " for month: " + validMonth.toString() + " has been saved");
+        return saved;
     }
 
     private ExpenseCategoryVersion buildExpenseCategoryVersionPersistence(BigDecimal maximumAmount, ExpenseCategory expenseCategoryPersistence) {

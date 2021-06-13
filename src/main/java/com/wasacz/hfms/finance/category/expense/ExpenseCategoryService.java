@@ -7,6 +7,7 @@ import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryVersio
 import com.wasacz.hfms.finance.transaction.TransactionType;
 import com.wasacz.hfms.persistence.*;
 import com.wasacz.hfms.utils.date.DateTime;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.YearMonth;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ExpenseCategoryService implements ICategoryService {
 
     private final ExpenseCategoryRepository expenseCategoryRepository;
@@ -34,19 +36,22 @@ public class ExpenseCategoryService implements ICategoryService {
     @Override
     public ExpenseCategoryResponse addCategory(AbstractCategory categoryRequest, User user) {
         if(!(categoryRequest instanceof ExpenseCategoryObj)) {
-            throw new IllegalStateException("Incorrect object!");
+            log.error("Provide incorrect object!");
+            throw new IllegalStateException("Provide incorrect object!");
         }
         ExpenseCategoryObj expenseCategoryObj = (ExpenseCategoryObj) categoryRequest;
         CategoryValidator.validate(expenseCategoryObj);
         ExpenseCategoryVersion expenseCategoryVersionSaved = expenseCategorySaver.saveExpenseCategory(expenseCategoryObj, user);
+        log.debug("Expense category version has been saved: %s for month: %s".formatted(expenseCategoryVersionSaved.getExpenseCategory().getCategoryName(), expenseCategoryVersionSaved.getValidMonth().toString()));
         return mapExpenseCategoryResponse(expenseCategoryVersionSaved.getExpenseCategory());
     }
 
     @Override
-    public ExpenseCategoryResponse setAsFavourite(long categoryId, boolean isFavourite, User user) {
+    public ExpenseCategoryResponse toggleFavourite(long categoryId, boolean isFavourite, User user) {
         ExpenseCategory expenseCategoryToUpdate = findByIdAndUser(categoryId, user);
         expenseCategoryToUpdate.setIsFavourite(isFavourite);
         ExpenseCategory updatedExpenseCategory = expenseCategoryRepository.save(expenseCategoryToUpdate);
+        log.debug("Expense category " + updatedExpenseCategory.getCategoryName() + " favourite field has been toggled to: " + isFavourite);
         return mapExpenseCategoryResponse(updatedExpenseCategory);
     }
 
@@ -55,13 +60,17 @@ public class ExpenseCategoryService implements ICategoryService {
         ExpenseCategory expenseCategory = findByIdAndUser(expenseCategoryId, user);
         expenseCategory.setIsDeleted(true);
         ExpenseCategory updatedExpenseCategory = expenseCategoryRepository.save(expenseCategory);
+        log.debug("Expense category " + updatedExpenseCategory.getCategoryName() + " has been deleted");
         return mapExpenseCategoryResponse(updatedExpenseCategory);
     }
 
     public ExpenseCategory findByIdAndUser(long expenseCategoryId, User user) {
         return expenseCategoryRepository
                 .findByIdAndUserAndIsDeletedFalse(expenseCategoryId, user)
-                .orElseThrow(() -> new IllegalArgumentException("Expense category not found."));
+                .orElseThrow(() -> {
+                    log.warn("Expense category " + expenseCategoryId + " not found.");
+                    throw new IllegalArgumentException("Expense category not found.");
+                });
     }
 
     @Override
@@ -84,6 +93,7 @@ public class ExpenseCategoryService implements ICategoryService {
             expenseCategory.setColorHex(newColorHex);
         }
         ExpenseCategory updatedExpenseCategory = expenseCategoryRepository.save(expenseCategory);
+        log.debug("Expense category " + updatedExpenseCategory.getCategoryName() + " has been edited.");
         return mapExpenseCategoryResponse(updatedExpenseCategory);
     }
 

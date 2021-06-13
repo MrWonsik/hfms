@@ -31,7 +31,6 @@ public class AuthService {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        log.debug("{} authenticated correct.", username);
     }
 
     public String generateToken() {

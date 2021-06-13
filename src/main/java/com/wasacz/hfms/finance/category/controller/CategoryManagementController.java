@@ -53,7 +53,7 @@ public class CategoryManagementController {
                                                     @PathVariable("id") long categoryId,
                                                     @PathVariable("type") CategoryType categoryType,
                                                     @RequestBody CategoryIsFavouriteRequest request) {
-        AbstractCategoryResponse response = categoryServiceFactory.getService(categoryType).setAsFavourite(categoryId, request.getIsFavourite(), user.getUser());
+        AbstractCategoryResponse response = categoryServiceFactory.getService(categoryType).toggleFavourite(categoryId, request.getIsFavourite(), user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

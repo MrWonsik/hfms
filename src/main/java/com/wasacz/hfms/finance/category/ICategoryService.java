@@ -8,7 +8,7 @@ public interface ICategoryService {
 
      AbstractCategoryResponse addCategory(AbstractCategory categoryRequest, User user);
 
-     AbstractCategoryResponse setAsFavourite(long categoryId, boolean isFavourite, User user);
+     AbstractCategoryResponse toggleFavourite(long categoryId, boolean isFavourite, User user);
 
      AbstractCategoryResponse deleteCategory(long categoryId, User user);
 

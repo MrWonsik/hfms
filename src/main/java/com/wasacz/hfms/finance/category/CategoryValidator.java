@@ -3,11 +3,13 @@ package com.wasacz.hfms.finance.category;
 import com.wasacz.hfms.finance.category.expense.ExpenseCategoryObj;
 import com.wasacz.hfms.finance.category.income.IncomeCategoryObj;
 import com.wasacz.hfms.utils.ValidatorUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 
 import static com.wasacz.hfms.utils.HexColorUtils.*;
 
+@Slf4j
 public class CategoryValidator {
 
     public static void validate(ExpenseCategoryObj expenseCategory) {
@@ -33,6 +35,7 @@ public class CategoryValidator {
             return;
         }
         if(maximumAmount.compareTo(BigDecimal.ZERO) < 0) {
+            log.debug("Maximum amount should be grater than 0. Provided: " + maximumAmount);
             throw new IllegalArgumentException("Maximum amount should be grater than 0.");
         }
     }
@@ -46,6 +49,7 @@ public class CategoryValidator {
             return;
         }
         if(isNotCorrectHexColor(hexColor)) {
+            log.debug("Incorrect hex color provided. Provided:" + hexColor);
             throw new IllegalArgumentException("Incorrect hex color provided.");
         }
     }

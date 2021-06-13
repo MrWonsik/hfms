@@ -82,7 +82,7 @@ class IncomeCategoryServiceTest {
         when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(TransactionType.class))).thenReturn(Collections.emptyMap());
 
         //when
-        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.setAsFavourite(1L, true, user);
+        IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.toggleFavourite(1L, true, user);
 
         //then
         assertTrue(incomeCategoryResponse.isFavourite());
@@ -124,7 +124,7 @@ class IncomeCategoryServiceTest {
 
         //then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> incomeCategoryService.setAsFavourite(1L, false, user));
+                () -> incomeCategoryService.toggleFavourite(1L, false, user));
         assertEquals(exception.getMessage(), "Income category not found.");
     }
 
