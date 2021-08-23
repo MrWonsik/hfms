@@ -66,7 +66,7 @@ class ShopManagementControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("shopName cannot be blank."));
+                .andExpect(status().reason("Field: shopName cannot be blank."));
     }
 
     @Test

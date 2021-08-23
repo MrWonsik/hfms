@@ -4,6 +4,7 @@ import com.wasacz.hfms.finance.category.CategoryServiceFactory;
 import com.wasacz.hfms.finance.category.CategoryType;
 import com.wasacz.hfms.finance.category.controller.AbstractCategoryResponse;
 import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
+import com.wasacz.hfms.finance.category.expense.ExpenseCategoryVersionService;
 import com.wasacz.hfms.finance.transaction.TransactionServiceFactory;
 import com.wasacz.hfms.finance.transaction.TransactionType;
 import com.wasacz.hfms.finance.transaction.expense.ExpenseObj;
@@ -37,8 +38,9 @@ public class ExampleUserFactory {
     private final UserRepository userRepository;
     private final CategoryServiceFactory categoryServiceFactory;
     private final Randomizer randomizer;
+    private final ExpenseCategoryVersionService expenseCategoryVersionService;
 
-    public ExampleUserFactory(UserManagementService userManagementService, TransactionServiceFactory transactionServiceFactory, UserRepository userRepository, CategoryServiceFactory categoryServiceFactory, Randomizer randomizer) {
+    public ExampleUserFactory(UserManagementService userManagementService, TransactionServiceFactory transactionServiceFactory, UserRepository userRepository, CategoryServiceFactory categoryServiceFactory, Randomizer randomizer, ExpenseCategoryVersionService expenseCategoryVersionService) {
         this.userManagementService = userManagementService;
         this.transactionServiceFactory = transactionServiceFactory;
         this.userRepository = userRepository;
@@ -46,6 +48,7 @@ public class ExampleUserFactory {
         this.randomizer = randomizer;
         incomeCategories = randomizer.getIncomeCategories();
         expenseCategories = randomizer.getExpenseCategories();
+        this.expenseCategoryVersionService = expenseCategoryVersionService;
     }
 
 
@@ -71,7 +74,18 @@ public class ExampleUserFactory {
     private void createExampleUser() {
         userManagementService.createUser(CreateUserRequest.builder().username("example").password("Example123!@").role("ROLE_USER").build());
         User user = userRepository.findByUsername("example").orElseThrow(() -> new IllegalStateException("Something goes wrong while creating example user..."));
+        createExamplePlannedAmounts(user);
         createExampleTransactions(user);
+    }
+
+    private void createExamplePlannedAmounts(User user) {
+        CategoriesResponse allExpenseCategories = categoryServiceFactory.getService(CategoryType.EXPENSE).getAllCategories(user);
+        allExpenseCategories.getCategories().forEach(abstractCategoryResponse -> {
+                    if (expenseCategories.containsKey(abstractCategoryResponse.getCategoryName())) {
+                        Randomizer.Properties properties = expenseCategories.get(abstractCategoryResponse.getCategoryName());
+                        expenseCategoryVersionService.editCategoryVersion(user, abstractCategoryResponse.getId(), properties.getPlannedAmount().doubleValue());
+                    }
+                });
     }
 
     private void createExampleTransactions(User user) {

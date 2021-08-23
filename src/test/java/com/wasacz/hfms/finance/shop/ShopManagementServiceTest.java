@@ -55,7 +55,7 @@ class ShopManagementServiceTest {
         //then
         IllegalStateException exception = assertThrows(IllegalStateException.class,
                 () -> shopManagementService.addNewShop(shop, user));
-        assertEquals(exception.getMessage(), "shopName cannot be blank.");
+        assertEquals(exception.getMessage(), "Field: shopName cannot be blank.");
     }
 
 

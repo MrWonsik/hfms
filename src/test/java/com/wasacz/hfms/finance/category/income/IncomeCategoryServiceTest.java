@@ -278,7 +278,7 @@ class IncomeCategoryServiceTest {
         //then
         IllegalStateException exception = assertThrows(IllegalStateException.class,
                 () -> incomeCategoryService.editCategory(1L, "", null, user));
-        assertEquals(exception.getMessage(), "categoryName cannot be blank.");
+        assertEquals(exception.getMessage(), "Field: categoryName cannot be blank.");
     }
 
     @Test

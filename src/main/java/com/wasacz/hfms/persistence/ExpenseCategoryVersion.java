@@ -25,7 +25,7 @@ public class ExpenseCategoryVersion {
     private Long id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ExpenseCategory expenseCategory;
 

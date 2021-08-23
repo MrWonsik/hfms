@@ -64,7 +64,7 @@ class UserValidatorTest {
 
         IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
                 () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)));
-        assertEquals("Username cannot be blank.", exception.getMessage());
+        assertEquals("Field: Username cannot be blank.", exception.getMessage());
 
     }
 
@@ -76,7 +76,7 @@ class UserValidatorTest {
 
         IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
                 () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)));
-        assertEquals("Password cannot be blank.", exception.getMessage());
+        assertEquals("Field: Password cannot be blank.", exception.getMessage());
 
     }
 
@@ -99,7 +99,7 @@ class UserValidatorTest {
 
         IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
                 () -> userValidator.validate(null, createUserRequest, new UserCreateValidator(userRepository)));
-        assertEquals("Role cannot be blank.", exception.getMessage());
+        assertEquals("Field: Role cannot be blank.", exception.getMessage());
     }
 
     @Test

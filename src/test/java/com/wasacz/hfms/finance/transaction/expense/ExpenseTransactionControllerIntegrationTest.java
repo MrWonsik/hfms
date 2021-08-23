@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.io.File;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -69,6 +70,7 @@ class ExpenseTransactionControllerIntegrationTest {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_05_09")
                 .amount(129.99)
+                .transactionDate(LocalDate.now())
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
                 .build();
@@ -109,6 +111,7 @@ class ExpenseTransactionControllerIntegrationTest {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_05_09_2")
                 .amount(129.99)
+                .transactionDate(LocalDate.now())
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
                 .build();
@@ -147,6 +150,7 @@ class ExpenseTransactionControllerIntegrationTest {
                 .amount(129.99)
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
+                .transactionDate(LocalDate.now())
                 .build();
         MvcResult expense = this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))

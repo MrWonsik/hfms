@@ -81,12 +81,19 @@ class ExpensePositionServiceTest {
         newExpenses.add(ExpensePositionObj.builder().id(1L).positionName("Position1_edit").size(1d).amount(123d).build());
         newExpenses.add(ExpensePositionObj.builder().id(null).positionName("Position2").size(1d).amount(123d).build());
 
-        ExpensePosition newExpensePosition = ExpensePosition.builder().id(1L).expensePositionName("Position1").size(BigDecimal.valueOf(1)).amount(BigDecimal.valueOf(122d)).build();
+        ExpensePosition newExpensePosition = ExpensePosition.builder()
+                .id(1L)
+                .expensePositionName("Position1")
+                .size(BigDecimal.valueOf(1))
+                .amount(BigDecimal.valueOf(122d))
+                .expense(expense)
+                .build();
 
         when(expense.getId()).thenReturn(1L);
         when(repository.findAllByExpenseId(1L)).thenReturn(Optional.of(oldExpenses));
         when(repository.findById(1L)).thenReturn(Optional.of(newExpensePosition));
         when(repository.save(any())).then(returnsFirstArg());
+        when(expense.getExpenseName()).thenReturn("ExpenseName");
 
         //when
         List<ExpensePosition> expensePositionList = expensePositionService.updateExpensePositions(expense, newExpenses);

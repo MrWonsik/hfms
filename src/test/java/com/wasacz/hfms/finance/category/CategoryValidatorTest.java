@@ -61,7 +61,7 @@ class CategoryValidatorTest {
 
         //when and then
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> CategoryValidator.validate(expenseCategoryObj));
-        assertEquals("categoryName cannot be blank.", exception.getMessage());
+        assertEquals("Field: categoryName cannot be blank.", exception.getMessage());
     }
 
     @Test

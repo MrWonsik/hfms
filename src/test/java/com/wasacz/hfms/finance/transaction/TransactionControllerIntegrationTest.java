@@ -32,6 +32,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.Year;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -234,6 +235,7 @@ public class TransactionControllerIntegrationTest {
                 .amount(129.99)
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
+                .transactionDate(LocalDate.now())
                 .build();
         MvcResult expense = this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(FileToMultipartFileConverter.convertFileToMultiPart("src/test/resources/receipt_test.jpg"))
@@ -261,6 +263,7 @@ public class TransactionControllerIntegrationTest {
                 .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
                 .transactionType("Expense")
+                .transactionDate(LocalDate.now())
                 .build();
         MvcResult expense = this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
@@ -288,6 +291,7 @@ public class TransactionControllerIntegrationTest {
                 .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions)
+                .transactionDate(LocalDate.now())
                 .transactionType("Expense")
                 .build();
         MvcResult expense = this.mockMvc.perform(multipart("/api/transaction/expense/")
@@ -317,13 +321,14 @@ public class TransactionControllerIntegrationTest {
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions)
                 .transactionType("Expense")
+                .transactionDate(LocalDate.now())
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
                 .with(user(currentUser))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("positionName cannot be blank."));
+                .andExpect(status().reason("Field: positionName cannot be blank."));
     }
 
     @Test
@@ -334,6 +339,7 @@ public class TransactionControllerIntegrationTest {
                 .expenseName("expense_2021_04_22")
                 .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
+                .transactionDate(LocalDate.now())
                 .expensePositions(expensePositions)
                 .transactionType("Expense")
                 .build();
@@ -349,6 +355,7 @@ public class TransactionControllerIntegrationTest {
         ExpenseObj expenseObj2 = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
                 .amount(129.99)
+                .transactionDate(LocalDate.now())
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions2)
                 .transactionType("Expense")
@@ -369,6 +376,7 @@ public class TransactionControllerIntegrationTest {
                 .expenseName("expense_2021_04_22")
                 .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
+                .transactionDate(LocalDate.now())
                 .expensePositions(expensePositions)
                 .transactionType("Expense")
                 .build();
@@ -413,6 +421,7 @@ public class TransactionControllerIntegrationTest {
                 .shop(ShopObj.builder().id(99999999L).build())
                 .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
+                .transactionDate(LocalDate.now())
                 .transactionType("Expense")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
@@ -429,6 +438,7 @@ public class TransactionControllerIntegrationTest {
                 .expenseName("expense_2021_04_22")
                 .amount(129.99)
                 .categoryId(99999L)
+                .transactionDate(LocalDate.now())
                 .transactionType("EXPENSE")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
@@ -445,6 +455,7 @@ public class TransactionControllerIntegrationTest {
                 .name("income_2021_04_22")
                 .amount(129.99)
                 .categoryId(99999L)
+                .transactionDate(LocalDate.now())
                 .transactionType("INCOME")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/income/")
@@ -461,6 +472,7 @@ public class TransactionControllerIntegrationTest {
                 .expenseName("expense_2021_04_22")
                 .amount(129.99)
                 .transactionType("Expense")
+                .transactionDate(LocalDate.now())
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
@@ -476,6 +488,7 @@ public class TransactionControllerIntegrationTest {
                 .name("income_2021_04_22")
                 .amount(129.99)
                 .transactionType("Income")
+                .transactionDate(LocalDate.now())
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/income/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(incomeObj).getBytes()))
@@ -491,6 +504,7 @@ public class TransactionControllerIntegrationTest {
                 .amount(129.99)
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
+                .transactionDate(LocalDate.now())
                 .transactionType("Expense")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
@@ -498,7 +512,7 @@ public class TransactionControllerIntegrationTest {
                 .with(user(currentUser))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("name cannot be blank."));
+                .andExpect(status().reason("Field: name cannot be blank."));
     }
 
     @Test
@@ -508,6 +522,7 @@ public class TransactionControllerIntegrationTest {
                 .amount(-129.99)
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
+                .transactionDate(LocalDate.now())
                 .transactionType("Expense")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
@@ -540,6 +555,7 @@ public class TransactionControllerIntegrationTest {
                 .name("income_2021_04_22")
                 .amount(-129.99)
                 .categoryId(incomeCategoryResponse.getId())
+                .transactionDate(LocalDate.now())
                 .transactionType("Income")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/income/")
@@ -608,6 +624,7 @@ public class TransactionControllerIntegrationTest {
         ExpenseObj expenseObjectBody = ExpenseObj.builder()
                 .expenseName("Updated_name")
                 .amount(2000d)
+                .transactionDate(LocalDate.now())
                 .shop(ShopObj.builder().name("updated_shop").build())
                 .categoryId(expenseCategoryResponse.getId())
                 .build();
@@ -628,13 +645,15 @@ public class TransactionControllerIntegrationTest {
 
     @Test
     public void whenUpdateIncome_givenIncomeRequest_thenReturnOkStatus() throws Exception {
-        MvcResult income = createIncome("income_2021_05_09", 129.99, currentUser, incomeCategoryResponse.getId(), LocalDate.now());
+        LocalDate now = LocalDate.now();
+        MvcResult income = createIncome("income_2021_05_09", 129.99, currentUser, incomeCategoryResponse.getId(), now);
 
         IncomeResponse incomeResponse = objectMapper.readValue(income.getResponse().getContentAsString(), IncomeResponse.class);
 
         IncomeObj incomeObjectBody = IncomeObj.builder()
                 .name("Updated_name")
                 .amount(2000d)
+                .transactionDate(now.minusDays(20))
                 .categoryId(incomeCategoryResponse.getId())
                 .build();
         MvcResult updatedIncomeResult = this.mockMvc.perform(put("/api/transaction/income/" + incomeResponse.getId())

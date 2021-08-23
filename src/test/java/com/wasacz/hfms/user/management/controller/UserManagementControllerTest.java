@@ -55,7 +55,7 @@ class UserManagementControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("Username cannot be blank."));
+                .andExpect(status().reason("Field: Username cannot be blank."));
     }
 
     @Test

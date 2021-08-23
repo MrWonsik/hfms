@@ -212,7 +212,7 @@ class CategoryControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("categoryName cannot be blank."));
+                .andExpect(status().reason("Field: categoryName cannot be blank."));
     }
 
     @Test
@@ -360,7 +360,7 @@ class CategoryControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("categoryName cannot be blank."));
+                .andExpect(status().reason("Field: categoryName cannot be blank."));
     }
 
     @Test
