@@ -26,6 +26,8 @@ public class ReceiptFileService {
     @Value("${app.receipt.storage.path}")
     private String destinationPath;
 
+    private final String SEPARATOR = System.getProperty("file.separator");
+
     private final ReceiptFileRepository repository;
 
     public ReceiptFileService(ReceiptFileRepository repository) {
@@ -41,8 +43,8 @@ public class ReceiptFileService {
             log.warn(msg);
             throw new IllegalStateException(msg);
         }
-        String dirPath = "%s/%s".formatted(destinationPath, username);
-        String filePathname = "%s/%s_%s.jpg".formatted(dirPath, expense.getExpenseName(), Instant.now().getEpochSecond());
+        String dirPath = destinationPath + SEPARATOR + username;
+        String filePathname = dirPath + SEPARATOR + expense.getExpenseName() + "_" + Instant.now().getEpochSecond();
         try {
             Files.createDirectories(Paths.get(dirPath));
             File newFile = new File(filePathname);
@@ -112,7 +114,7 @@ public class ReceiptFileService {
         ReceiptFile receiptFile = file.get();
 
         try {
-            Files.delete(Path.of(receiptFile.getReceiptFilePath() + "\\" + receiptFile.getFileName()));
+            Files.delete(Path.of(receiptFile.getReceiptFilePath() + SEPARATOR + receiptFile.getFileName()));
             repository.delete(receiptFile);
         } catch (IOException e) {
             log.error("Error while delete the file: {} - {}", e.getClass(), e.getMessage());

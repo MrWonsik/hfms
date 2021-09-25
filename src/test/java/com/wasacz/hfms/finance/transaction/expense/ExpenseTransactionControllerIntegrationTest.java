@@ -57,7 +57,10 @@ class ExpenseTransactionControllerIntegrationTest {
 
     @BeforeAll
     public void setup() throws Exception {
-        FileUtils.cleanDirectory(new File(destinationPath));
+        File directory = new File(destinationPath);
+        if(directory.exists()) {
+            FileUtils.cleanDirectory(directory);
+        }
         currentUser = currentUserMock.createMockUser("User_expense_2", Role.ROLE_USER);
         MvcResult shop = ShopCreatorStatic.callCreateShopEndpoint(mockMvc, "existing_shop_2", currentUser);
         shopResponse = objectMapper.readValue(shop.getResponse().getContentAsString(), ShopResponse.class);
