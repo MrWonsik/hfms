@@ -10,9 +10,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class AppInitializer implements CommandLineRunner {
 
-    @Value("${spring.jpa.hibernate.ddl-auto:\"\"}")
-    private String ddlAuto;
-
     @Value("${recreateExampleUser:false}")
     private boolean recreateExampleUser;
 
@@ -25,12 +22,10 @@ public class AppInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (ddlAuto.equals("create")) {
-            exampleUserFactory.produceBasicUsers();
-        }
+        exampleUserFactory.generateAdminUser();
 
         if (recreateExampleUser) {
-            exampleUserFactory.produceExampleUser();
+            exampleUserFactory.genarateExampleUser();
         }
     }
 

@@ -37,7 +37,6 @@ public class ExampleUserFactory {
     private final TransactionServiceFactory transactionServiceFactory;
     private final UserRepository userRepository;
     private final CategoryServiceFactory categoryServiceFactory;
-    private final Randomizer randomizer;
     private final ExpenseCategoryVersionService expenseCategoryVersionService;
 
     public ExampleUserFactory(UserManagementService userManagementService, TransactionServiceFactory transactionServiceFactory, UserRepository userRepository, CategoryServiceFactory categoryServiceFactory, Randomizer randomizer, ExpenseCategoryVersionService expenseCategoryVersionService) {
@@ -45,19 +44,20 @@ public class ExampleUserFactory {
         this.transactionServiceFactory = transactionServiceFactory;
         this.userRepository = userRepository;
         this.categoryServiceFactory = categoryServiceFactory;
-        this.randomizer = randomizer;
         incomeCategories = randomizer.getIncomeCategories();
         expenseCategories = randomizer.getExpenseCategories();
         this.expenseCategoryVersionService = expenseCategoryVersionService;
     }
 
 
-    public void produceBasicUsers() {
-        userManagementService.createUser(CreateUserRequest.builder().username("admin").password("Admin123!@").role("ROLE_ADMIN").build());
-        userManagementService.createUser(CreateUserRequest.builder().username("user").password("User123!@").role("ROLE_USER").build());
+    public void generateAdminUser() {
+        Optional<User> admin = userRepository.findByUsername("admin");
+        if(admin.isEmpty()) {
+            userManagementService.createUser(CreateUserRequest.builder().username("admin").password("Admin123!@").role("ROLE_ADMIN").build());
+        }
     }
 
-    public void produceExampleUser() {
+    public void genarateExampleUser() {
         Optional<User> example = userRepository.findByUsername("example");
         if (example.isPresent()) {
             deleteAndCreateExampleUser(example.get());
