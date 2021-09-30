@@ -1,5 +1,5 @@
 package com.wasacz.hfms.finance.category;
 
-public enum CategoryType {
+public enum CategoryServiceType {
     INCOME, EXPENSE
 }

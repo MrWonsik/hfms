@@ -2,7 +2,7 @@ package com.wasacz.hfms.finance.category.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wasacz.hfms.finance.category.AbstractCategory;
-import com.wasacz.hfms.finance.category.CategoryType;
+import com.wasacz.hfms.finance.category.CategoryServiceType;
 import com.wasacz.hfms.finance.category.expense.ExpenseCategoryObj;
 import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
 import com.wasacz.hfms.finance.category.income.IncomeCategoryObj;
@@ -60,20 +60,20 @@ class CategoryControllerIntegrationTest {
                 .isFavourite(false)
                 .build();
 
-        var expenseCategoryResponse = (ExpenseCategoryResponse) createCategoryAndReturn(categoryObj, CategoryType.EXPENSE);
+        var expenseCategoryResponse = (ExpenseCategoryResponse) createCategoryAndReturn(categoryObj, CategoryServiceType.EXPENSE);
 
         assertFalse(expenseCategoryResponse.getExpenseCategoryVersions().isEmpty());
         assertNotNull(expenseCategoryResponse.getCurrentVersion());
     }
 
-    private AbstractCategoryResponse createCategoryAndReturn(AbstractCategory categoryObj, CategoryType type) throws Exception {
+    private AbstractCategoryResponse createCategoryAndReturn(AbstractCategory categoryObj, CategoryServiceType type) throws Exception {
         MvcResult createdCategoryResult = this.mockMvc.perform(post("/api/category/" + type.name() + "/").with(user(currentUser))
                 .content(asJsonString(categoryObj))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        if(type.equals(CategoryType.EXPENSE)) {
+        if(type.equals(CategoryServiceType.EXPENSE)) {
             return objectMapper.readValue(createdCategoryResult.getResponse().getContentAsString(), ExpenseCategoryResponse.class);
         } else {
             return objectMapper.readValue(createdCategoryResult.getResponse().getContentAsString(), IncomeCategoryResponse.class);
@@ -175,7 +175,7 @@ class CategoryControllerIntegrationTest {
                 .categoryName("Car")
                 .build();
 
-        var expenseCategoryResponse = createCategoryAndReturn(categoryObj, CategoryType.EXPENSE);
+        var expenseCategoryResponse = createCategoryAndReturn(categoryObj, CategoryServiceType.EXPENSE);
 
         assertFalse(expenseCategoryResponse.getColorHex().isEmpty());
         assertEquals("Car", expenseCategoryResponse.getCategoryName());
@@ -236,7 +236,7 @@ class CategoryControllerIntegrationTest {
                 .isFavourite(false)
                 .build();
 
-        var incomeCategoryResponse = createCategoryAndReturn(categoryObj, CategoryType.INCOME);
+        var incomeCategoryResponse = createCategoryAndReturn(categoryObj, CategoryServiceType.INCOME);
         assertFalse(incomeCategoryResponse.isFavourite());
         assertEquals("#F00", incomeCategoryResponse.getColorHex());
     }
@@ -250,7 +250,7 @@ class CategoryControllerIntegrationTest {
                 .isFavourite(false)
                 .build();
 
-        var incomeCategoryResponse = createCategoryAndReturn(categoryObj, CategoryType.INCOME);
+        var incomeCategoryResponse = createCategoryAndReturn(categoryObj, CategoryServiceType.INCOME);
 
         CategoryIsFavouriteRequest categoryIsFavouriteRequest = new CategoryIsFavouriteRequest(true);
 
@@ -284,7 +284,7 @@ class CategoryControllerIntegrationTest {
                 .isFavourite(false)
                 .build();
 
-        var incomeCategoryResponse = createCategoryAndReturn(categoryObj, CategoryType.INCOME);
+        var incomeCategoryResponse = createCategoryAndReturn(categoryObj, CategoryServiceType.INCOME);
 
         this.mockMvc.perform(delete("/api/category/income/" + incomeCategoryResponse.getId()).with(user(currentUser))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -323,7 +323,7 @@ class CategoryControllerIntegrationTest {
                 .categoryName("Work")
                 .build();
 
-        var incomeCategoryResponse = createCategoryAndReturn(categoryObj, CategoryType.INCOME);
+        var incomeCategoryResponse = createCategoryAndReturn(categoryObj, CategoryServiceType.INCOME);
 
         assertFalse(incomeCategoryResponse.getColorHex().isEmpty());
         assertEquals("Work", incomeCategoryResponse.getCategoryName());

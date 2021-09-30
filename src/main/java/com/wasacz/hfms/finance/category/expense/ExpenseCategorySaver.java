@@ -59,7 +59,7 @@ public class ExpenseCategorySaver {
         return ExpenseCategoryVersion.builder()
                 .expenseCategory(expenseCategoryPersistence)
                 .maximumAmount(maximumAmount != null ? maximumAmount : BigDecimal.ZERO)
-                .validMonth(validMonth)
+                .validMonth(validMonth.atDay(1))
                 .build();
     }
 

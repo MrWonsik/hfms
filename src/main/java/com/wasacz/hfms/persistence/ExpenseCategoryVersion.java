@@ -33,7 +33,7 @@ public class ExpenseCategoryVersion {
 
     @NotNull
     @Builder.Default
-    private YearMonth validMonth = YearMonth.now();
+    private LocalDate validMonth = LocalDate.now();
 
     @CreatedDate
     @Builder.Default

@@ -3,7 +3,7 @@ package com.wasacz.hfms.persistence;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.YearMonth;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,5 +12,5 @@ public interface ExpenseCategoryVersionRepository extends JpaRepository<ExpenseC
 
     Optional<List<ExpenseCategoryVersion>> findByExpenseCategoryId(Long id);
 
-    Optional<ExpenseCategoryVersion> findByExpenseCategoryAndValidMonth(ExpenseCategory expenseCategory, YearMonth validMonth);
+    Optional<ExpenseCategoryVersion> findByExpenseCategoryAndValidMonth(ExpenseCategory expenseCategory, LocalDate validMonth);
 }

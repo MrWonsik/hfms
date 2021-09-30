@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.YearMonth;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +50,7 @@ class ExpenseCategoryVersionServiceTest {
                 .id(1L)
                 .expenseCategory(expenseCategory)
                 .maximumAmount(BigDecimal.TEN)
-                .validMonth(YearMonth.now())
+                .validMonth(LocalDate.now())
                 .build();
 
         ExpenseCategoryVersion nextMonth = ExpenseCategoryVersion
@@ -58,7 +58,7 @@ class ExpenseCategoryVersionServiceTest {
                 .id(2L)
                 .expenseCategory(expenseCategory)
                 .maximumAmount(BigDecimal.TEN)
-                .validMonth(YearMonth.now().plusMonths(1))
+                .validMonth(LocalDate.now().plusMonths(1))
                 .build();
 
         ExpenseCategoryVersion previousMonth = ExpenseCategoryVersion
@@ -66,7 +66,7 @@ class ExpenseCategoryVersionServiceTest {
                 .id(3L)
                 .expenseCategory(expenseCategory)
                 .maximumAmount(BigDecimal.TEN)
-                .validMonth(YearMonth.now().minusMonths(1))
+                .validMonth(LocalDate.now().minusMonths(1))
                 .build();
 
         when(repository.findByExpenseCategoryId(any(Long.class))).thenReturn(Optional.of(List.of(previousMonth, currentVersion, nextMonth)));
@@ -100,7 +100,7 @@ class ExpenseCategoryVersionServiceTest {
                 .id(2L)
                 .expenseCategory(expenseCategory)
                 .maximumAmount(BigDecimal.TEN)
-                .validMonth(YearMonth.now().plusMonths(1))
+                .validMonth(LocalDate.now().plusMonths(1))
                 .build();
 
         ExpenseCategoryVersion previousVersion = ExpenseCategoryVersion
@@ -108,7 +108,7 @@ class ExpenseCategoryVersionServiceTest {
                 .id(3L)
                 .expenseCategory(expenseCategory)
                 .maximumAmount(BigDecimal.TEN)
-                .validMonth(YearMonth.now().minusMonths(3))
+                .validMonth(LocalDate.now().minusMonths(3))
                 .build();
 
         when(repository.findByExpenseCategoryId(any(Long.class))).thenReturn(Optional.of(List.of(previousVersion, nextMonth)));
@@ -154,7 +154,7 @@ class ExpenseCategoryVersionServiceTest {
                 .id(2L)
                 .expenseCategory(expenseCategory)
                 .maximumAmount(BigDecimal.TEN)
-                .validMonth(YearMonth.now().plusMonths(1))
+                .validMonth(LocalDate.now().plusMonths(1))
                 .build();
 
 

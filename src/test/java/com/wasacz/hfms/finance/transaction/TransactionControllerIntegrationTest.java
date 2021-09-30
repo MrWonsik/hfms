@@ -113,7 +113,6 @@ public class TransactionControllerIntegrationTest {
                 .shop(ShopObj.builder().name(shopName).build())
                 .categoryId(categoryId)
                 .transactionDate(date)
-                .transactionType("EXPENSE")
                 .build();
         return this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
@@ -129,7 +128,6 @@ public class TransactionControllerIntegrationTest {
                 .amount(amount)
                 .categoryId(categoryId)
                 .transactionDate(date)
-                .transactionType("INCOME")
                 .build();
         return this.mockMvc.perform(multipart("/api/transaction/income/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(incomeObj).getBytes()))
@@ -265,7 +263,6 @@ public class TransactionControllerIntegrationTest {
                 .expenseName("expense_2021_04_22")
                 .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
-                .transactionType("Expense")
                 .transactionDate(LocalDate.now())
                 .build();
         MvcResult expense = this.mockMvc.perform(multipart("/api/transaction/expense/")
@@ -295,7 +292,6 @@ public class TransactionControllerIntegrationTest {
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions)
                 .transactionDate(LocalDate.now())
-                .transactionType("Expense")
                 .build();
         MvcResult expense = this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
@@ -323,7 +319,6 @@ public class TransactionControllerIntegrationTest {
                 .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions)
-                .transactionType("Expense")
                 .transactionDate(LocalDate.now())
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
@@ -344,7 +339,6 @@ public class TransactionControllerIntegrationTest {
                 .categoryId(expenseCategoryResponse.getId())
                 .transactionDate(LocalDate.now())
                 .expensePositions(expensePositions)
-                .transactionType("Expense")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
@@ -361,7 +355,6 @@ public class TransactionControllerIntegrationTest {
                 .transactionDate(LocalDate.now())
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions2)
-                .transactionType("Expense")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj2).getBytes()))
@@ -381,7 +374,6 @@ public class TransactionControllerIntegrationTest {
                 .categoryId(expenseCategoryResponse.getId())
                 .transactionDate(LocalDate.now())
                 .expensePositions(expensePositions)
-                .transactionType("Expense")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
@@ -397,7 +389,6 @@ public class TransactionControllerIntegrationTest {
                 .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
                 .expensePositions(expensePositions2)
-                .transactionType("Expense")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
@@ -425,7 +416,6 @@ public class TransactionControllerIntegrationTest {
                 .amount(129.99)
                 .categoryId(expenseCategoryResponse.getId())
                 .transactionDate(LocalDate.now())
-                .transactionType("Expense")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
@@ -442,7 +432,6 @@ public class TransactionControllerIntegrationTest {
                 .amount(129.99)
                 .categoryId(99999L)
                 .transactionDate(LocalDate.now())
-                .transactionType("EXPENSE")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
@@ -459,7 +448,6 @@ public class TransactionControllerIntegrationTest {
                 .amount(129.99)
                 .categoryId(99999L)
                 .transactionDate(LocalDate.now())
-                .transactionType("INCOME")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/income/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(incomeObj).getBytes()))
@@ -474,7 +462,6 @@ public class TransactionControllerIntegrationTest {
         ExpenseObj expenseObj = ExpenseObj.builder()
                 .expenseName("expense_2021_04_22")
                 .amount(129.99)
-                .transactionType("Expense")
                 .transactionDate(LocalDate.now())
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
@@ -490,7 +477,6 @@ public class TransactionControllerIntegrationTest {
         IncomeObj incomeObj = IncomeObj.builder()
                 .name("income_2021_04_22")
                 .amount(129.99)
-                .transactionType("Income")
                 .transactionDate(LocalDate.now())
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/income/")
@@ -508,7 +494,6 @@ public class TransactionControllerIntegrationTest {
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
                 .transactionDate(LocalDate.now())
-                .transactionType("Expense")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
@@ -526,7 +511,6 @@ public class TransactionControllerIntegrationTest {
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
                 .transactionDate(LocalDate.now())
-                .transactionType("Expense")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
@@ -540,7 +524,6 @@ public class TransactionControllerIntegrationTest {
                 .amount(null)
                 .shop(ShopObj.builder().id(shopResponse.getId()).build())
                 .categoryId(expenseCategoryResponse.getId())
-                .transactionType("Expense")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/expense/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(expenseObj).getBytes()))
@@ -559,7 +542,6 @@ public class TransactionControllerIntegrationTest {
                 .amount(-129.99)
                 .categoryId(incomeCategoryResponse.getId())
                 .transactionDate(LocalDate.now())
-                .transactionType("Income")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/income/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(incomeObj).getBytes()))
@@ -572,7 +554,6 @@ public class TransactionControllerIntegrationTest {
                 .name("income_2021_04_22")
                 .amount(null)
                 .categoryId(incomeCategoryResponse.getId())
-                .transactionType("Income")
                 .build();
         this.mockMvc.perform(multipart("/api/transaction/income/")
                 .file(new MockMultipartFile("transaction", "", "application/json", objectMapper.writeValueAsString(incomeObj).getBytes()))

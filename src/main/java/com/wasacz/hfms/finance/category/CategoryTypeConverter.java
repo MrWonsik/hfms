@@ -6,12 +6,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class CategoryTypeConverter implements Converter<String, CategoryType> {
+public class CategoryTypeConverter implements Converter<String, CategoryServiceType> {
 
     @Override
-    public CategoryType convert(String value) {
+    public CategoryServiceType convert(String value) {
         try {
-            return CategoryType.valueOf(value.toUpperCase());
+            return CategoryServiceType.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException ex) {
             log.warn("Incorrect category type " + value);
             throw new IllegalArgumentException("Incorrect category type.");

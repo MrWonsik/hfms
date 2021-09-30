@@ -38,7 +38,8 @@ public class ExpenseCategoryVersionService {
     private ExpenseCategoryVersion obtainCurrentCategoryVersion(List<ExpenseCategoryVersion> expenseCategoryVersions) {
         Optional<ExpenseCategoryVersion> newestVersionOptional = expenseCategoryVersions
                 .stream()
-                .filter(expenseCategoryVersion -> expenseCategoryVersion.getValidMonth().isBefore(YearMonth.now().plusMonths(1)))
+                .filter(expenseCategoryVersion -> YearMonth.of(expenseCategoryVersion.getValidMonth().getYear(), expenseCategoryVersion.getValidMonth().getMonth())
+                        .isBefore(YearMonth.now().plusMonths(1)))
                 .max(Comparator.comparing(ExpenseCategoryVersion::getValidMonth));
         if(newestVersionOptional.isEmpty()) {
             log.error("Not found current version!");
@@ -66,7 +67,7 @@ public class ExpenseCategoryVersionService {
         findExpenseCategoryByIdAndUser(categoryId, user);
         ExpenseCategoryVersion currentCategoryVersion = getCurrentCategoryVersion(categoryId);
 
-        if(currentCategoryVersion.getValidMonth().isBefore(YearMonth.now())) {
+        if(currentCategoryVersion.getValidMonth().isBefore(YearMonth.now().atEndOfMonth())) {
             return addNewVersion(user, categoryId, newMaximumAmount, YearMonth.now());
         }
         return updateCategoryVersion(currentCategoryVersion, newMaximumAmount);
@@ -74,7 +75,7 @@ public class ExpenseCategoryVersionService {
 
     private ExpenseCategoryVersion addNewVersion(User user, long categoryId, Double newMaximumAmount, YearMonth validMonth) {
         ExpenseCategory category = findExpenseCategoryByIdAndUser(categoryId, user);
-        Optional<ExpenseCategoryVersion> expenseCategoryVersionOptional = expenseCategoryVersionRepository.findByExpenseCategoryAndValidMonth(category, validMonth);
+        Optional<ExpenseCategoryVersion> expenseCategoryVersionOptional = expenseCategoryVersionRepository.findByExpenseCategoryAndValidMonth(category, validMonth.atDay(1));
         return expenseCategoryVersionOptional
                 .map(categoryVersion -> updateCategoryVersion(categoryVersion, newMaximumAmount))
                 .orElseGet(() -> expenseCategorySaver.saveExpenseCategoryVersion(BigDecimal.valueOf(newMaximumAmount), category, validMonth));

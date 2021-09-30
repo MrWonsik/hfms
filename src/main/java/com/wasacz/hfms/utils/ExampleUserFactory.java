@@ -1,7 +1,7 @@
 package com.wasacz.hfms.utils;
 
 import com.wasacz.hfms.finance.category.CategoryServiceFactory;
-import com.wasacz.hfms.finance.category.CategoryType;
+import com.wasacz.hfms.finance.category.CategoryServiceType;
 import com.wasacz.hfms.finance.category.controller.AbstractCategoryResponse;
 import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
 import com.wasacz.hfms.finance.category.expense.ExpenseCategoryVersionService;
@@ -79,7 +79,7 @@ public class ExampleUserFactory {
     }
 
     private void createExamplePlannedAmounts(User user) {
-        CategoriesResponse allExpenseCategories = categoryServiceFactory.getService(CategoryType.EXPENSE).getAllCategories(user);
+        CategoriesResponse allExpenseCategories = categoryServiceFactory.getService(CategoryServiceType.EXPENSE).getAllCategories(user);
         allExpenseCategories.getCategories().forEach(abstractCategoryResponse -> {
                     if (expenseCategories.containsKey(abstractCategoryResponse.getCategoryName())) {
                         Randomizer.Properties properties = expenseCategories.get(abstractCategoryResponse.getCategoryName());
@@ -94,7 +94,7 @@ public class ExampleUserFactory {
     }
 
     private void createExampleIncomeTransactions(User user) {
-        CategoriesResponse allIncomeCategories = categoryServiceFactory.getService(CategoryType.INCOME).getAllCategories(user);
+        CategoriesResponse allIncomeCategories = categoryServiceFactory.getService(CategoryServiceType.INCOME).getAllCategories(user);
         createSalaryIncomes(user, allIncomeCategories);
         createRandomIncomes(user, allIncomeCategories, "Selling", 4);
         createRandomIncomes(user, allIncomeCategories, "Gifts", 4);
@@ -111,7 +111,6 @@ public class ExampleUserFactory {
                     .name(product.getName())
                     .amount(Math.random() * (product.getMaxAmount().doubleValue() - product.getMinAmount().doubleValue()) + product.getMinAmount().doubleValue())
                     .categoryId(categoryAbstract.getId())
-                    .transactionType("INCOME")
                     .transactionDate(date)
                     .build();
             transactionServiceFactory.getService(TransactionType.INCOME).add(income, user, null);
@@ -129,7 +128,6 @@ public class ExampleUserFactory {
                     .name(product.getName())
                     .amount(Math.random() * (product.getMaxAmount().doubleValue() - product.getMinAmount().doubleValue()) + product.getMinAmount().doubleValue())
                     .categoryId(category.getId())
-                    .transactionType("INCOME")
                     .transactionDate(getRandomDate())
                     .build();
             transactionServiceFactory.getService(TransactionType.INCOME).add(income, user, null);
@@ -137,7 +135,7 @@ public class ExampleUserFactory {
     }
 
     private void createExampleExpenseTransactions(User user) {
-        CategoriesResponse allExpenseCategories = categoryServiceFactory.getService(CategoryType.EXPENSE).getAllCategories(user);
+        CategoriesResponse allExpenseCategories = categoryServiceFactory.getService(CategoryServiceType.EXPENSE).getAllCategories(user);
         createBillsExpenses(user, allExpenseCategories);
         createRandomExpense(user, allExpenseCategories, "Grocery Shopping", 200);
         createRandomExpense(user, allExpenseCategories, "Transport", 50);
@@ -162,7 +160,6 @@ public class ExampleUserFactory {
                         .expenseName(product.getName())
                         .amount(Math.random() * (product.getMaxAmount().doubleValue() - product.getMinAmount().doubleValue()) + product.getMinAmount().doubleValue())
                         .categoryId(categoryAbstract.getId())
-                        .transactionType("EXPENSE")
                         .transactionDate(date)
                         .build();
                 transactionServiceFactory.getService(TransactionType.EXPENSE).add(income, user, null);
@@ -181,7 +178,6 @@ public class ExampleUserFactory {
                     .expenseName(product.getName())
                     .amount(Math.random() * (product.getMaxAmount().doubleValue() + product.getMinAmount().doubleValue()) + product.getMinAmount().doubleValue())
                     .categoryId(category.getId())
-                    .transactionType("EXPENSE")
                     .transactionDate(getRandomDate())
                     .build();
             transactionServiceFactory.getService(TransactionType.EXPENSE).add(expense, user, null);

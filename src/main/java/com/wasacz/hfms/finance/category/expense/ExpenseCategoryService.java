@@ -98,8 +98,8 @@ public class ExpenseCategoryService implements ICategoryService {
     }
 
     @Override
-    public CategoryType getService() {
-        return CategoryType.EXPENSE;
+    public String getServiceName() {
+        return "EXPENSE_CATEGORY_SERVICE";
     }
 
 

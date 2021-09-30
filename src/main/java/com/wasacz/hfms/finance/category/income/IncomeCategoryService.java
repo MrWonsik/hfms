@@ -1,7 +1,7 @@
 package com.wasacz.hfms.finance.category.income;
 
 import com.wasacz.hfms.finance.category.AbstractCategory;
-import com.wasacz.hfms.finance.category.CategoryType;
+import com.wasacz.hfms.finance.category.CategoryServiceType;
 import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
 import com.wasacz.hfms.finance.category.CategoryValidator;
 import com.wasacz.hfms.finance.category.ICategoryService;
@@ -87,8 +87,8 @@ public class IncomeCategoryService implements ICategoryService {
     }
 
     @Override
-    public CategoryType getService() {
-        return CategoryType.INCOME;
+    public String getServiceName() {
+        return "INCOME_CATEGORY_SERVICE";
     }
 
     private IncomeCategory buildIncomeCategory(IncomeCategoryObj incomeCategoryObj, User user) {

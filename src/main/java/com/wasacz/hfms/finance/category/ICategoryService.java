@@ -16,5 +16,5 @@ public interface ICategoryService {
 
      AbstractCategoryResponse editCategory(long id, String newCategoryName, String newColorHex, User user);
 
-     CategoryType getService();
+     String getServiceName();
 }

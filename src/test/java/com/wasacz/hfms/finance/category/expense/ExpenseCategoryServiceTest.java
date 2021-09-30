@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
@@ -64,7 +65,7 @@ class ExpenseCategoryServiceTest {
                 .isDeleted(false)
                 .build();
 
-        YearMonth now = YearMonth.now();
+        LocalDate now = LocalDate.now();
         ExpenseCategoryVersion expenseCategoryVersion = ExpenseCategoryVersion
                 .builder()
                 .id(1L)
@@ -76,7 +77,7 @@ class ExpenseCategoryServiceTest {
                 .builder()
                 .id(1L)
                 .maximumAmount(BigDecimal.TEN.doubleValue())
-                .validMonth(now)
+                .validMonth(YearMonth.of(now.getYear(), now.getMonth()))
                 .isValid(true)
                 .build();
 
@@ -98,7 +99,8 @@ class ExpenseCategoryServiceTest {
         ExpenseCategoryVersionResponse currentVersion = expenseCategoryResponse.getCurrentVersion();
         assertEquals(currentVersion.getId(), expenseCategoryVersion.getId());
         assertEquals(currentVersion.getMaximumAmount(), expenseCategoryVersion.getMaximumAmount().doubleValue());
-        assertEquals(currentVersion.getValidMonth(), expenseCategoryVersion.getValidMonth());
+        LocalDate validMonth = expenseCategoryVersion.getValidMonth();
+        assertEquals(currentVersion.getValidMonth(), YearMonth.of(validMonth.getYear(), validMonth.getMonth()));
         assertTrue(currentVersion.isValid());
     }
 

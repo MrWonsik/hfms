@@ -15,8 +15,8 @@ public class ExpenseObj extends AbstractTransaction {
     private final List<ExpensePositionObj> expensePositions;
 
     @Builder
-    public ExpenseObj(Long id, Long categoryId, String expenseName, Double amount, ShopObj shop, List<ExpensePositionObj> expensePositions, String transactionType, LocalDate transactionDate) {
-        super(id, categoryId, expenseName, amount, transactionType, transactionDate);
+    public ExpenseObj(Long id, Long categoryId, String expenseName, Double amount, ShopObj shop, List<ExpensePositionObj> expensePositions, LocalDate transactionDate) {
+        super(id, categoryId, expenseName, amount, "EXPENSE", transactionDate);
         this.shop = shop;
         this.expensePositions = expensePositions;
     }
