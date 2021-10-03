@@ -1,6 +1,5 @@
 package com.wasacz.hfms.finance.category;
 
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryObj;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

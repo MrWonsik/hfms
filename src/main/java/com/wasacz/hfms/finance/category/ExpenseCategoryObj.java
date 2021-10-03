@@ -1,7 +1,6 @@
-package com.wasacz.hfms.finance.category.expense;
+package com.wasacz.hfms.finance.category;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.wasacz.hfms.finance.category.AbstractCategory;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,7 +13,7 @@ public class ExpenseCategoryObj extends AbstractCategory {
 
     @Builder
     protected ExpenseCategoryObj(String categoryName, String colorHex, Boolean isFavourite, String type, BigDecimal maximumAmount) {
-        super(categoryName, colorHex, isFavourite, type);
+        super(categoryName, colorHex, isFavourite, "EXPENSE");
         this.maximumAmount = maximumAmount;
     }
 }

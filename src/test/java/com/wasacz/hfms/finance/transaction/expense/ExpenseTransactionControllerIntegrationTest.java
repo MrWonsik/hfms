@@ -1,7 +1,7 @@
 package com.wasacz.hfms.finance.transaction.expense;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
+import com.wasacz.hfms.finance.category.controller.dto.ExpenseCategoryResponse;
 import com.wasacz.hfms.finance.shop.ShopObj;
 import com.wasacz.hfms.finance.shop.ShopResponse;
 import com.wasacz.hfms.finance.transaction.expense.receiptFile.FileReceiptResponse;

@@ -1,12 +1,13 @@
-package com.wasacz.hfms.finance.category;
+package com.wasacz.hfms.finance.category.controller;
 
+import com.wasacz.hfms.finance.category.CategoryServiceType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class CategoryTypeConverter implements Converter<String, CategoryServiceType> {
+class CategoryTypeConverter implements Converter<String, CategoryServiceType> {
 
     @Override
     public CategoryServiceType convert(String value) {

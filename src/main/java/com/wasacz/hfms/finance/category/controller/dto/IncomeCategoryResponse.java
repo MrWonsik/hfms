@@ -1,7 +1,7 @@
-package com.wasacz.hfms.finance.category.income;
+package com.wasacz.hfms.finance.category.controller.dto;
 
 
-import com.wasacz.hfms.finance.category.controller.AbstractCategoryResponse;
+import com.wasacz.hfms.finance.category.controller.dto.AbstractCategoryResponse;
 import com.wasacz.hfms.utils.date.DateTime;
 import lombok.Builder;
 import lombok.Getter;

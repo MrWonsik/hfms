@@ -2,8 +2,6 @@ package com.wasacz.hfms.finance.category;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryObj;
-import com.wasacz.hfms.finance.category.income.IncomeCategoryObj;
 import lombok.*;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "categoryType")

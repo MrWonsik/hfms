@@ -1,11 +1,7 @@
-package com.wasacz.hfms.finance.category.income;
+package com.wasacz.hfms.finance.category;
 
-import com.wasacz.hfms.finance.category.AbstractCategory;
-import com.wasacz.hfms.finance.category.CategoryServiceType;
-import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
-import com.wasacz.hfms.finance.category.CategoryValidator;
-import com.wasacz.hfms.finance.category.ICategoryService;
-import com.wasacz.hfms.finance.category.TransactionSummaryProvider;
+import com.wasacz.hfms.finance.category.controller.dto.CategoriesResponse;
+import com.wasacz.hfms.finance.category.controller.dto.IncomeCategoryResponse;
 import com.wasacz.hfms.finance.transaction.TransactionType;
 import com.wasacz.hfms.persistence.*;
 import com.wasacz.hfms.utils.date.DateTime;

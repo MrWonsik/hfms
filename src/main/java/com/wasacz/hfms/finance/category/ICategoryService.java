@@ -1,7 +1,7 @@
 package com.wasacz.hfms.finance.category;
 
-import com.wasacz.hfms.finance.category.controller.AbstractCategoryResponse;
-import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
+import com.wasacz.hfms.finance.category.controller.dto.AbstractCategoryResponse;
+import com.wasacz.hfms.finance.category.controller.dto.CategoriesResponse;
 import com.wasacz.hfms.persistence.User;
 
 public interface ICategoryService {

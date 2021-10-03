@@ -1,8 +1,8 @@
 package com.wasacz.hfms.finance.transaction;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
-import com.wasacz.hfms.finance.category.income.IncomeCategoryResponse;
+import com.wasacz.hfms.finance.category.controller.dto.ExpenseCategoryResponse;
+import com.wasacz.hfms.finance.category.controller.dto.IncomeCategoryResponse;
 import com.wasacz.hfms.finance.transaction.expense.ExpenseResponse;
 import com.wasacz.hfms.finance.shop.ShopObj;
 import com.wasacz.hfms.finance.shop.ShopResponse;
@@ -32,7 +32,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.Year;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

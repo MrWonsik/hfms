@@ -11,6 +11,4 @@ import java.util.Optional;
 public interface ExpenseCategoryVersionRepository extends JpaRepository<ExpenseCategoryVersion, Long> {
 
     Optional<List<ExpenseCategoryVersion>> findByExpenseCategoryId(Long id);
-
-    Optional<ExpenseCategoryVersion> findByExpenseCategoryAndValidMonth(ExpenseCategory expenseCategory, LocalDate validMonth);
 }

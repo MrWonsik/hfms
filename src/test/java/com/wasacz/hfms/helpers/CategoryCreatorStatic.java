@@ -1,7 +1,7 @@
 package com.wasacz.hfms.helpers;
 
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryObj;
-import com.wasacz.hfms.finance.category.income.IncomeCategoryObj;
+import com.wasacz.hfms.finance.category.ExpenseCategoryObj;
+import com.wasacz.hfms.finance.category.IncomeCategoryObj;
 import com.wasacz.hfms.security.UserPrincipal;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;

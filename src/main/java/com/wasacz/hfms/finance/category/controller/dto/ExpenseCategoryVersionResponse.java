@@ -1,4 +1,4 @@
-package com.wasacz.hfms.finance.category.expense.controller;
+package com.wasacz.hfms.finance.category.controller.dto;
 
 import com.wasacz.hfms.utils.date.DateTime;
 import lombok.*;

@@ -3,10 +3,9 @@ package com.wasacz.hfms.finance.category.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wasacz.hfms.finance.category.AbstractCategory;
 import com.wasacz.hfms.finance.category.CategoryServiceType;
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryObj;
-import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
-import com.wasacz.hfms.finance.category.income.IncomeCategoryObj;
-import com.wasacz.hfms.finance.category.income.IncomeCategoryResponse;
+import com.wasacz.hfms.finance.category.ExpenseCategoryObj;
+import com.wasacz.hfms.finance.category.IncomeCategoryObj;
+import com.wasacz.hfms.finance.category.controller.dto.*;
 import com.wasacz.hfms.helpers.CurrentUserMock;
 import com.wasacz.hfms.persistence.Role;
 import com.wasacz.hfms.security.UserPrincipal;
@@ -381,7 +380,7 @@ class CategoryControllerIntegrationTest {
 
         IncomeCategoryResponse incomeCategoryResponse = objectMapper.readValue(createdCategory.getResponse().getContentAsString(), IncomeCategoryResponse.class);
 
-        EditCategoryRequest editCategoryRequest = new EditCategoryRequest("NewName", "#aaa");
+        EditCategoryRequest editCategoryRequest = EditCategoryRequest.builder().categoryName("NewName").colorHex("#aaa").build();
 
         MvcResult editedCategory = this.mockMvc.perform(patch("/api/category/income/" + incomeCategoryResponse.getId()).with(user(currentUser))
                 .content(asJsonString(editCategoryRequest))

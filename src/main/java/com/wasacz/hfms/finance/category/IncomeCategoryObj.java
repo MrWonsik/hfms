@@ -1,7 +1,6 @@
-package com.wasacz.hfms.finance.category.income;
+package com.wasacz.hfms.finance.category;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.wasacz.hfms.finance.category.AbstractCategory;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,6 +10,6 @@ public class IncomeCategoryObj extends AbstractCategory {
 
     @Builder
     protected IncomeCategoryObj(String categoryName, String colorHex, Boolean isFavourite, String type) {
-        super(categoryName, colorHex, isFavourite, type);
+        super(categoryName, colorHex, isFavourite, "INCOME");
     }
 }

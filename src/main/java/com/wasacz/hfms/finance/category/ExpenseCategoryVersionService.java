@@ -1,6 +1,5 @@
-package com.wasacz.hfms.finance.category.expense;
+package com.wasacz.hfms.finance.category;
 
-import com.wasacz.hfms.finance.category.CategoryValidator;
 import com.wasacz.hfms.persistence.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,6 +10,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+
+import static com.wasacz.hfms.finance.category.LocalDateToYearMonthConverter.convertToYearMonth;
+import static java.util.Optional.empty;
 
 @Service
 @Slf4j
@@ -26,26 +28,19 @@ public class ExpenseCategoryVersionService {
         this.expenseCategorySaver = expenseCategorySaver;
     }
 
-    public ExpenseCategoryVersion getCurrentCategoryVersion(Long expenseCategoryId) {
-        List<ExpenseCategoryVersion> expenseCategoryVersions = expenseCategoryVersionRepository
-                .findByExpenseCategoryId(expenseCategoryId).orElseThrow(() -> {
-                    log.warn("Expense category " + expenseCategoryId + " versions is empty!");
-                    throw new IllegalStateException("Expense category versions is empty!");
-                });
+    public Optional<ExpenseCategoryVersion> getCurrentCategoryVersion(Long expenseCategoryId) {
+        List<ExpenseCategoryVersion> expenseCategoryVersions = getCategoryVersions(expenseCategoryId);
+        if(expenseCategoryVersions.isEmpty()) {
+            return Optional.empty();
+        }
         return obtainCurrentCategoryVersion(expenseCategoryVersions);
     }
 
-    private ExpenseCategoryVersion obtainCurrentCategoryVersion(List<ExpenseCategoryVersion> expenseCategoryVersions) {
-        Optional<ExpenseCategoryVersion> newestVersionOptional = expenseCategoryVersions
+    private Optional<ExpenseCategoryVersion> obtainCurrentCategoryVersion(List<ExpenseCategoryVersion> expenseCategoryVersions) {
+        return expenseCategoryVersions
                 .stream()
-                .filter(expenseCategoryVersion -> YearMonth.of(expenseCategoryVersion.getValidMonth().getYear(), expenseCategoryVersion.getValidMonth().getMonth())
-                        .isBefore(YearMonth.now().plusMonths(1)))
+                .filter(expenseCategoryVersion -> convertToYearMonth(expenseCategoryVersion.getValidMonth()).isBefore(YearMonth.now().plusMonths(1)))
                 .max(Comparator.comparing(ExpenseCategoryVersion::getValidMonth));
-        if(newestVersionOptional.isEmpty()) {
-            log.error("Not found current version!");
-            throw new IllegalStateException("Not found current version!");
-        }
-        return newestVersionOptional.get();
     }
 
     public List<ExpenseCategoryVersion> getCategoryVersions(Long expenseCategoryId) {
@@ -53,32 +48,25 @@ public class ExpenseCategoryVersionService {
                 .findByExpenseCategoryId(expenseCategoryId).orElse(Collections.emptyList());
     }
 
-    public ExpenseCategoryVersion addNewVersionForNextMonth(User user, long categoryId, Double newMaximumAmount) {
+    public ExpenseCategoryVersion updateCategoryVersion(User user, long categoryId, Double newMaximumAmount, YearMonth validMonth) {
         CategoryValidator.validateMaximumAmount(BigDecimal.valueOf(newMaximumAmount));
-        return addNewVersion(user, categoryId, newMaximumAmount, getNextMonthFromNow());
-    }
-
-    private YearMonth getNextMonthFromNow() {
-        return YearMonth.now().plusMonths(1);
-    }
-
-    public ExpenseCategoryVersion editCategoryVersion(User user, long categoryId, Double newMaximumAmount) {
-        CategoryValidator.validateMaximumAmount(BigDecimal.valueOf(newMaximumAmount));
-        findExpenseCategoryByIdAndUser(categoryId, user);
-        ExpenseCategoryVersion currentCategoryVersion = getCurrentCategoryVersion(categoryId);
-
-        if(currentCategoryVersion.getValidMonth().isBefore(YearMonth.now().atEndOfMonth())) {
-            return addNewVersion(user, categoryId, newMaximumAmount, YearMonth.now());
-        }
-        return updateCategoryVersion(currentCategoryVersion, newMaximumAmount);
-    }
-
-    private ExpenseCategoryVersion addNewVersion(User user, long categoryId, Double newMaximumAmount, YearMonth validMonth) {
         ExpenseCategory category = findExpenseCategoryByIdAndUser(categoryId, user);
-        Optional<ExpenseCategoryVersion> expenseCategoryVersionOptional = expenseCategoryVersionRepository.findByExpenseCategoryAndValidMonth(category, validMonth.atDay(1));
+        Optional<ExpenseCategoryVersion> expenseCategoryVersionOptional = getVersionByValidMonth(categoryId, validMonth);
+
         return expenseCategoryVersionOptional
                 .map(categoryVersion -> updateCategoryVersion(categoryVersion, newMaximumAmount))
                 .orElseGet(() -> expenseCategorySaver.saveExpenseCategoryVersion(BigDecimal.valueOf(newMaximumAmount), category, validMonth));
+    }
+
+    private Optional<ExpenseCategoryVersion> getVersionByValidMonth(long categoryId, YearMonth validMonth) {
+        List<ExpenseCategoryVersion> categoryVersions = getCategoryVersions(categoryId);
+        for (ExpenseCategoryVersion expenseCategoryVersion : categoryVersions) {
+            YearMonth yearMonth = YearMonth.of(expenseCategoryVersion.getValidMonth().getYear(), expenseCategoryVersion.getValidMonth().getMonth());
+            if (yearMonth.equals(validMonth)) {
+                return Optional.of(expenseCategoryVersion);
+            }
+        }
+        return empty();
     }
 
     private ExpenseCategory findExpenseCategoryByIdAndUser(long categoryId, User user) {

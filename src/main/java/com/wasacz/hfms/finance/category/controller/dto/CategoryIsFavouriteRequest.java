@@ -1,4 +1,4 @@
-package com.wasacz.hfms.finance.category.controller;
+package com.wasacz.hfms.finance.category.controller.dto;
 
 import lombok.*;
 

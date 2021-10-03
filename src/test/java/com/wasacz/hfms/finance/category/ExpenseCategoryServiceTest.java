@@ -1,9 +1,8 @@
-package com.wasacz.hfms.finance.category.expense;
+package com.wasacz.hfms.finance.category;
 
-import com.wasacz.hfms.finance.category.TransactionSummaryProvider;
-import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
-import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryVersionMapper;
-import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryVersionResponse;
+import com.wasacz.hfms.finance.category.controller.dto.ExpenseCategoryResponse;
+import com.wasacz.hfms.finance.category.controller.ExpenseCategoryVersionMapper;
+import com.wasacz.hfms.finance.category.controller.dto.ExpenseCategoryVersionResponse;
 import com.wasacz.hfms.finance.transaction.TransactionType;
 import com.wasacz.hfms.persistence.*;
 import org.junit.jupiter.api.Test;
@@ -82,7 +81,7 @@ class ExpenseCategoryServiceTest {
                 .build();
 
         when(expenseCategorySaver.saveExpenseCategory(any(ExpenseCategoryObj.class), any(User.class))).thenReturn(expenseCategoryVersion);
-        when(expenseCategoryVersionService.getCurrentCategoryVersion(any(Long.class))).thenReturn(expenseCategoryVersion);
+        when(expenseCategoryVersionService.getCurrentCategoryVersion(any(Long.class))).thenReturn(Optional.of(expenseCategoryVersion));
         when(expenseCategoryVersionService.getCategoryVersions(any(Long.class))).thenReturn(List.of(expenseCategoryVersion));
         when(expenseCategoryVersionMapper.mapExpenseCategoryVersionToResponse(any(ExpenseCategoryVersion.class))).thenReturn(expenseCategoryVersionResponse);
         when(expenseCategoryVersionMapper.mapExpenseCategoryVersionsListToResponse(anyList())).thenReturn(List.of(expenseCategoryVersionResponse));

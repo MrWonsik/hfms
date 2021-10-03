@@ -1,5 +1,6 @@
-package com.wasacz.hfms.finance.category.controller;
+package com.wasacz.hfms.finance.category.controller.dto;
 
+import com.wasacz.hfms.finance.category.controller.dto.AbstractCategoryResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

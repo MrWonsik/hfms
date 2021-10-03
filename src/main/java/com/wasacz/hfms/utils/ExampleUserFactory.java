@@ -1,10 +1,10 @@
 package com.wasacz.hfms.utils;
 
-import com.wasacz.hfms.finance.category.CategoryServiceFactory;
-import com.wasacz.hfms.finance.category.CategoryServiceType;
-import com.wasacz.hfms.finance.category.controller.AbstractCategoryResponse;
-import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryVersionService;
+import com.wasacz.hfms.finance.category.ExpenseCategoryService;
+import com.wasacz.hfms.finance.category.IncomeCategoryService;
+import com.wasacz.hfms.finance.category.controller.dto.AbstractCategoryResponse;
+import com.wasacz.hfms.finance.category.controller.dto.CategoriesResponse;
+import com.wasacz.hfms.finance.category.ExpenseCategoryVersionService;
 import com.wasacz.hfms.finance.transaction.TransactionServiceFactory;
 import com.wasacz.hfms.finance.transaction.TransactionType;
 import com.wasacz.hfms.finance.transaction.expense.ExpenseObj;
@@ -16,10 +16,7 @@ import com.wasacz.hfms.user.management.service.UserManagementService;
 import com.wasacz.hfms.utils.randomizer.Randomizer;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.Random;
@@ -36,14 +33,16 @@ public class ExampleUserFactory {
     private final UserManagementService userManagementService;
     private final TransactionServiceFactory transactionServiceFactory;
     private final UserRepository userRepository;
-    private final CategoryServiceFactory categoryServiceFactory;
+    private final ExpenseCategoryService expenseCategoryService;
+    private final IncomeCategoryService incomeCategoryService;
     private final ExpenseCategoryVersionService expenseCategoryVersionService;
 
-    public ExampleUserFactory(UserManagementService userManagementService, TransactionServiceFactory transactionServiceFactory, UserRepository userRepository, CategoryServiceFactory categoryServiceFactory, Randomizer randomizer, ExpenseCategoryVersionService expenseCategoryVersionService) {
+    public ExampleUserFactory(UserManagementService userManagementService, TransactionServiceFactory transactionServiceFactory, UserRepository userRepository, ExpenseCategoryService expenseCategoryService, IncomeCategoryService incomeCategoryService, Randomizer randomizer, ExpenseCategoryVersionService expenseCategoryVersionService) {
         this.userManagementService = userManagementService;
         this.transactionServiceFactory = transactionServiceFactory;
         this.userRepository = userRepository;
-        this.categoryServiceFactory = categoryServiceFactory;
+        this.expenseCategoryService = expenseCategoryService;
+        this.incomeCategoryService = incomeCategoryService;
         incomeCategories = randomizer.getIncomeCategories();
         expenseCategories = randomizer.getExpenseCategories();
         this.expenseCategoryVersionService = expenseCategoryVersionService;
@@ -79,11 +78,11 @@ public class ExampleUserFactory {
     }
 
     private void createExamplePlannedAmounts(User user) {
-        CategoriesResponse allExpenseCategories = categoryServiceFactory.getService(CategoryServiceType.EXPENSE).getAllCategories(user);
+        CategoriesResponse allExpenseCategories = expenseCategoryService.getAllCategories(user);
         allExpenseCategories.getCategories().forEach(abstractCategoryResponse -> {
                     if (expenseCategories.containsKey(abstractCategoryResponse.getCategoryName())) {
                         Randomizer.Properties properties = expenseCategories.get(abstractCategoryResponse.getCategoryName());
-                        expenseCategoryVersionService.editCategoryVersion(user, abstractCategoryResponse.getId(), properties.getPlannedAmount().doubleValue());
+                        expenseCategoryVersionService.updateCategoryVersion(user, abstractCategoryResponse.getId(), properties.getPlannedAmount().doubleValue(), YearMonth.now());
                     }
                 });
     }
@@ -94,7 +93,7 @@ public class ExampleUserFactory {
     }
 
     private void createExampleIncomeTransactions(User user) {
-        CategoriesResponse allIncomeCategories = categoryServiceFactory.getService(CategoryServiceType.INCOME).getAllCategories(user);
+        CategoriesResponse allIncomeCategories = incomeCategoryService.getAllCategories(user);
         createSalaryIncomes(user, allIncomeCategories);
         createRandomIncomes(user, allIncomeCategories, "Selling", 4);
         createRandomIncomes(user, allIncomeCategories, "Gifts", 4);
@@ -135,7 +134,7 @@ public class ExampleUserFactory {
     }
 
     private void createExampleExpenseTransactions(User user) {
-        CategoriesResponse allExpenseCategories = categoryServiceFactory.getService(CategoryServiceType.EXPENSE).getAllCategories(user);
+        CategoriesResponse allExpenseCategories = expenseCategoryService.getAllCategories(user);
         createBillsExpenses(user, allExpenseCategories);
         createRandomExpense(user, allExpenseCategories, "Grocery Shopping", 200);
         createRandomExpense(user, allExpenseCategories, "Transport", 50);

@@ -1,6 +1,8 @@
-package com.wasacz.hfms.finance.category.expense.controller;
+package com.wasacz.hfms.finance.category.controller;
 
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryVersionService;
+import com.wasacz.hfms.finance.category.ExpenseCategoryVersionService;
+import com.wasacz.hfms.finance.category.controller.dto.ExpenseCategoryMaximumAmountRequest;
+import com.wasacz.hfms.persistence.ExpenseCategoryVersion;
 import com.wasacz.hfms.security.CurrentUser;
 import com.wasacz.hfms.security.UserPrincipal;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.YearMonth;
 
 @RestController
 @Slf4j
@@ -33,23 +36,16 @@ public class ExpenseCategoryManagementController {
 
     @PutMapping("/expense/{id}/version")
     @Secured({"ROLE_USER"})
-    public ResponseEntity<?> editMaximumAmountExpenseCategory(@CurrentUser UserPrincipal user,
-                                                            @PathVariable("id") long categoryId,
-                                                            @RequestBody ExpenseCategoryMaximumAmountRequest expenseCategoryMaximumAmountRequest) {
-        ExpenseCategoryVersionResponse expenseCategoryVersionResponse;
-        if(expenseCategoryMaximumAmountRequest.getIsValidFromNextMonth()) {
-            expenseCategoryVersionResponse = expenseCategoryVersionMapper.mapExpenseCategoryVersionToResponse(
-                    expenseCategoryVersionService.addNewVersionForNextMonth(user.getUser(),
-                                    categoryId,
-                                    expenseCategoryMaximumAmountRequest.getNewMaximumAmount()));
-        } else {
-            expenseCategoryVersionResponse = expenseCategoryVersionMapper.mapExpenseCategoryVersionToResponse(
-                    expenseCategoryVersionService.editCategoryVersion(user.getUser(),
-                            categoryId,
-                            expenseCategoryMaximumAmountRequest.getNewMaximumAmount())
-            );
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(expenseCategoryVersionResponse);
+    public ResponseEntity<?> updateMaximumAmountExpenseCategory(@CurrentUser UserPrincipal user,
+                                                                @PathVariable("id") long categoryId,
+                                                                @RequestBody ExpenseCategoryMaximumAmountRequest request) {
+
+        YearMonth now = YearMonth.now();
+        ExpenseCategoryVersion expenseCategoryVersion = expenseCategoryVersionService.updateCategoryVersion(user.getUser(),
+                categoryId,
+                request.getNewMaximumAmount(),
+                request.getIsValidFromNextMonth() ? now.plusMonths(1) : now);
+        return ResponseEntity.status(HttpStatus.OK).body(expenseCategoryVersionMapper.mapExpenseCategoryVersionToResponse(expenseCategoryVersion));
     }
 
 }

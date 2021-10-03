@@ -1,4 +1,4 @@
-package com.wasacz.hfms.finance.category.expense;
+package com.wasacz.hfms.finance.category;
 
 import com.wasacz.hfms.persistence.*;
 import lombok.extern.slf4j.Slf4j;
@@ -16,12 +16,12 @@ public class ExpenseCategorySaver {
     private final ExpenseCategoryVersionRepository expenseCategoryVersionRepository;
     private final ExpenseCategoryRepository expenseCategoryRepository;
 
-    public ExpenseCategorySaver(ExpenseCategoryVersionRepository expenseCategoryVersionRepository, ExpenseCategoryRepository expenseCategoryRepository) {
+    ExpenseCategorySaver(ExpenseCategoryVersionRepository expenseCategoryVersionRepository, ExpenseCategoryRepository expenseCategoryRepository) {
         this.expenseCategoryVersionRepository = expenseCategoryVersionRepository;
         this.expenseCategoryRepository = expenseCategoryRepository;
     }
 
-    public ExpenseCategoryVersion saveExpenseCategory(ExpenseCategoryObj expenseCategoryObj, User user) {
+    ExpenseCategoryVersion saveExpenseCategory(ExpenseCategoryObj expenseCategoryObj, User user) {
         ExpenseCategory expenseCategoryPersistence = buildExpenseCategory(expenseCategoryObj, user);
         ExpenseCategory savedExpenseCategory = expenseCategoryRepository.save(expenseCategoryPersistence);
         return saveExpenseCategoryVersion(expenseCategoryObj.getMaximumAmount(), savedExpenseCategory);
@@ -41,7 +41,7 @@ public class ExpenseCategorySaver {
         return expenseCategoryVersionRepository.save(expenseCategoryVersion);
     }
 
-    public ExpenseCategoryVersion saveExpenseCategoryVersion(BigDecimal maximumAmount, ExpenseCategory expenseCategoryPersistence, YearMonth validMonth) {
+    ExpenseCategoryVersion saveExpenseCategoryVersion(BigDecimal maximumAmount, ExpenseCategory expenseCategoryPersistence, YearMonth validMonth) {
         ExpenseCategoryVersion expenseCategoryVersion = buildExpenseCategoryVersionPersistence(maximumAmount, expenseCategoryPersistence, validMonth);
         ExpenseCategoryVersion saved = expenseCategoryVersionRepository.save(expenseCategoryVersion);
         log.debug("Expense category version: " + expenseCategoryPersistence.getCategoryName() + " for month: " + validMonth.toString() + " has been saved");

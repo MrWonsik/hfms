@@ -1,18 +1,18 @@
-package com.wasacz.hfms.finance.category.expense;
+package com.wasacz.hfms.finance.category;
 
-import com.wasacz.hfms.finance.category.*;
-import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
-import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryResponse;
-import com.wasacz.hfms.finance.category.expense.controller.ExpenseCategoryVersionMapper;
+import com.wasacz.hfms.finance.category.controller.dto.CategoriesResponse;
+import com.wasacz.hfms.finance.category.controller.dto.ExpenseCategoryResponse;
+import com.wasacz.hfms.finance.category.controller.dto.ExpenseCategoryResponse.ExpenseCategoryResponseBuilder;
+import com.wasacz.hfms.finance.category.controller.ExpenseCategoryVersionMapper;
 import com.wasacz.hfms.finance.transaction.TransactionType;
 import com.wasacz.hfms.persistence.*;
 import com.wasacz.hfms.utils.date.DateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,7 +64,7 @@ public class ExpenseCategoryService implements ICategoryService {
         return mapExpenseCategoryResponse(updatedExpenseCategory);
     }
 
-    public ExpenseCategory findByIdAndUser(long expenseCategoryId, User user) {
+    private ExpenseCategory findByIdAndUser(long expenseCategoryId, User user) {
         return expenseCategoryRepository
                 .findByIdAndUserAndIsDeletedFalse(expenseCategoryId, user)
                 .orElseThrow(() -> {
@@ -104,20 +104,25 @@ public class ExpenseCategoryService implements ICategoryService {
 
 
     private ExpenseCategoryResponse mapExpenseCategoryResponse(ExpenseCategory expenseCategory) {
-        return ExpenseCategoryResponse.builder()
+
+        ExpenseCategoryResponseBuilder expenseCategoryResponseBuilder = ExpenseCategoryResponse.builder()
                 .id(expenseCategory.getId())
                 .categoryName(expenseCategory.getCategoryName())
                 .colorHex(expenseCategory.getColorHex())
                 .isDeleted(expenseCategory.getIsDeleted())
                 .isFavourite(expenseCategory.getIsFavourite())
-                .currentVersion(expenseCategoryVersionMapper.mapExpenseCategoryVersionToResponse(
-                        expenseCategoryVersionService.getCurrentCategoryVersion(expenseCategory.getId()))
-                )
                 .expenseCategoryVersions(expenseCategoryVersionMapper.mapExpenseCategoryVersionsListToResponse(
                         expenseCategoryVersionService.getCategoryVersions(expenseCategory.getId()))
                 )
                 .createDate(new DateTime(expenseCategory.getCreatedDate()))
-                .summaryTransactionMap(transactionSummaryProvider.getTransactionMapProvider(expenseCategory.getId(), TransactionType.EXPENSE))
-                .build();
+                .summaryTransactionMap(transactionSummaryProvider.getTransactionMapProvider(expenseCategory.getId(), TransactionType.EXPENSE));
+
+        Optional<ExpenseCategoryVersion> currentCategoryVersion = expenseCategoryVersionService.getCurrentCategoryVersion(expenseCategory.getId());
+        if(currentCategoryVersion.isPresent()) {
+            expenseCategoryResponseBuilder
+                    .currentVersion(expenseCategoryVersionMapper.mapExpenseCategoryVersionToResponse(currentCategoryVersion.get()));
+        }
+
+        return expenseCategoryResponseBuilder.build();
     }
 }

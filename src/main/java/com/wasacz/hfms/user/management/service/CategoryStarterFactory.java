@@ -1,9 +1,9 @@
 package com.wasacz.hfms.user.management.service;
 
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryObj;
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryService;
-import com.wasacz.hfms.finance.category.income.IncomeCategoryObj;
-import com.wasacz.hfms.finance.category.income.IncomeCategoryService;
+import com.wasacz.hfms.finance.category.ExpenseCategoryObj;
+import com.wasacz.hfms.finance.category.ExpenseCategoryService;
+import com.wasacz.hfms.finance.category.IncomeCategoryObj;
+import com.wasacz.hfms.finance.category.IncomeCategoryService;
 import com.wasacz.hfms.persistence.User;
 import org.springframework.stereotype.Service;
 

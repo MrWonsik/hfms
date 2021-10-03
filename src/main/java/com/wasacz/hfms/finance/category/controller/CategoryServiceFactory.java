@@ -1,5 +1,7 @@
-package com.wasacz.hfms.finance.category;
+package com.wasacz.hfms.finance.category.controller;
 
+import com.wasacz.hfms.finance.category.CategoryServiceType;
+import com.wasacz.hfms.finance.category.ICategoryService;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -8,15 +10,15 @@ import java.util.Set;
 
 
 @Service
-public class CategoryServiceFactory {
+class CategoryServiceFactory {
 
     private Map<CategoryServiceType, ICategoryService> categoryServices;
 
-    public CategoryServiceFactory(Set<ICategoryService> categoryServiceSet) {
+    CategoryServiceFactory(Set<ICategoryService> categoryServiceSet) {
         createCategoryService(categoryServiceSet);
     }
 
-    public ICategoryService getService(CategoryServiceType strategyName) {
+    ICategoryService getService(CategoryServiceType strategyName) {
         return categoryServices.get(strategyName);
     }
     private void createCategoryService(Set<ICategoryService> categoryServiceSet) {

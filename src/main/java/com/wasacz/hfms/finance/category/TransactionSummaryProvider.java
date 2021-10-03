@@ -12,15 +12,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class TransactionSummaryProvider {
+class TransactionSummaryProvider {
 
     private final TransactionServiceFactory transactionServiceFactory;
 
-    public TransactionSummaryProvider(TransactionServiceFactory transactionServiceFactory) {
+    TransactionSummaryProvider(TransactionServiceFactory transactionServiceFactory) {
         this.transactionServiceFactory = transactionServiceFactory;
     }
 
-    public Map<YearMonth, Double> getTransactionMapProvider(long categoryId, TransactionType transactionType) {
+    Map<YearMonth, Double> getTransactionMapProvider(long categoryId, TransactionType transactionType) {
         AbstractTransactionResponse theOldestTransactionForCategory = transactionServiceFactory.getService(transactionType).getTheOldestTransactionForCategory(categoryId);
         if(theOldestTransactionForCategory == null) {
             return Collections.emptyMap();
@@ -31,7 +31,7 @@ public class TransactionSummaryProvider {
         Map<YearMonth, Double> summaryMap = new HashMap<>();
 
         while(!createdDate.isAfter(now)) {
-            YearMonth yearMonth = YearMonth.of(createdDate.getYear(), createdDate.getMonth());
+            YearMonth yearMonth = LocalDateToYearMonthConverter.convertToYearMonth(createdDate);
             summaryMap.put(yearMonth, transactionServiceFactory.getService(transactionType).getSummaryAmountOfCategoryForMonth(categoryId, yearMonth).doubleValue());
             createdDate = createdDate.plusMonths(1);
         }

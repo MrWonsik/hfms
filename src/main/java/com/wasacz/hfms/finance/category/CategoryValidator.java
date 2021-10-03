@@ -1,7 +1,5 @@
 package com.wasacz.hfms.finance.category;
 
-import com.wasacz.hfms.finance.category.expense.ExpenseCategoryObj;
-import com.wasacz.hfms.finance.category.income.IncomeCategoryObj;
 import com.wasacz.hfms.utils.ValidatorUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,25 +10,25 @@ import static com.wasacz.hfms.utils.HexColorUtils.*;
 @Slf4j
 public class CategoryValidator {
 
-    public static void validate(ExpenseCategoryObj expenseCategory) {
+    static void validate(ExpenseCategoryObj expenseCategory) {
         validateName(expenseCategory.getCategoryName());
         validateHexColor(expenseCategory.getColorHex());
         validateMaximumAmount(expenseCategory.getMaximumAmount());
     }
 
-    public static void validate(IncomeCategoryObj incomeCategory) {
+    static void validate(IncomeCategoryObj incomeCategory) {
         validateName(incomeCategory.getCategoryName());
         validateHexColor(incomeCategory.getColorHex());
     }
 
-    public static void validateBeforeEdit(String categoryName, String hexColor) {
+    static void validateBeforeEdit(String categoryName, String hexColor) {
         if(categoryName != null) {
             validateName(categoryName);
         }
         validateHexColor(hexColor);
     }
 
-    public static void validateMaximumAmount(BigDecimal maximumAmount) {
+    static void validateMaximumAmount(BigDecimal maximumAmount) {
         if(maximumAmount == null) {
             return;
         }
@@ -44,7 +42,7 @@ public class CategoryValidator {
         ValidatorUtils.handleFieldBlank(categoryName, "categoryName");
     }
 
-    public static void validateHexColor(String hexColor) {
+    static void validateHexColor(String hexColor) {
         if(hexColor == null) {
             return;
         }
