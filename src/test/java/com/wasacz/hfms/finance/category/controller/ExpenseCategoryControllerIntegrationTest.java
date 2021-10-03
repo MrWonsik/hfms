@@ -2,8 +2,6 @@ package com.wasacz.hfms.finance.category.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wasacz.hfms.finance.category.ExpenseCategoryObj;
-import com.wasacz.hfms.finance.category.controller.dto.ExpenseCategoryMaximumAmountRequest;
-import com.wasacz.hfms.finance.category.controller.dto.ExpenseCategoryVersionResponse;
 import com.wasacz.hfms.helpers.CurrentUserMock;
 import com.wasacz.hfms.persistence.Role;
 import com.wasacz.hfms.security.UserPrincipal;

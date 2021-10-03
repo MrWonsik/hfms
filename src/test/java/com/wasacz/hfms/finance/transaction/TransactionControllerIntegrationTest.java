@@ -1,8 +1,8 @@
 package com.wasacz.hfms.finance.transaction;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wasacz.hfms.finance.category.controller.dto.ExpenseCategoryResponse;
-import com.wasacz.hfms.finance.category.controller.dto.IncomeCategoryResponse;
+import com.wasacz.hfms.finance.category.controller.ExpenseCategoryResponse;
+import com.wasacz.hfms.finance.category.controller.IncomeCategoryResponse;
 import com.wasacz.hfms.finance.transaction.expense.ExpenseResponse;
 import com.wasacz.hfms.finance.shop.ShopObj;
 import com.wasacz.hfms.finance.shop.ShopResponse;

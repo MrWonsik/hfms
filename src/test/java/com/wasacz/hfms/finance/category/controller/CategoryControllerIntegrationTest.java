@@ -5,7 +5,6 @@ import com.wasacz.hfms.finance.category.AbstractCategory;
 import com.wasacz.hfms.finance.category.CategoryServiceType;
 import com.wasacz.hfms.finance.category.ExpenseCategoryObj;
 import com.wasacz.hfms.finance.category.IncomeCategoryObj;
-import com.wasacz.hfms.finance.category.controller.dto.*;
 import com.wasacz.hfms.helpers.CurrentUserMock;
 import com.wasacz.hfms.persistence.Role;
 import com.wasacz.hfms.security.UserPrincipal;

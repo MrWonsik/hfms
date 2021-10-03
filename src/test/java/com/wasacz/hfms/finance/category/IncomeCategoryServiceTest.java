@@ -1,6 +1,6 @@
 package com.wasacz.hfms.finance.category;
 
-import com.wasacz.hfms.finance.category.controller.dto.IncomeCategoryResponse;
+import com.wasacz.hfms.finance.category.controller.IncomeCategoryResponse;
 import com.wasacz.hfms.finance.transaction.TransactionType;
 import com.wasacz.hfms.persistence.IncomeCategory;
 import com.wasacz.hfms.persistence.IncomeCategoryRepository;

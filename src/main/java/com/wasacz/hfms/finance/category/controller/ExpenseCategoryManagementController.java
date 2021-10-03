@@ -1,7 +1,6 @@
 package com.wasacz.hfms.finance.category.controller;
 
 import com.wasacz.hfms.finance.category.ExpenseCategoryVersionService;
-import com.wasacz.hfms.finance.category.controller.dto.ExpenseCategoryMaximumAmountRequest;
 import com.wasacz.hfms.persistence.ExpenseCategoryVersion;
 import com.wasacz.hfms.security.CurrentUser;
 import com.wasacz.hfms.security.UserPrincipal;

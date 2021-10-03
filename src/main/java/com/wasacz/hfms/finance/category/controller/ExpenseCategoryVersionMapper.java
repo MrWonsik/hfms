@@ -1,6 +1,5 @@
 package com.wasacz.hfms.finance.category.controller;
 
-import com.wasacz.hfms.finance.category.controller.dto.ExpenseCategoryVersionResponse;
 import com.wasacz.hfms.persistence.ExpenseCategoryVersion;
 import com.wasacz.hfms.utils.date.DateTime;
 import org.springframework.stereotype.Component;

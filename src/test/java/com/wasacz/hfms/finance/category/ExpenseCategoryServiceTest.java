@@ -1,8 +1,8 @@
 package com.wasacz.hfms.finance.category;
 
-import com.wasacz.hfms.finance.category.controller.dto.ExpenseCategoryResponse;
+import com.wasacz.hfms.finance.category.controller.ExpenseCategoryResponse;
 import com.wasacz.hfms.finance.category.controller.ExpenseCategoryVersionMapper;
-import com.wasacz.hfms.finance.category.controller.dto.ExpenseCategoryVersionResponse;
+import com.wasacz.hfms.finance.category.controller.ExpenseCategoryVersionResponse;
 import com.wasacz.hfms.finance.transaction.TransactionType;
 import com.wasacz.hfms.persistence.*;
 import org.junit.jupiter.api.Test;

@@ -2,10 +2,6 @@ package com.wasacz.hfms.finance.category.controller;
 
 import com.wasacz.hfms.finance.category.AbstractCategory;
 import com.wasacz.hfms.finance.category.CategoryServiceType;
-import com.wasacz.hfms.finance.category.controller.dto.AbstractCategoryResponse;
-import com.wasacz.hfms.finance.category.controller.dto.CategoriesResponse;
-import com.wasacz.hfms.finance.category.controller.dto.CategoryIsFavouriteRequest;
-import com.wasacz.hfms.finance.category.controller.dto.EditCategoryRequest;
 import com.wasacz.hfms.security.CurrentUser;
 import com.wasacz.hfms.security.UserPrincipal;
 import lombok.extern.slf4j.Slf4j;

@@ -2,8 +2,8 @@ package com.wasacz.hfms.utils;
 
 import com.wasacz.hfms.finance.category.ExpenseCategoryService;
 import com.wasacz.hfms.finance.category.IncomeCategoryService;
-import com.wasacz.hfms.finance.category.controller.dto.AbstractCategoryResponse;
-import com.wasacz.hfms.finance.category.controller.dto.CategoriesResponse;
+import com.wasacz.hfms.finance.category.controller.AbstractCategoryResponse;
+import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
 import com.wasacz.hfms.finance.category.ExpenseCategoryVersionService;
 import com.wasacz.hfms.finance.transaction.TransactionServiceFactory;
 import com.wasacz.hfms.finance.transaction.TransactionType;
