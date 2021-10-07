@@ -1,8 +1,8 @@
 package com.wasacz.hfms.finance.category;
 
+import com.wasacz.hfms.finance.ServiceType;
 import com.wasacz.hfms.finance.transaction.AbstractTransactionResponse;
 import com.wasacz.hfms.finance.transaction.TransactionServiceFactory;
-import com.wasacz.hfms.finance.transaction.TransactionType;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -20,8 +20,8 @@ class TransactionSummaryProvider {
         this.transactionServiceFactory = transactionServiceFactory;
     }
 
-    Map<YearMonth, Double> getTransactionMapProvider(long categoryId, TransactionType transactionType) {
-        AbstractTransactionResponse theOldestTransactionForCategory = transactionServiceFactory.getService(transactionType).getTheOldestTransactionForCategory(categoryId);
+    Map<YearMonth, Double> getTransactionMapProvider(long categoryId, ServiceType serviceType) {
+        AbstractTransactionResponse theOldestTransactionForCategory = transactionServiceFactory.getService(serviceType).getTheOldestTransactionForCategory(categoryId);
         if(theOldestTransactionForCategory == null) {
             return Collections.emptyMap();
         }
@@ -32,7 +32,7 @@ class TransactionSummaryProvider {
 
         while(!createdDate.isAfter(now)) {
             YearMonth yearMonth = LocalDateToYearMonthConverter.convertToYearMonth(createdDate);
-            summaryMap.put(yearMonth, transactionServiceFactory.getService(transactionType).getSummaryAmountOfCategoryForMonth(categoryId, yearMonth).doubleValue());
+            summaryMap.put(yearMonth, transactionServiceFactory.getService(serviceType).getSummaryAmountOfCategoryForMonth(categoryId, yearMonth).doubleValue());
             createdDate = createdDate.plusMonths(1);
         }
 

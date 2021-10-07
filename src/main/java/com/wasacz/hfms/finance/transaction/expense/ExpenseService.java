@@ -1,8 +1,8 @@
 package com.wasacz.hfms.finance.transaction.expense;
 
+import com.wasacz.hfms.finance.ServiceType;
 import com.wasacz.hfms.finance.shop.ShopObj;
 import com.wasacz.hfms.finance.transaction.*;
-import com.wasacz.hfms.finance.shop.ShopManagementService;
 import com.wasacz.hfms.finance.shop.ShopValidator;
 import com.wasacz.hfms.finance.transaction.expense.expensePositions.ExpensePositionService;
 import com.wasacz.hfms.finance.transaction.expense.receiptFile.FileReceiptResponse;
@@ -31,7 +31,7 @@ public class ExpenseService implements ITransactionService {
     private final ExpensePositionService expensePositionService;
     private final ReceiptFileService receiptFileService;
 
-    public ExpenseService(ExpenseRepository expenseRepository, ExpenseCategoryRepository expenseCategoryRepository, ShopManagementService shopManagementService, ShopRepository shopRepository, ExpensePositionService expensePositionService, ReceiptFileService receiptFileService) {
+    public ExpenseService(ExpenseRepository expenseRepository, ExpenseCategoryRepository expenseCategoryRepository, ShopRepository shopRepository, ExpensePositionService expensePositionService, ReceiptFileService receiptFileService) {
         this.expenseRepository = expenseRepository;
         this.expenseCategoryRepository = expenseCategoryRepository;
         this.shopRepository = shopRepository;
@@ -126,8 +126,8 @@ public class ExpenseService implements ITransactionService {
     }
 
     @Override
-    public TransactionType getService() {
-        return TransactionType.EXPENSE;
+    public ServiceType getService() {
+        return ServiceType.EXPENSE;
     }
 
     @Override

@@ -1,10 +1,11 @@
 package com.wasacz.hfms.finance.category;
 
+import com.wasacz.hfms.finance.ServiceType;
+import com.wasacz.hfms.finance.category.controller.AbstractCategoryResponse;
 import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
 import com.wasacz.hfms.finance.category.controller.ExpenseCategoryResponse;
 import com.wasacz.hfms.finance.category.controller.ExpenseCategoryResponse.ExpenseCategoryResponseBuilder;
 import com.wasacz.hfms.finance.category.controller.ExpenseCategoryVersionMapper;
-import com.wasacz.hfms.finance.transaction.TransactionType;
 import com.wasacz.hfms.persistence.*;
 import com.wasacz.hfms.utils.date.DateTime;
 import lombok.extern.slf4j.Slf4j;
@@ -115,7 +116,7 @@ public class ExpenseCategoryService implements ICategoryService {
                         expenseCategoryVersionService.getCategoryVersions(expenseCategory.getId()))
                 )
                 .createDate(new DateTime(expenseCategory.getCreatedDate()))
-                .summaryTransactionMap(transactionSummaryProvider.getTransactionMapProvider(expenseCategory.getId(), TransactionType.EXPENSE));
+                .summaryTransactionMap(transactionSummaryProvider.getTransactionMapProvider(expenseCategory.getId(), ServiceType.EXPENSE));
 
         Optional<ExpenseCategoryVersion> currentCategoryVersion = expenseCategoryVersionService.getCurrentCategoryVersion(expenseCategory.getId());
         if(currentCategoryVersion.isPresent()) {

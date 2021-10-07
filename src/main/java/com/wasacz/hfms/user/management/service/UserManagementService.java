@@ -103,5 +103,4 @@ public class UserManagementService {
                 .updateDate(LocalDate.ofInstant(user.getLastModifiedDate(), ZoneId.systemDefault()))
                 .build();
     }
-
 }

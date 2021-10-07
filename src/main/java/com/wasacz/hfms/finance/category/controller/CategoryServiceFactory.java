@@ -1,6 +1,6 @@
 package com.wasacz.hfms.finance.category.controller;
 
-import com.wasacz.hfms.finance.category.CategoryServiceType;
+import com.wasacz.hfms.finance.ServiceType;
 import com.wasacz.hfms.finance.category.ICategoryService;
 import org.springframework.stereotype.Service;
 
@@ -10,15 +10,15 @@ import java.util.Set;
 
 
 @Service
-class CategoryServiceFactory {
+public class CategoryServiceFactory {
 
-    private Map<CategoryServiceType, ICategoryService> categoryServices;
+    private Map<ServiceType, ICategoryService> categoryServices;
 
     CategoryServiceFactory(Set<ICategoryService> categoryServiceSet) {
         createCategoryService(categoryServiceSet);
     }
 
-    ICategoryService getService(CategoryServiceType strategyName) {
+    public ICategoryService getService(ServiceType strategyName) {
         return categoryServices.get(strategyName);
     }
     private void createCategoryService(Set<ICategoryService> categoryServiceSet) {
@@ -27,11 +27,11 @@ class CategoryServiceFactory {
                 categoryService -> categoryServices.put(getServiceType(categoryService), categoryService));
     }
 
-    private CategoryServiceType getServiceType(ICategoryService categoryService) {
+    private ServiceType getServiceType(ICategoryService categoryService) {
         String serviceName = categoryService.getServiceName();
         return switch (serviceName) {
-            case "EXPENSE_CATEGORY_SERVICE" -> CategoryServiceType.EXPENSE;
-            case "INCOME_CATEGORY_SERVICE" -> CategoryServiceType.INCOME;
+            case "EXPENSE_CATEGORY_SERVICE" -> ServiceType.EXPENSE;
+            case "INCOME_CATEGORY_SERVICE" -> ServiceType.INCOME;
             default -> throw new IllegalArgumentException("Invalid service name.");
         };
     }

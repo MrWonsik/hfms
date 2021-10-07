@@ -1,5 +1,6 @@
 package com.wasacz.hfms.finance.transaction;
 
+import com.wasacz.hfms.finance.ServiceType;
 import com.wasacz.hfms.persistence.User;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,7 +18,7 @@ public interface ITransactionService {
 
     AbstractTransactionResponse delete(long transactionId, User user);
 
-    TransactionType getService();
+    ServiceType getService();
 
     AbstractTransactionResponse updateTransaction(Long transactionId, AbstractTransaction transaction, User user);
 

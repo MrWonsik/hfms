@@ -1,5 +1,6 @@
 package com.wasacz.hfms.finance.transaction.income;
 
+import com.wasacz.hfms.finance.ServiceType;
 import com.wasacz.hfms.finance.transaction.*;
 import com.wasacz.hfms.persistence.*;
 import org.springframework.stereotype.Service;
@@ -81,8 +82,8 @@ public class IncomeService implements ITransactionService {
     }
 
     @Override
-    public TransactionType getService() {
-        return TransactionType.INCOME;
+    public ServiceType getService() {
+        return ServiceType.INCOME;
     }
 
     @Override

@@ -1,12 +1,12 @@
 package com.wasacz.hfms.utils;
 
+import com.wasacz.hfms.finance.ServiceType;
 import com.wasacz.hfms.finance.category.ExpenseCategoryService;
 import com.wasacz.hfms.finance.category.IncomeCategoryService;
 import com.wasacz.hfms.finance.category.controller.AbstractCategoryResponse;
 import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
 import com.wasacz.hfms.finance.category.ExpenseCategoryVersionService;
 import com.wasacz.hfms.finance.transaction.TransactionServiceFactory;
-import com.wasacz.hfms.finance.transaction.TransactionType;
 import com.wasacz.hfms.finance.transaction.expense.ExpenseObj;
 import com.wasacz.hfms.finance.transaction.income.IncomeObj;
 import com.wasacz.hfms.persistence.User;
@@ -112,7 +112,7 @@ public class ExampleUserFactory {
                     .categoryId(categoryAbstract.getId())
                     .transactionDate(date)
                     .build();
-            transactionServiceFactory.getService(TransactionType.INCOME).add(income, user, null);
+            transactionServiceFactory.getService(ServiceType.INCOME).add(income, user, null);
             date = date.minusMonths(1L);
         }
     }
@@ -129,7 +129,7 @@ public class ExampleUserFactory {
                     .categoryId(category.getId())
                     .transactionDate(getRandomDate())
                     .build();
-            transactionServiceFactory.getService(TransactionType.INCOME).add(income, user, null);
+            transactionServiceFactory.getService(ServiceType.INCOME).add(income, user, null);
         }
     }
 
@@ -161,7 +161,7 @@ public class ExampleUserFactory {
                         .categoryId(categoryAbstract.getId())
                         .transactionDate(date)
                         .build();
-                transactionServiceFactory.getService(TransactionType.EXPENSE).add(income, user, null);
+                transactionServiceFactory.getService(ServiceType.EXPENSE).add(income, user, null);
                 date = date.minusMonths(1L);
             }
         });
@@ -179,7 +179,7 @@ public class ExampleUserFactory {
                     .categoryId(category.getId())
                     .transactionDate(getRandomDate())
                     .build();
-            transactionServiceFactory.getService(TransactionType.EXPENSE).add(expense, user, null);
+            transactionServiceFactory.getService(ServiceType.EXPENSE).add(expense, user, null);
         }
 
     }

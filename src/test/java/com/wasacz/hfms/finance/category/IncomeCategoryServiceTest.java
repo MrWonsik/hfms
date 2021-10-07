@@ -1,7 +1,7 @@
 package com.wasacz.hfms.finance.category;
 
+import com.wasacz.hfms.finance.ServiceType;
 import com.wasacz.hfms.finance.category.controller.IncomeCategoryResponse;
-import com.wasacz.hfms.finance.transaction.TransactionType;
 import com.wasacz.hfms.persistence.IncomeCategory;
 import com.wasacz.hfms.persistence.IncomeCategoryRepository;
 import com.wasacz.hfms.persistence.User;
@@ -51,7 +51,7 @@ class IncomeCategoryServiceTest {
                 .build();
 
         when(incomeCategoryRepository.save(any(IncomeCategory.class))).thenReturn(incomeCategory);
-        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(TransactionType.class))).thenReturn(Collections.emptyMap());
+        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(ServiceType.class))).thenReturn(Collections.emptyMap());
 
         //when
         IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.addCategory(categoryObj, user);
@@ -79,7 +79,7 @@ class IncomeCategoryServiceTest {
                 .build();
         when(incomeCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(incomeCategory));
         when(incomeCategoryRepository.save(any(IncomeCategory.class))).thenReturn(incomeCategory);
-        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(TransactionType.class))).thenReturn(Collections.emptyMap());
+        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(ServiceType.class))).thenReturn(Collections.emptyMap());
 
         //when
         IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.toggleFavourite(1L, true, user);
@@ -105,7 +105,7 @@ class IncomeCategoryServiceTest {
                 .build();
         when(incomeCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(incomeCategory));
         when(incomeCategoryRepository.save(any(IncomeCategory.class))).thenReturn(incomeCategory);
-        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(TransactionType.class))).thenReturn(Collections.emptyMap());
+        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(ServiceType.class))).thenReturn(Collections.emptyMap());
 
         //when
         IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.deleteCategory(1L, user);
@@ -165,7 +165,7 @@ class IncomeCategoryServiceTest {
                 .build();
         when(incomeCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(incomeCategory));
         when(incomeCategoryRepository.save(any(IncomeCategory.class))).thenReturn(incomeCategoryUpdated);
-        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(TransactionType.class))).thenReturn(Collections.emptyMap());
+        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(ServiceType.class))).thenReturn(Collections.emptyMap());
 
         //when
         IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.editCategory(1L, "CategoryName", "#aaa", user);
@@ -190,7 +190,7 @@ class IncomeCategoryServiceTest {
                 .build();
 
         when(incomeCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(incomeCategory));
-        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(TransactionType.class))).thenReturn(Collections.emptyMap());
+        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(ServiceType.class))).thenReturn(Collections.emptyMap());
 
         //when
         IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.editCategory(1L, null, null, user);
@@ -224,7 +224,7 @@ class IncomeCategoryServiceTest {
                 .build();
         when(incomeCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(incomeCategory));
         when(incomeCategoryRepository.save(any(IncomeCategory.class))).thenReturn(incomeCategoryUpdated);
-        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(TransactionType.class))).thenReturn(Collections.emptyMap());
+        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(ServiceType.class))).thenReturn(Collections.emptyMap());
 
         //when
         IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.editCategory(1L, null, "#aaa", user);
@@ -259,7 +259,7 @@ class IncomeCategoryServiceTest {
                 .build();
         when(incomeCategoryRepository.findByIdAndUserAndIsDeletedFalse(1L, user)).thenReturn(Optional.of(incomeCategory));
         when(incomeCategoryRepository.save(any(IncomeCategory.class))).thenReturn(incomeCategoryUpdated);
-        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(TransactionType.class))).thenReturn(Collections.emptyMap());
+        when(transactionSummaryProvider.getTransactionMapProvider(anyLong(), any(ServiceType.class))).thenReturn(Collections.emptyMap());
 
         //when
         IncomeCategoryResponse incomeCategoryResponse = incomeCategoryService.editCategory(1L, "CategoryName", null, user);

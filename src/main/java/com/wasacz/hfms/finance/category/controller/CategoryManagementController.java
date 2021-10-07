@@ -1,7 +1,7 @@
 package com.wasacz.hfms.finance.category.controller;
 
+import com.wasacz.hfms.finance.ServiceType;
 import com.wasacz.hfms.finance.category.AbstractCategory;
-import com.wasacz.hfms.finance.category.CategoryServiceType;
 import com.wasacz.hfms.security.CurrentUser;
 import com.wasacz.hfms.security.UserPrincipal;
 import lombok.extern.slf4j.Slf4j;
@@ -40,9 +40,9 @@ public class CategoryManagementController {
     @PostMapping("/{type}")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> addCategory(@CurrentUser UserPrincipal user,
-                                         @PathVariable("type") CategoryServiceType categoryServiceType,
+                                         @PathVariable("type") ServiceType serviceType,
                                          @RequestBody AbstractCategory categoryObj) {
-        AbstractCategoryResponse response = categoryServiceFactory.getService(categoryServiceType).addCategory(categoryObj, user.getUser());
+        AbstractCategoryResponse response = categoryServiceFactory.getService(serviceType).addCategory(categoryObj, user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -50,9 +50,9 @@ public class CategoryManagementController {
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> setCategoryAsFavourite(@CurrentUser UserPrincipal user,
                                                     @PathVariable("id") long categoryId,
-                                                    @PathVariable("type") CategoryServiceType categoryServiceType,
+                                                    @PathVariable("type") ServiceType serviceType,
                                                     @RequestBody CategoryIsFavouriteRequest request) {
-        AbstractCategoryResponse response = categoryServiceFactory.getService(categoryServiceType).toggleFavourite(categoryId, request.getIsFavourite(), user.getUser());
+        AbstractCategoryResponse response = categoryServiceFactory.getService(serviceType).toggleFavourite(categoryId, request.getIsFavourite(), user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -60,16 +60,16 @@ public class CategoryManagementController {
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> deleteCategory(@CurrentUser UserPrincipal user,
                                             @PathVariable("id") long categoryId,
-                                            @PathVariable("type") CategoryServiceType categoryServiceType) {
-        AbstractCategoryResponse abstractCategoryResponse = categoryServiceFactory.getService(categoryServiceType).deleteCategory(categoryId, user.getUser());
+                                            @PathVariable("type") ServiceType serviceType) {
+        AbstractCategoryResponse abstractCategoryResponse = categoryServiceFactory.getService(serviceType).deleteCategory(categoryId, user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(abstractCategoryResponse);
     }
 
     @GetMapping("/{type}")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> getAllExpenseCategory(@CurrentUser UserPrincipal user,
-                                                   @PathVariable("type") CategoryServiceType categoryServiceType) {
-        CategoriesResponse categoriesResponse = categoryServiceFactory.getService(categoryServiceType).getAllCategories(user.getUser());
+                                                   @PathVariable("type") ServiceType serviceType) {
+        CategoriesResponse categoriesResponse = categoryServiceFactory.getService(serviceType).getAllCategories(user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(categoriesResponse);
     }
 
@@ -77,9 +77,9 @@ public class CategoryManagementController {
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> editCategory(@CurrentUser UserPrincipal user,
                                                     @PathVariable("id") long categoryId,
-                                                    @PathVariable("type") CategoryServiceType categoryServiceType,
+                                                    @PathVariable("type") ServiceType serviceType,
                                                     @RequestBody EditCategoryRequest editCategoryRequest) {
-        AbstractCategoryResponse abstractCategoryResponse = categoryServiceFactory.getService(categoryServiceType).editCategory(categoryId, editCategoryRequest.getCategoryName(), editCategoryRequest.getColorHex(), user.getUser());
+        AbstractCategoryResponse abstractCategoryResponse = categoryServiceFactory.getService(serviceType).editCategory(categoryId, editCategoryRequest.getCategoryName(), editCategoryRequest.getColorHex(), user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(abstractCategoryResponse);
     }
 

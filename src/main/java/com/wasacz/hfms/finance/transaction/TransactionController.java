@@ -1,5 +1,6 @@
 package com.wasacz.hfms.finance.transaction;
 
+import com.wasacz.hfms.finance.ServiceType;
 import com.wasacz.hfms.security.CurrentUser;
 import com.wasacz.hfms.security.UserPrincipal;
 import lombok.extern.slf4j.Slf4j;
@@ -36,34 +37,34 @@ public class TransactionController {
     public ResponseEntity<?> add(@CurrentUser UserPrincipal user,
                                  @RequestParam(value = "file", required = false) MultipartFile receiptFile,
                                  @RequestPart AbstractTransaction transaction,
-                                 @PathVariable("type") TransactionType transactionType) {
-        AbstractTransactionResponse response = transactionServiceFactory.getService(transactionType).add(transaction, user.getUser(), receiptFile);
+                                 @PathVariable("type") ServiceType serviceType) {
+        AbstractTransactionResponse response = transactionServiceFactory.getService(serviceType).add(transaction, user.getUser(), receiptFile);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping(value = "/{type}")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> getAll(@CurrentUser UserPrincipal user,
-                                    @PathVariable("type") TransactionType transactionType,
+                                    @PathVariable("type") ServiceType serviceType,
                                     @RequestParam(required = false) Integer month,
                                     @RequestParam(required = false) Integer year) {
-        return ResponseEntity.status(HttpStatus.OK).body(obtainTransactionResponse(user, transactionType, month, year));
+        return ResponseEntity.status(HttpStatus.OK).body(obtainTransactionResponse(user, serviceType, month, year));
     }
 
-    private List<AbstractTransactionResponse> obtainTransactionResponse(UserPrincipal user, TransactionType transactionType, Integer month, Integer year) {
+    private List<AbstractTransactionResponse> obtainTransactionResponse(UserPrincipal user, ServiceType serviceType, Integer month, Integer year) {
         if(year != null && month != null) {
-            return transactionServiceFactory.getService(transactionType).getAllForMonthInYear(user.getUser(), YearMonth.of(year, month));
+            return transactionServiceFactory.getService(serviceType).getAllForMonthInYear(user.getUser(), YearMonth.of(year, month));
         } else {
-            return transactionServiceFactory.getService(transactionType).getAll(user.getUser());
+            return transactionServiceFactory.getService(serviceType).getAll(user.getUser());
         }
     }
 
     @DeleteMapping(value = "/{type}/{id}")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> deleteTransaction(@CurrentUser UserPrincipal user,
-                                               @PathVariable("type") TransactionType transactionType,
+                                               @PathVariable("type") ServiceType serviceType,
                                                @PathVariable("id") Long transactionId) {
-        AbstractTransactionResponse response = transactionServiceFactory.getService(transactionType).delete(transactionId, user.getUser());
+        AbstractTransactionResponse response = transactionServiceFactory.getService(serviceType).delete(transactionId, user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -71,10 +72,10 @@ public class TransactionController {
     @PutMapping(value = "/{type}/{id}")
     @Secured({"ROLE_USER"})
     public ResponseEntity<?> updateTransaction(@CurrentUser UserPrincipal user,
-                                    @PathVariable("type") TransactionType transactionType,
+                                    @PathVariable("type") ServiceType serviceType,
                                     @PathVariable("id") Long transactionId,
                                     @RequestBody AbstractTransaction transaction) {
-        AbstractTransactionResponse response = transactionServiceFactory.getService(transactionType).updateTransaction(transactionId, transaction, user.getUser());
+        AbstractTransactionResponse response = transactionServiceFactory.getService(serviceType).updateTransaction(transactionId, transaction, user.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

@@ -1,8 +1,8 @@
 package com.wasacz.hfms.finance.category;
 
+import com.wasacz.hfms.finance.ServiceType;
 import com.wasacz.hfms.finance.category.controller.CategoriesResponse;
 import com.wasacz.hfms.finance.category.controller.IncomeCategoryResponse;
-import com.wasacz.hfms.finance.transaction.TransactionType;
 import com.wasacz.hfms.persistence.*;
 import com.wasacz.hfms.utils.date.DateTime;
 import org.springframework.stereotype.Service;
@@ -104,7 +104,7 @@ public class IncomeCategoryService implements ICategoryService {
                 .isDeleted(incomeCategory.getIsDeleted())
                 .isFavourite(incomeCategory.getIsFavourite())
                 .createDate(new DateTime(incomeCategory.getCreatedDate()))
-                .summaryTransactionMap(transactionSummaryProvider.getTransactionMapProvider(incomeCategory.getId(), TransactionType.INCOME))
+                .summaryTransactionMap(transactionSummaryProvider.getTransactionMapProvider(incomeCategory.getId(), ServiceType.INCOME))
                 .build();
     }
 }
