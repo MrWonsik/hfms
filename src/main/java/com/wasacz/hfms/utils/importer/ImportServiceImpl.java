@@ -38,7 +38,9 @@ public class ImportServiceImpl implements ImportService {
                                 importData.getCategoryId(),
                                 importData.getName());
                         if(transaction != null) {
-                            transactionServiceFactory.getService(importData.getServiceType()).add(transaction, user, null);
+                            if(amount > 0.0) {
+                                transactionServiceFactory.getService(importData.getServiceType()).add(transaction, user, null);
+                            }
                             currentDate = currentDate.plusMonths(1);
                         }
                     }

@@ -12,7 +12,7 @@
     <artifactId>hfms</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>hfms</name>
-    <description>Home finances management system..</description>
+    <description>Home Finances Management System</description>
     <properties>
         <java.version>15</java.version>
     </properties>
